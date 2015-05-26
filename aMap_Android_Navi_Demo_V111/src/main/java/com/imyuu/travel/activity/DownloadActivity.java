@@ -70,7 +70,7 @@ public class DownloadActivity extends Activity {
                     //显示下载错误信息
                     Toast.makeText(DownloadActivity.this, "", Toast.LENGTH_SHORT).show();
                     break;
-            }
+        }
         }
     };
 

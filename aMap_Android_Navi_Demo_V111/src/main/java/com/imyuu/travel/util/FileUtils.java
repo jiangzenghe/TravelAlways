@@ -295,8 +295,11 @@ public class FileUtils {
 
     public static void unzip(File zipFile, String outpath) {
         try {
-
             File outputDir = new File(outpath);
+            if (!outputDir.exists()) {
+                outputDir.mkdirs();
+            }
+
             ZipInputStream in = new ZipInputStream(new FileInputStream(zipFile));
             String outputDirectory = outputDir.getAbsolutePath();
             ZipEntry z;
