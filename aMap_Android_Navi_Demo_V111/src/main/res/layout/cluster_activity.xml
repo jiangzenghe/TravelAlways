@@ -1,0 +1,38 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <LinearLayout
+        android:id="@+id/app_title_container"
+        style="@style/app_title_layout_theme" >
+         <ImageView
+            android:id="@+id/image_cancel_back"
+            android:layout_width="fill_parent"
+            android:layout_height="22dp"
+            android:layout_marginTop="5dp"
+
+            android:gravity="left|center_vertical"
+            android:layout_weight="5"
+           />
+        <com.imyuu.travel.view.DrawableCenterButton
+            android:gravity="center_horizontal|center_vertical"
+            android:drawableRight="@drawable/h74"
+            android:drawablePadding="5dp"
+            android:id="@+id/text_choose_city"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@android:color/transparent"
+            android:text="选择城市"
+            android:textColor="@color/black"
+             android:textSize="17sp"
+            android:paddingRight="16dip"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+    <com.amap.api.maps.MapView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/map_cluster"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" />
+
+</LinearLayout>

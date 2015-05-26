@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+
+    >
+
+    <ImageView
+            android:id="@+id/image_map_line_point"
+            android:src="@drawable/img_map_point"
+            android:background="@drawable/img_map_line"
+            android:layout_width="40dip"
+            android:layout_height="40dip"/>
+    <TextView
+            android:id="@+id/text_map_line_title"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:gravity="center_horizontal"
+            android:textSize="14sp"
+            android:layout_width="80dip"
+            android:layout_height="wrap_content"/>
+</LinearLayout>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="grey"> #ebebeb</color>
+    <color name="black"> #000000</color>
+    <color name="darkgrey"> #C0C0C0</color>
+    <color name="white"> #FFFFFF</color>
+     <color name="red"> #FF0000</color>
+  <color name="darkyellow"> #FFCC33</color>
+    <color name="placeholder">#FFCC33</color>
+    <color name="error">#FFCC33</color>
+<color name="transparent">#ffffff</color>
+    <color name="a2">#ffffff</color>
+    <color name="black_overlay">#66000000</color>
+    <color name="color_black">#000000</color>
+    <color name="color_white">#FFFFFF</color>
+    <color name="color_gray_light">#99C9C9C9</color>
+    <color name="color_black_light">#99000000</color>
+    <color name="color_red">#ffff0000</color>
+</resources>

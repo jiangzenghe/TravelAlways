@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.facebook.fresco/drawee/0.4.0/0.4.0.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.facebook.fresco/drawee/0.4.0/0.4.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.facebook.fresco/fbcore/0.4.0/0.4.0.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.facebook.fresco/fbcore/0.4.0/0.4.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.facebook.fresco/fresco/0.4.0/0.4.0.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.facebook.fresco/fresco/0.4.0/0.4.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.facebook.fresco/imagepipeline/0.4.0/0.4.0.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.facebook.fresco/imagepipeline/0.4.0/0.4.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.astuetz/pagerslidingtabstrip/1.0.1/1.0.1.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.astuetz/pagerslidingtabstrip/1.0.1/1.0.1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.android.support/cardview-v7/22.0.0/22.0.0.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.android.support/cardview-v7/22.0.0/22.0.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/22.0.0/22.0.0.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/22.0.0/22.0.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.1.1/22.1.1.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.1.1/22.1.1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.android.support/support-v4/22.1.1/22.1.1.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.android.support/support-v4/22.1.1/22.1.1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.sothree.slidinguppanel/library/3.0.0/3.0.0.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/exploded-aar/com.sothree.slidinguppanel/library/3.0.0/3.0.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/generated/source/buildConfig/androidTest/androidTest.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/generated/source/buildConfig/androidTest/androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/generated/source/buildConfig/buildConfig.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/generated/source/buildConfig/buildConfig.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/classes/classes.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/classes/classes.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/manifests/androidTest/debug/debug.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/manifests/androidTest/debug/debug.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/manifests/full/debug/debug.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/intermediates/manifests/full/debug/debug.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/src/main/main.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/src/main/main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/generated/source/r/r.iml" filepath="$PROJECT_DIR$/aMap_Android_Navi_Demo_V111/build/generated/source/r/r.iml" />
+    </modules>
+  </component>
+</project>
+

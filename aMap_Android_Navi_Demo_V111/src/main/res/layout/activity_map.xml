@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout android:id="@id/dragView" android:focusable="false"
+        android:clickable="true" android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <com.imyuu.travel.view.ImageMapView android:id="@id/amp_view"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+        <ImageButton android:id="@id/drop_tag"
+            android:background="@drawable/drawer_bar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="45.0dip"
+            android:layout_alignTop="@id/amp_view"
+            android:contentDescription="@string/nothing" />
+        <Button android:id="@id/touch_btn" android:background="#00000000"
+            android:visibility="visible" android:layout_width="fill_parent"
+            android:layout_height="fill_parent" android:layout_marginTop="45.0dip"
+            android:text="" android:layout_alignTop="@id/amp_view" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/app_title_container"
+        style="@style/app_title_layout_theme" >
+
+        <ImageView
+            android:id="@+id/image_search_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:src="@drawable/img_search_back" />
+
+        <TextView
+            android:id="@+id/text_app_title"
+            style="@style/app_title_theme" />
+
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/linearlayout_map_bottom_menu"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_alignParentBottom="true"
+        android:background="#5557C4FA"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/button_map_menu_choice"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:drawableLeft="@drawable/img_map_line_choice"
+            android:gravity="left|center_vertical"
+            android:paddingLeft="15dip"
+            android:text="@string/map_bottom_menu_line"
+            android:textColor="@color/darkgrey" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:drawableRight="@drawable/img_map_service"
+            android:gravity="right|center_vertical"
+            android:paddingRight="15dip"
+            android:text="@string/map_bottom_menu_service"
+            android:textColor="@color/darkgrey" />
+    </LinearLayout>
+
+
+    
+    <HorizontalScrollView
+        android:id="@+id/horizontalscrollview_map_line"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:layout_above="@id/linearlayout_map_bottom_menu"
+        android:layout_below="@+id/routemap"
+        android:background="#5557C4FA"
+        android:scrollbars="none"
+        android:fillViewport="true" >
+
+        <LinearLayout
+            android:id="@+id/linearlayout_map_line"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <com.amap.api.maps.MapView android:id="@id/routemap"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/app_title_container"
+        android:layout_above="@+id/linearlayout_map_bottom_menu"/>
+
+</RelativeLayout>
