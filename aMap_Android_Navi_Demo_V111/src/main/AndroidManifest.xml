@@ -31,7 +31,7 @@
             android:value="IUUdb.db" />
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="750021b4570cc3060b8de5564ad75a86" />
+            android:value="3039ace77c21b91581522cc7d2f23098" />
 
         <activity
             android:name=".ui.WelcomeActivity"
@@ -53,6 +53,7 @@
             />
         <activity android:name=".ui.ClusterActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".ui.MapActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".ui.MapOnlineActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <activity android:name=".ui.QueryCityActivity"/>
         <service android:name=".base.LocationService" android:exported="false"/>

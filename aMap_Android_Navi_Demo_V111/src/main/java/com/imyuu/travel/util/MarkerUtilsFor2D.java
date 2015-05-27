@@ -1,5 +1,8 @@
 package com.imyuu.travel.util;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -7,27 +10,24 @@ import android.graphics.Color;
 import android.text.TextPaint;
 import android.util.Log;
 
-import com.amap.api.maps.AMap;
-import com.amap.api.maps.model.BitmapDescriptorFactory;
-import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.Marker;
-import com.amap.api.maps.model.MarkerOptions;
+import com.amap.api.maps2d.AMap;
+import com.amap.api.maps2d.model.BitmapDescriptorFactory;
+import com.amap.api.maps2d.model.LatLng;
+import com.amap.api.maps2d.model.Marker;
+import com.amap.api.maps2d.model.MarkerOptions;
 import com.imyuu.travel.R;
 import com.imyuu.travel.model.ScenicPointJson;
 
-import java.util.ArrayList;
-import java.util.Date;
-
-public class MarkerUtils {
+public class MarkerUtilsFor2D {
 	private Activity activity;
 	private AMap aMap;
 	/**
 	 * 所有的point
 	 */
 	ArrayList<ScenicPointJson> pointsList;
-
-	public MarkerUtils(Activity activity, AMap aMap,
-					   ArrayList<ScenicPointJson> pointsList) {
+	
+	public MarkerUtilsFor2D(Activity activity, AMap aMap,
+							ArrayList<ScenicPointJson> pointsList) {
 		super();
 		this.activity = activity;
 		this.aMap = aMap;
@@ -96,7 +96,7 @@ public class MarkerUtils {
 						.position(new LatLng(each.getLat(), each.getLng()));
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.hotviewport_nosel_map));
 				arg1.icon(BitmapDescriptorFactory.fromBitmap(
-						getBitMap(each.getScenicPointName(),R.drawable.hotviewport_transparent_long)));
+						getBitMap(each.getScenicPointName(), R.drawable.hotviewport_transparent_long)));
 				arg0.title(each.getScenicPointName());
 				Marker eachMarker = aMap.addMarker(arg0);
 				Marker eachMarker_add = aMap.addMarker(arg1);
@@ -193,7 +193,7 @@ public class MarkerUtils {
 	}
 	
 	 public Bitmap getBitMap(String text, int sourceId) {                
-	 	Bitmap bitmap = BitmapDescriptorFactory.fromResource(sourceId).getBitmap();
+	 	Bitmap bitmap = BitmapDescriptorFactory.fromResource(sourceId).getBitmap().copy(Bitmap.Config.ARGB_8888, true);
 		bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
 		             bitmap.getHeight());
 				Canvas canvas = new Canvas(bitmap);

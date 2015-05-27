@@ -31,27 +31,24 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.location.LocationManagerProxy;
 import com.amap.api.location.LocationProviderProxy;
-import com.amap.api.maps.AMap;
-import com.amap.api.maps.AMap.InfoWindowAdapter;
-import com.amap.api.maps.AMap.OnCameraChangeListener;
-import com.amap.api.maps.AMap.OnInfoWindowClickListener;
-import com.amap.api.maps.AMap.OnMapLoadedListener;
-import com.amap.api.maps.AMap.OnMarkerClickListener;
-import com.amap.api.maps.CameraUpdateFactory;
-import com.amap.api.maps.LocationSource;
-import com.amap.api.maps.MapView;
-import com.amap.api.maps.model.BitmapDescriptorFactory;
-import com.amap.api.maps.model.CameraPosition;
-import com.amap.api.maps.model.GroundOverlay;
-import com.amap.api.maps.model.GroundOverlayOptions;
-import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.LatLngBounds;
-import com.amap.api.maps.model.Marker;
-import com.amap.api.maps.model.MarkerOptions;
-import com.amap.api.maps.model.MyLocationStyle;
-import com.amap.api.maps.model.Polyline;
-import com.amap.api.maps.model.PolylineOptions;
-import com.amap.api.maps.model.VisibleRegion;
+
+import com.amap.api.maps2d.AMap;
+import com.amap.api.maps2d.CameraUpdateFactory;
+import com.amap.api.maps2d.LocationSource;
+import com.amap.api.maps2d.MapView;
+import com.amap.api.maps2d.MapsInitializer;
+import com.amap.api.maps2d.model.BitmapDescriptorFactory;
+import com.amap.api.maps2d.model.CameraPosition;
+import com.amap.api.maps2d.model.GroundOverlay;
+import com.amap.api.maps2d.model.GroundOverlayOptions;
+import com.amap.api.maps2d.model.LatLng;
+import com.amap.api.maps2d.model.LatLngBounds;
+import com.amap.api.maps2d.model.Marker;
+import com.amap.api.maps2d.model.MarkerOptions;
+import com.amap.api.maps2d.model.MyLocationStyle;
+import com.amap.api.maps2d.model.Polyline;
+import com.amap.api.maps2d.model.PolylineOptions;
+import com.amap.api.maps2d.model.VisibleRegion;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
 import com.amap.api.navi.model.AMapNaviInfo;
@@ -69,7 +66,7 @@ import com.imyuu.travel.model.SpotInfo;
 import com.imyuu.travel.util.ApplicationHelper;
 import com.imyuu.travel.util.CommonUtils;
 import com.imyuu.travel.util.Config;
-import com.imyuu.travel.util.MarkerUtils;
+import com.imyuu.travel.util.MarkerUtilsFor2D;
 import com.imyuu.travel.util.Player;
 import com.imyuu.travel.util.ToastUtil;
 import com.imyuu.travel.view.ColumnHorizontalScrollView;
@@ -88,9 +85,10 @@ import retrofit.client.Response;
 /**
  * AMapV1地图demo总汇
  */
-public final class MapOnlineActivity extends Activity implements OnMarkerClickListener, OnInfoWindowClickListener,
-	InfoWindowAdapter, OnCameraChangeListener, OnMapLoadedListener, LocationSource, 
+public final class MapOnlineActivity extends Activity implements AMap.OnMarkerClickListener, AMap.OnInfoWindowClickListener,
+		AMap.InfoWindowAdapter, AMap.OnCameraChangeListener, AMap.OnMapLoadedListener, LocationSource,
 	AMapLocationListener, AMapNaviListener {
+	private static final String TVL_URL_ROOT = "http://imyuu.com:9100/tiles/";
 
 	private AMap mMap;
 	private MapView mapView;
@@ -99,7 +97,6 @@ public final class MapOnlineActivity extends Activity implements OnMarkerClickLi
 	private GridView layoutShow;
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
-	private GroundOverlay groundoverlay;
 	private AMapNavi mAMapNavi;
 	private ColumnHorizontalScrollView mColumnHorizontalScrollView;
 	private LinearLayout mRoute_layout;
@@ -123,7 +120,7 @@ public final class MapOnlineActivity extends Activity implements OnMarkerClickLi
 	private ArrayList<RecommendLine> routeList=new ArrayList<RecommendLine>();
 	private ArrayList<SpotInfo> spotList=new ArrayList<SpotInfo>();
 	private ArrayList<ScenicPointJson> markerList=new ArrayList<ScenicPointJson>();
-	private MarkerUtils markerUtils;
+	private MarkerUtilsFor2D markerUtilsFor2D;
 
     @InjectView(R.id.image_cancel_back)
     ImageView vm_cancel;
@@ -152,6 +149,8 @@ public final class MapOnlineActivity extends Activity implements OnMarkerClickLi
 //        actionBar.setDisplayShowHomeEnabled(false);
 //        actionBar.setDisplayShowTitleEnabled(true);
 //        actionBar.setTitle("                        "+"崂山风景区");
+		String tvl_url = TVL_URL_ROOT +scenic.getScenicId()+"/%d/%d/%d.png";
+		MapsInitializer.replaceURL(tvl_url, "OnLine");
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
 		
@@ -281,7 +280,7 @@ public final class MapOnlineActivity extends Activity implements OnMarkerClickLi
 	    						lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
 	    								.addAll(arg1).color(Color.RED).visible(true));
 	    						mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-	    								arg1.get(0), 18));  //37.5206,121.358
+										arg1.get(0), 18));  //37.5206,121.358
 	    					} else {
 	    						rl_column.setVisibility(View.GONE);
 	    					}
@@ -471,9 +470,9 @@ public final class MapOnlineActivity extends Activity implements OnMarkerClickLi
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				String item = adapter.getItem(arg2);
-				if(markerUtils!=null) {
-					markerUtils.removeAllAddition();
-					markerUtils.addMarkerGrphic(item);
+				if(markerUtilsFor2D !=null) {
+					markerUtilsFor2D.removeAllAddition();
+					markerUtilsFor2D.addMarkerGrphic(item);
 				}
 				
 			}
@@ -597,7 +596,7 @@ public final class MapOnlineActivity extends Activity implements OnMarkerClickLi
 	        		Toast.makeText(MapOnlineActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
 	        	}
 	        	markerList = (ArrayList)resultJson;
-	        	markerUtils = new MarkerUtils(MapOnlineActivity.this, mMap, markerList);
+	        	markerUtilsFor2D = new MarkerUtilsFor2D(MapOnlineActivity.this, mMap, markerList);
 	        	addMarkerFunc("1");
 	        }
 
@@ -625,14 +624,6 @@ public final class MapOnlineActivity extends Activity implements OnMarkerClickLi
             .include(new LatLng(lat_left,lng_left))
             .include(new LatLng(lat_right,lng_right)).build();
             Log.d("MapActivity", Config.Map_FILEPATH);
-            groundoverlay = mMap.addGroundOverlay(new GroundOverlayOptions()
-                    .anchor(0.5f, 0.5f)
-                    .transparency(0f)
-                    .image(BitmapDescriptorFactory.fromResource(R.drawable.laoshan))
-//                            .image(BitmapDescriptorFactory
-//                                    .fromPath(Environment.getExternalStorageDirectory().getAbsolutePath() +
-//                                            scenic.getImageUrl()))
-                    .positionFromBounds(bounds).zIndex(1));
 
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng((lat_left+lat_right)/2,(lng_left+lng_right)/2), 18));// 设置当前地图显示
@@ -642,7 +633,7 @@ public final class MapOnlineActivity extends Activity implements OnMarkerClickLi
     }
 	
 	private void addMarkerFunc(String spotype) {
-		markerUtils.addMarkerGrphic(spotype);
+		markerUtilsFor2D.addMarkerGrphic(spotype);
 	}
 	
 	@Override
@@ -655,13 +646,13 @@ public final class MapOnlineActivity extends Activity implements OnMarkerClickLi
 	public void onCameraChangeFinish(CameraPosition cameraPosition) {
     	zoom = cameraPosition.zoom;
     	
-    	if(markerUtils!=null && zoom < 17 ) {
-    		markerUtils.setAllUnVisible();
-    	} else if(markerUtils!=null) {
-    		markerUtils.setAllVisible();
+    	if(markerUtilsFor2D !=null && zoom < 17 ) {
+    		markerUtilsFor2D.setAllUnVisible();
+    	} else if(markerUtilsFor2D !=null) {
+    		markerUtilsFor2D.setAllVisible();
     	}
     	
-	    VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion(); 
+	    VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
 	    LatLngBounds bounds = new LatLngBounds.Builder()
         .include(new LatLng(36.1377,120.6737))   //36.1377,120.6737 laoshan  37.515658,121.352212
 		.include(new LatLng(36.1415,120.6758)).build();  //36.1415,120.6758  37.528217,121.365323

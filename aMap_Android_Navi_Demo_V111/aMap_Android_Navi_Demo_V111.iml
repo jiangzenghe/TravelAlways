@@ -95,21 +95,22 @@
     <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-22.0.0" level="project" />
     <orderEntry type="library" exported="" name="pagerslidingtabstrip-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="Msc" level="project" />
     <orderEntry type="library" exported="" name="gson-2.2.4" level="project" />
+    <orderEntry type="library" exported="" name="Msc" level="project" />
     <orderEntry type="library" exported="" name="commons-codec-1.6" level="project" />
-    <orderEntry type="library" exported="" name="eventbus-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="json-lib-2.4-jdk15" level="project" />
+    <orderEntry type="library" exported="" name="eventbus-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.1.1" level="project" />
-    <orderEntry type="library" exported="" name="butterknife-6.1.0" level="project" />
     <orderEntry type="library" exported="" name="library-3.0.0" level="project" />
+    <orderEntry type="library" exported="" name="butterknife-6.1.0" level="project" />
     <orderEntry type="library" exported="" name="cardview-v7-22.0.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.1.1" level="project" />
     <orderEntry type="library" exported="" name="AMap_3DMap_V2.4.1" level="project" />
     <orderEntry type="library" exported="" name="imagepipeline-0.4.0" level="project" />
     <orderEntry type="library" exported="" name="activeandroid-3.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" exported="" name="commons-httpclient-3.1" level="project" />
+    <orderEntry type="library" exported="" name="Android_2DMapApi_V2.4.1" level="project" />
     <orderEntry type="library" exported="" name="bolts-android-1.1.4" level="project" />
+    <orderEntry type="library" exported="" name="commons-httpclient-3.1" level="project" />
     <orderEntry type="library" exported="" name="Android_Navi_V1.1.2" level="project" />
     <orderEntry type="library" exported="" name="drawee-0.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.1.1" level="project" />
