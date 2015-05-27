@@ -357,7 +357,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 		if(arg0.getObject() != null) {//1marker
 			PointsClusterEntity result = (PointsClusterEntity)arg0.getObject();
 			if(result.getClusterCount() == 1) {
-				Intent intent = new Intent(ClusterActivity.this, MapActivity.class);
+				Intent intent = new Intent(ClusterActivity.this, MapOnlineActivity.class);
                 intent.putExtra("scenicId", result.getSubScenicEntity().get(0).getScenicId());
 //				Intent intent = new Intent(ClusterActivity.this, MarkerActivity.class);
 				startActivity(intent);

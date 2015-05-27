@@ -615,6 +615,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
         if(scenic != null) {
 //            LatLng northeast = scenic.get;
 //            LatLng southwest =;
+
             double lat_left = 36.1379;
             double lng_left = 120.6739;
             double lat_right = 36.14150;

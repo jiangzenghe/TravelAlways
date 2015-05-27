@@ -13,7 +13,7 @@
             android:id="@+id/image_map_line_point"
             android:src="@drawable/img_map_point"
             android:background="@drawable/img_map_line"
-            android:layout_width="40dip"
+            android:layout_width="80dip"
             android:layout_height="40dip"/>
     <TextView
             android:id="@+id/text_map_line_title"
