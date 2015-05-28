@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.Gravity;
@@ -63,6 +64,7 @@ import com.amap.api.navi.model.NaviLatLng;
 import com.imyuu.travel.R;
 import com.imyuu.travel.adapters.GridAdapter;
 import com.imyuu.travel.api.ApiClient;
+import com.imyuu.travel.bean.SpotModel;
 import com.imyuu.travel.model.RecommendLine;
 import com.imyuu.travel.model.ScenicAreaJson;
 import com.imyuu.travel.model.ScenicPointJson;
@@ -306,22 +308,22 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 		//点击助手
 		cilckText.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				if(layoutShow.getVisibility() == View.VISIBLE) {
-					TranslateAnimation mHideAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,     
-							Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,     
-							0.0f, Animation.RELATIVE_TO_SELF, 1.0f);  
-					mHideAction.setDuration(50); 
+				if (layoutShow.getVisibility() == View.VISIBLE) {
+					TranslateAnimation mHideAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+							Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+							0.0f, Animation.RELATIVE_TO_SELF, 1.0f);
+					mHideAction.setDuration(50);
 					layoutShow.setAnimation(mHideAction);
 					layoutShow.setVisibility(View.GONE);
 				} else {
-					TranslateAnimation mShowAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,     
-							Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,     
-							1.0f, Animation.RELATIVE_TO_SELF, 0.0f);  
-					mShowAction.setDuration(50); 
+					TranslateAnimation mShowAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+							Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+							1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+					mShowAction.setDuration(50);
 					layoutShow.setAnimation(mShowAction);
 					layoutShow.setVisibility(View.VISIBLE);
 				}
@@ -331,7 +333,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		initGridView();
 	}
 
-	public void movePoint(final Marker marker, final HashMap<String, LatLng> temp) {
+	public void movePoint(final Marker marker, final ArrayList<SpotModel> temp) {
 		final Handler handler = new Handler();
 		final long start = SystemClock.uptimeMillis();
 //		Projection proj = addMarkerap.getProjection();
@@ -343,23 +345,26 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 //		final Interpolator interpolator = new BounceInterpolator();
 
-		for(final String each:temp.keySet()) {
-			handler.post(new Runnable() {
-				@Override
-				public void run() {
+		handler.post(new Runnable() {
+			int each = 0;
+			@Override
+			public void run() {
 //					long elapsed = SystemClock.uptimeMillis() - start;
 //					float t = interpolator.getInterpolation((float) elapsed
 //							/ duration);
 
-					marker.setPosition(temp.get(each));
-					marker.setObject(Integer.parseInt(each));
-					mMap.invalidate();// 刷新地图
+				Log.e("each", each + "");
+				marker.setPosition(temp.get(each).getLatLng());
+				marker.setObject(temp.get(each).getRouteIndex());
+				mMap.invalidate();// 刷新地图
 
+				if(each != temp.size()-1) {
+					each+=1;
 					handler.postDelayed(this, duration);
-
 				}
-			});
-		}
+			}
+		});
+
 
 	}
 
@@ -424,11 +429,26 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
                                     LatLng center = new LatLng(spotList.get(i).getLat(), spotList.get(i).getLng());
                                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
 											center, 19));  //37.5206,121.358
-									HashMap<String, LatLng> temp = new HashMap<String, LatLng>();
+									ArrayList<SpotModel> temp = new ArrayList<SpotModel>();
 									int flag = (int)mCurrentVirtualPoint.getObject();
-									for(int key = flag;key<=i;key++) {
-										temp.put(key + "", new LatLng(spotList.get(key).getLat(), spotList.get(key).getLng()));
+									if(flag<i) {
+										int j = 0;
+										for(int key = flag;key<=i;key++) {
+											LatLng latlng = new LatLng(spotList.get(key).getLat(), spotList.get(key).getLng());
+											SpotModel model = new SpotModel(j, key, latlng);
+											temp.add(model);
+											j++;
+										}
+									} else {
+										int j = 0;
+										for(int key = flag;key>=i;key--) {
+											LatLng latlng = new LatLng(spotList.get(key).getLat(), spotList.get(key).getLng());
+											SpotModel model = new SpotModel(j, key, latlng);
+											temp.add(model);
+											j++;
+										}
 									}
+
 									if(temp.size() > 0) {
 										movePoint(mCurrentVirtualPoint, temp);
 									}
