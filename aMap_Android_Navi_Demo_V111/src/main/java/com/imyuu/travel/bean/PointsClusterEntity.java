@@ -9,6 +9,7 @@ import android.graphics.Point;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
+import com.imyuu.travel.model.ScenicAreaJson;
 
 
 /**
@@ -32,7 +33,7 @@ public class PointsClusterEntity {
 	private String text;
 	private String title;
 	private String clusterId;
-	private List<ScenicModel> subScenicEntity = new ArrayList<ScenicModel>();
+	private List<ScenicAreaJson> subScenicEntity = new ArrayList<ScenicAreaJson>();
 
 	public PointsClusterEntity() {
 
@@ -68,15 +69,15 @@ public class PointsClusterEntity {
 	public void setPosition() {
 		int size = subScenicEntity.size();
 		if (size == 1) {
-			this.Lat = subScenicEntity.get(0).getLatLng().latitude;
-			this.Lng = subScenicEntity.get(0).getLatLng().longitude;
+			this.Lat = subScenicEntity.get(0).getLat();
+			this.Lng = subScenicEntity.get(0).getLng();
 			return;
 		}
 		double lat = 0.0;
 		double lng = 0.0;
-		for (ScenicModel op : subScenicEntity) {
-			lat += op.getLatLng().latitude;
-			lng += op.getLatLng().longitude;
+		for (ScenicAreaJson op : subScenicEntity) {
+			lat += op.getLat();
+			lng += op.getLng();
 		}
 		this.Lat = lat / size;
 		this.Lng = lng / size;// 设置中心位置为聚集点的平均距离
@@ -123,11 +124,11 @@ public class PointsClusterEntity {
 		this.clusterCount = clusterCount;
 	}
 
-	public List<ScenicModel> getSubScenicEntity() {
+	public List<ScenicAreaJson> getSubScenicEntity() {
 		return subScenicEntity;
 	}
 
-	public void setSubEventEntity(List<ScenicModel> subScenicEntity) {
+	public void setSubEventEntity(List<ScenicAreaJson> subScenicEntity) {
 		this.subScenicEntity = subScenicEntity;
 	}
 

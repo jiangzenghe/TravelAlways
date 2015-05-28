@@ -19,6 +19,7 @@ import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.imyuu.travel.R;
 import com.imyuu.travel.bean.*;
+import com.imyuu.travel.model.ScenicAreaJson;
 
 
 public class ClusterUtils {
@@ -30,12 +31,13 @@ public class ClusterUtils {
 	/**
 	 * 所有的point
 	 */
-	ArrayList<ScenicModel> pointsList;
+//	ArrayList<ScenicModel> pointsList;
+	ArrayList<ScenicAreaJson> pointsList;
 	
 	Handler handler;
 
 	public ClusterUtils(Activity activity, AMap aMap,
-			ArrayList<ScenicModel> pointsList) {
+			ArrayList<ScenicAreaJson> pointsList) {
 		super();
 		this.activity = activity;
 		this.aMap = aMap;
@@ -55,14 +57,14 @@ public class ClusterUtils {
 		// 自定义的聚合类MarkerCluster
 		ArrayList<PointsClusterEntity> clustersList = new ArrayList<PointsClusterEntity>();
 		// 开始刷新界面
-		for (ScenicModel fp : pointsList) {
+		for (ScenicAreaJson fp : pointsList) {
 			
 			if (clustersList.size() == 0) {
 				add2Cluster(fp, clustersList);
 			} else {
 				boolean isIn = false;
 				for (PointsClusterEntity cluster : clustersList) {
-					if (cluster.getBoundsEnv() != null && cluster.getBoundsEnv().contains(fp.getLatLng())) {
+					if (cluster.getBoundsEnv() != null && cluster.getBoundsEnv().contains(new LatLng(fp.getLat(), fp.getLng()))) {
 						cluster.setClusterCount(cluster.getClusterCount() + 1);
 						if(cluster.getClusterCount()==2) {
 							String replaceText = "该地区共有"+cluster.getClusterCount()+"个景区，依次为"
@@ -73,9 +75,9 @@ public class ClusterUtils {
 							cluster.setText(cluster.getText()+addText);
 						}
 //						cluster.setTitle("该地区共有"+cluster.getClusterCount()+"个景区");
-						ScenicModel object = new ScenicModel();
-						object.setLatLng(fp.getLatLng());
-						cluster.getSubScenicEntity().add(object);
+//						ScenicAreaJson object = new ScenicAreaJson();
+//						object.setLatLng(new LatLng(fp.getLat(), fp.getLng()));
+						cluster.getSubScenicEntity().add(fp);
 						isIn = true;
 						break;
 					}
@@ -94,16 +96,16 @@ public class ClusterUtils {
 		return clustersList;
 	}
 
-	private void add2Cluster(ScenicModel each, ArrayList<PointsClusterEntity> normalClustList) {
-		LatLng point = each.getLatLng();
+	private void add2Cluster(ScenicAreaJson each, ArrayList<PointsClusterEntity> normalClustList) {
+		LatLng point = new LatLng(each.getLat(), each.getLng());
 		PointsClusterEntity arg0 = new PointsClusterEntity(aMap, point, 
 				gridSize);
 		arg0.setClusterCount(1);
 		arg0.setClusterId(normalClustList.size() + 1 + "");
-		ScenicModel object = new ScenicModel();
-		object.setLatLng(point);
-		object.setScenicName(each.getScenicName());
-		arg0.getSubScenicEntity().add(object);
+//		ScenicModel object = new ScenicModel();
+//		object.setLatLng(point);
+//		object.setScenicName(each.getScenicName());
+		arg0.getSubScenicEntity().add(each);
 		arg0.setText(each.getScenicName());
 		normalClustList.add(arg0);
 	}

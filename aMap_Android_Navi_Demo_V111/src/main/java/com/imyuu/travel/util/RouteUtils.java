@@ -1,8 +1,5 @@
 package com.imyuu.travel.util;
 
-import java.util.ArrayList;
-import java.util.Date;
-
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -18,16 +15,19 @@ import com.amap.api.maps2d.model.MarkerOptions;
 import com.imyuu.travel.R;
 import com.imyuu.travel.model.ScenicPointJson;
 
-public class MarkerUtilsFor2D {
+import java.util.ArrayList;
+import java.util.Date;
+
+public class RouteUtils {
 	private Activity activity;
 	private AMap aMap;
 	/**
 	 * 所有的point
 	 */
 	ArrayList<ScenicPointJson> pointsList;
-	
-	public MarkerUtilsFor2D(Activity activity, AMap aMap,
-							ArrayList<ScenicPointJson> pointsList) {
+
+	public RouteUtils(Activity activity, AMap aMap,
+					  ArrayList<ScenicPointJson> pointsList) {
 		super();
 		this.activity = activity;
 		this.aMap = aMap;
@@ -199,8 +199,8 @@ public class MarkerUtilsFor2D {
 				Canvas canvas = new Canvas(bitmap);
 				TextPaint textPaint = new TextPaint();
 				textPaint.setTextSize(20f);
-				textPaint.setColor(Color.RED);
-				canvas.drawText(text, 22, 15, textPaint);// 设置bitmap上面的文字位置
+				textPaint.setColor(Color.BLACK);
+				canvas.drawText(text, 22, 18, textPaint);// 设置bitmap上面的文字位置
 		return bitmap;
 	}
 	

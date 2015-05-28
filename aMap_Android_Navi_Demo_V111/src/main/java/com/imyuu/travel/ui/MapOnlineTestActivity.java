@@ -7,9 +7,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -19,8 +16,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.BounceInterpolator;
-import android.view.animation.Interpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -34,25 +29,21 @@ import android.widget.Toast;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.location.LocationManagerProxy;
-import com.amap.api.location.LocationProviderProxy;
-
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.CameraUpdateFactory;
-import com.amap.api.maps2d.LocationSource;
-import com.amap.api.maps2d.MapView;
-import com.amap.api.maps2d.MapsInitializer;
-import com.amap.api.maps2d.model.BitmapDescriptorFactory;
-import com.amap.api.maps2d.model.CameraPosition;
-import com.amap.api.maps2d.model.GroundOverlay;
-import com.amap.api.maps2d.model.GroundOverlayOptions;
-import com.amap.api.maps2d.model.LatLng;
-import com.amap.api.maps2d.model.LatLngBounds;
-import com.amap.api.maps2d.model.Marker;
-import com.amap.api.maps2d.model.MarkerOptions;
-import com.amap.api.maps2d.model.MyLocationStyle;
-import com.amap.api.maps2d.model.Polyline;
-import com.amap.api.maps2d.model.PolylineOptions;
-import com.amap.api.maps2d.model.VisibleRegion;
+import com.amap.api.location.LocationProviderProxy;;
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdateFactory;
+import com.amap.api.maps.LocationSource;
+import com.amap.api.maps.MapView;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.CameraPosition;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.LatLngBounds;
+import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
+import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.Polyline;
+import com.amap.api.maps.model.PolylineOptions;
+import com.amap.api.maps.model.VisibleRegion;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
 import com.amap.api.navi.model.AMapNaviInfo;
@@ -70,15 +61,14 @@ import com.imyuu.travel.model.SpotInfo;
 import com.imyuu.travel.util.ApplicationHelper;
 import com.imyuu.travel.util.CommonUtils;
 import com.imyuu.travel.util.Config;
+import com.imyuu.travel.util.MarkerUtils;
 import com.imyuu.travel.util.MarkerUtilsFor2D;
 import com.imyuu.travel.util.Player;
 import com.imyuu.travel.util.ToastUtil;
 import com.imyuu.travel.view.ColumnHorizontalScrollView;
 import com.imyuu.travel.view.GridView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -91,7 +81,7 @@ import retrofit.client.Response;
 /**
  * AMapV1地图demo总汇
  */
-public final class MapOnlineActivity extends Activity implements AMap.OnMarkerClickListener, AMap.OnInfoWindowClickListener,
+public final class MapOnlineTestActivity extends Activity implements AMap.OnMarkerClickListener, AMap.OnInfoWindowClickListener,
 		AMap.InfoWindowAdapter, AMap.OnCameraChangeListener, AMap.OnMapLoadedListener, LocationSource,
 	AMapLocationListener, AMapNaviListener {
 	private static final String TVL_URL_ROOT = "http://imyuu.com:9100/tiles/";
@@ -104,7 +94,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
 	private AMapNavi mAMapNavi;
-//	private ColumnHorizontalScrollView mColumnHorizontalScrollView;
+	private ColumnHorizontalScrollView mColumnHorizontalScrollView;
 	private LinearLayout mRoute_layout;
 	private RelativeLayout rl_column;
 	private TextView redAlert;
@@ -113,20 +103,20 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	private float zoom;
 	private NaviLatLng mNaviEnd;
 	private NaviLatLng mNaviStart;
-	private Marker mCurrentVirtualPoint;
 	private Marker mMarkerRouteStart;
 	private Marker mMarkerRouteEnd;
 
 	// 规划线路
 //	private RouteOverLay mRouteOverLay;
 	private Polyline lineDraw;
+    private String scenicId;
     private ScenicAreaJson scenic;
 
 	/** 分类列表*/
 	private ArrayList<RecommendLine> routeList=new ArrayList<RecommendLine>();
 	private ArrayList<SpotInfo> spotList=new ArrayList<SpotInfo>();
 	private ArrayList<ScenicPointJson> markerList=new ArrayList<ScenicPointJson>();
-	private MarkerUtilsFor2D markerUtilsFor2D;
+	private MarkerUtils markerUtilsFor2D;
 
     @InjectView(R.id.image_cancel_back)
     ImageView vm_cancel;
@@ -135,25 +125,29 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
     @OnClick(R.id.image_cancel_back)
     public void cacelBackClick() {
-        Intent intent = new Intent(MapOnlineActivity.this,ClusterActivity.class);
+        Intent intent = new Intent(MapOnlineTestActivity.this,ClusterActivity.class);
         startActivity(intent);
     }
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.map_online_activity);
+		setContentView(R.layout.map_activity);
         ButterKnife.inject(this);
 
         scenic   = (ScenicAreaJson)getIntent().getExtras().getSerializable("scenicInfo");
+        if(scenic != null) {
+            scenicId = scenic.getScenicId();
+        }
 
-		String tvl_url = TVL_URL_ROOT +scenic.getScenicId()+"/%d/%d/%d.png";
-		MapsInitializer.replaceURL(tvl_url, "OnLine");
+//		String tvl_url = TVL_URL_ROOT +scenic.getScenicId()+"/%d/%d/%d.png";
+//		MapsInitializer.replaceURL(tvl_url, "OnLine");
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
 		
 		initMap();
-		initView();
+		
+//		initView();
 	}
 
 	private void removeRoute() {
@@ -162,9 +156,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		}
 		if(mMarkerRouteStart!=null) {			
 			mMarkerRouteStart.remove();
-		}
-		if(mCurrentVirtualPoint!=null) {
-			mCurrentVirtualPoint.remove();
 		}
 		if(mMarkerRouteEnd!=null) {
 //			mRouteOverLay.removeFromMap();
@@ -180,7 +171,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		redAlert = (TextView) findViewById(R.id.text_redalert);
 		layout_redalert = (LinearLayout) findViewById(R.id.layout_redalert);
 		mRoute_layout = (LinearLayout) findViewById(R.id.layout_route);
-//		mColumnHorizontalScrollView = (ColumnHorizontalScrollView) findViewById(R.id.mColumnHorizontalScrollView);
+		mColumnHorizontalScrollView = (ColumnHorizontalScrollView) findViewById(R.id.mColumnHorizontalScrollView);
 		cilckText = (TextView) findViewById(R.id.help);
 		layoutShow = (GridView) findViewById(R.id.layout_show);
 		routeText = (TextView) findViewById(R.id.route);
@@ -223,7 +214,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
                     // 显示窗口 
                 	int[] location = new int[2];  
                     v.getLocationOnScreen(location);  
-                    int mWindowHeight = CommonUtils.getWindowsHeight(MapOnlineActivity.this);
+                    int mWindowHeight = CommonUtils.getWindowsHeight(MapOnlineTestActivity.this);
                     pop.showAtLocation(v, Gravity.LEFT | Gravity.BOTTOM, 0, mWindowHeight-location[1]+pop.getHeight()); 
                     final LinearLayout classic_route = (LinearLayout)view.findViewById(R.id.classic_route);
                     final LinearLayout classic_good = (LinearLayout)view.findViewById(R.id.good_route);
@@ -240,7 +231,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 							nav_down.setBounds(0, 0, nav_down.getMinimumWidth(), nav_down.getMinimumHeight());
 							routeText.setCompoundDrawables(nav_down,null,null,null);
 							rl_column.setVisibility(View.GONE);
-	                    	Animation mShowAction = AnimationUtils.loadAnimation(MapOnlineActivity.this, R.anim.right_in);
+	                    	Animation mShowAction = AnimationUtils.loadAnimation(MapOnlineTestActivity.this, R.anim.right_in);
 	    					rl_column.setAnimation(mShowAction);
 	    					rl_column.setVisibility(View.VISIBLE);
 	    					
@@ -252,19 +243,14 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	    					if(arg1.size() != 0) {	    						
 	    						lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
 	    								.addAll(arg1).color(Color.RED).visible(true));
-								mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
-										.icon(BitmapDescriptorFactory.fromResource(R.drawable.m210))
-										.position(arg1.get(0)));
-								mCurrentVirtualPoint.setObject(0);
 	    						mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-										arg1.get(0), 19));  //37.5206,121.358
+										arg1.get(0), 18));  //37.5206,121.358
 	    					} else {
 	    						rl_column.setVisibility(View.GONE);
 	    					}
 						}
                     	
                     });
-
                     classic_good.setOnClickListener(new OnClickListener() {
 
 						@Override
@@ -276,23 +262,20 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 							nav_down.setBounds(0, 0, nav_down.getMinimumWidth(), nav_down.getMinimumHeight());
 							routeText.setCompoundDrawables(nav_down,null,null,null);
 							rl_column.setVisibility(View.GONE);
-	                    	Animation mShowAction = AnimationUtils.loadAnimation(MapOnlineActivity.this, R.anim.right_in);
+	                    	Animation mShowAction = AnimationUtils.loadAnimation(MapOnlineTestActivity.this, R.anim.right_in);
 	    					rl_column.setAnimation(mShowAction);
 	    					rl_column.setVisibility(View.VISIBLE);
 	    					
 	    					ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
 	    					for(SpotInfo each:spotList) {
 	    						arg1.add(new LatLng(each.getLat(),each.getLng()));
+//	    						mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).position(new LatLng(each.getLatitude(),each.getLongitude())));
 	    					}
 	    					if(arg1.size() != 0) {	    						
 	    						lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
 	    								.addAll(arg1).color(Color.RED).visible(true));
-								mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
-										.icon(BitmapDescriptorFactory.fromResource(R.drawable.m210))
-										.position(arg1.get(0)));
-								mCurrentVirtualPoint.setObject(0);
 	    						mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-										arg1.get(0), 19));  //37.5206,121.358
+	    								arg1.get(0), 18));  //37.5206,121.358
 	    					} else {
 	    						rl_column.setVisibility(View.GONE);
 	    					}
@@ -302,9 +285,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
                 } 
                    
             } 
-        });
-
-		//点击助手
+        }); 
 		cilckText.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -330,39 +311,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		
 		initGridView();
 	}
-
-	public void movePoint(final Marker marker, final HashMap<String, LatLng> temp) {
-		final Handler handler = new Handler();
-		final long start = SystemClock.uptimeMillis();
-//		Projection proj = addMarkerap.getProjection();
-//		Point startPoint = proj.toScreenLocation(Constants.XIAN);
-//		startPoint.offset(0, -100);
-//		final LatLng startLatLng = proj.fromScreenLocation(startPoint);
-		final LatLng startLatLng = marker.getPosition();
-		final long duration = 2000;
-
-//		final Interpolator interpolator = new BounceInterpolator();
-
-		for(final String each:temp.keySet()) {
-			handler.post(new Runnable() {
-				@Override
-				public void run() {
-//					long elapsed = SystemClock.uptimeMillis() - start;
-//					float t = interpolator.getInterpolation((float) elapsed
-//							/ duration);
-
-					marker.setPosition(temp.get(each));
-					marker.setObject(Integer.parseInt(each));
-					mMap.invalidate();// 刷新地图
-
-					handler.postDelayed(this, duration);
-
-				}
-			});
-		}
-
-	}
-
+	
 	/** 
 	 *  初始化Column栏目项
 	 * */
@@ -387,7 +336,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			count =  line.getLineSectionList().size();
 		}
 		LayoutInflater  inflater=LayoutInflater.from(this);
-
 		for(int i = 0; i< count; i++){
 			// 动态添加景点布局
             LinearLayout linearLayoutMapLineItem = (LinearLayout)
@@ -420,24 +368,15 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
                         				.equals(v.getTag().toString())) {
                         			ImageView imageMapLinePoint = (ImageView) v.findViewById(R.id.image_map_line_point);
                                     imageMapLinePoint
-											.setImageResource(R.drawable.img_map_point_choice);
+                                          .setImageResource(R.drawable.img_map_point_choice);
                                     LatLng center = new LatLng(spotList.get(i).getLat(), spotList.get(i).getLng());
                                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-											center, 19));  //37.5206,121.358
-									HashMap<String, LatLng> temp = new HashMap<String, LatLng>();
-									int flag = (int)mCurrentVirtualPoint.getObject();
-									for(int key = flag;key<=i;key++) {
-										temp.put(key + "", new LatLng(spotList.get(key).getLat(), spotList.get(key).getLng()));
-									}
-									if(temp.size() > 0) {
-										movePoint(mCurrentVirtualPoint, temp);
-									}
-
+                                    		center, 18));  //37.5206,121.358
                         		}
                         	}
                         }
-					});
-			mRoute_layout.addView(linearLayoutMapLineItem);
+                    });
+            mRoute_layout.addView(linearLayoutMapLineItem);
 			
 		}
 	}
@@ -487,7 +426,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		images.add(object7);
 		keys.add("9");
 		titles.add("出入口");
-		final GridAdapter adapter = new GridAdapter(MapOnlineActivity.this, titles, keys, images);
+		final GridAdapter adapter = new GridAdapter(MapOnlineTestActivity.this, titles, keys, images);
 		layoutShow.setAdapter(adapter);
 		layoutShow.setOnItemClickListener(new OnItemClickListener(){
 
@@ -574,12 +513,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 					.include(new LatLng(lat_left,lng_left))
 					.include(new LatLng(lat_right,lng_right)).build();
 
-			if(!bounds.contains(new LatLng(aLocation.getLatitude(), aLocation.getLongitude()))) {
-				ToastUtil.show(this, "定位位置离本景点太远，请到达景点再定位使用此功能");
-				return;
-			}
-
-			if (mListener != null && aLocation != null ) {
+			if (mListener != null && aLocation != null && bounds.contains(new LatLng(aLocation.getLatitude(), aLocation.getLongitude()))) {
 				mListener.onLocationChanged(aLocation);// 显示系统小蓝点
 				mNaviStart = new NaviLatLng(aLocation.getLatitude(), aLocation.getLongitude());
 			}
@@ -603,7 +537,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			 * ，第一个参数是定位provider，第二个参数时间最短是2000毫秒，第三个参数距离间隔单位是米，第四个参数是定位监听者
 			 */
 			mAMapLocationManager.requestLocationUpdates(
-					LocationProviderProxy.AMapNetwork, 10 * 2000, 10, this);
+					LocationProviderProxy.AMapNetwork, 2000, 10, this);
 		}
 	}
 
@@ -624,14 +558,10 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	public void onMapLoaded() {
 		zoom = mMap.getCameraPosition().zoom;
 		// 设置所有maker显示在View中
-		if(scenic != null) {
-//			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-//					new LatLng(36.1427, 120.6837), 18));  //37.5206,121.358
-			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-					new LatLng(scenic.getLat(), scenic.getLng()), 19));  //37.5206,121.358
-			getScenicSpotsNet(scenic.getScenicId());
-			initRouteList(scenic.getScenicId());
-		}
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//				new LatLng(36.1427, 120.6837), 18));  //37.5206,121.358
+//		getScenicSpotsNet("394");
+//		initRouteList("394");
 	}
 
 	private void initRouteList(String scenicId) {
@@ -639,9 +569,9 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		ApiClient.getIuuApiClient().queryRecommendLines(scenicId, new Callback<List<RecommendLine>>() {
 			@Override
 			public void success(List<RecommendLine> resultJson, Response response) {
-				Toast.makeText(MapOnlineActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MapOnlineTestActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
 				if (resultJson == null) {
-					Toast.makeText(MapOnlineActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
+					Toast.makeText(MapOnlineTestActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
 				}
 				for (RecommendLine each : resultJson) {
 					if (each.getLineName().equals("经典路线")) {
@@ -654,7 +584,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 			@Override
 			public void failure(RetrofitError error) {
-				Toast.makeText(MapOnlineActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MapOnlineTestActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
 			}
 		});
 	}
@@ -663,18 +593,18 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		ApiClient.getIuuApiClient().queryScenicSpotLists(scenicId, new Callback<List<ScenicPointJson>>() {
 	        @Override
 	        public void success(List<ScenicPointJson> resultJson, Response response) {
-	        	Toast.makeText(MapOnlineActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
+	        	Toast.makeText(MapOnlineTestActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
 	        	if(resultJson == null) {
-	        		Toast.makeText(MapOnlineActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
+	        		Toast.makeText(MapOnlineTestActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
 	        	}
 	        	markerList = (ArrayList)resultJson;
-	        	markerUtilsFor2D = new MarkerUtilsFor2D(MapOnlineActivity.this, mMap, markerList);
+	        	markerUtilsFor2D = new MarkerUtils(MapOnlineTestActivity.this, mMap, markerList);
 	        	addMarkerFunc("1");
 	        }
 
 	        @Override
 	        public void failure(RetrofitError error) {
-	            Toast.makeText(MapOnlineActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+	            Toast.makeText(MapOnlineTestActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
 	        }
 	    });
 	}
@@ -693,11 +623,23 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	public void onCameraChangeFinish(CameraPosition cameraPosition) {
     	zoom = cameraPosition.zoom;
     	
-    	if(markerUtilsFor2D !=null && zoom < 19 ) {
+    	if(markerUtilsFor2D !=null && zoom < 17 ) {
     		markerUtilsFor2D.setAllUnVisible();
     	} else if(markerUtilsFor2D !=null) {
     		markerUtilsFor2D.setAllVisible();
     	}
+    	
+	    VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
+	    LatLngBounds bounds = new LatLngBounds.Builder()
+        .include(new LatLng(36.1377,120.6737))   //36.1377,120.6737 laoshan  37.515658,121.352212
+		.include(new LatLng(36.1415,120.6758)).build();  //36.1415,120.6758  37.528217,121.365323
+	    // 获取可视区域
+	    LatLngBounds curBounds = visibleRegion.latLngBounds;
+	    if(!bounds.contains(curBounds))
+	    {
+//	    	mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//					new LatLng(37.522,121.356), 18));
+	    }
 	}
 	
 	/**
@@ -746,6 +688,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	@Override
 	public void onLocationChanged(Location arg0) {
 		// TODO Auto-generated method stub
+		int i = 1;
 	}
 
 	@Override
@@ -800,9 +743,9 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
 		// TODO Auto-generated method stub
-//		if(arg0.getObject() != null) {//1marker
-//
-//		}
+		if(arg0.getObject() != null) {//1marker	
+			
+		}
 		return false;
 	}
 
@@ -822,6 +765,8 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
+//					player.playUrl(Environment.getExternalStorageDirectory().getAbsolutePath()
+//							+"/Music/anyone of us.mp3");
                     Player player = ApplicationHelper.getInstance().getPlayer();
 					if(player.getStatus() != 0 && scenic != null) {
                         String url = point.getAudioUrl();
@@ -830,7 +775,8 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 					} else if(player.getStatus() == 0) {
 						player.stop();
 					}
-
+//					player.playUrl(Environment.getExternalStorageDirectory().getAbsolutePath()
+//							+"/Samsung/Music/Over_the_horizon.mp3");
 				}
 			
 			});
@@ -842,15 +788,10 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				if(mNaviStart==null) {
-					mNaviStart = new NaviLatLng(36.138143, 120.674922);
-				}
 				mNaviStart.setLatitude(36.138143);//120.674922,36.138143
 				mNaviStart.setLongitude(120.674922);
-
         //        mNaviStart.setLatitude(AppApplication.getInstance().getMyLocation().latitude);
         //        mNaviStart.setLongitude(AppApplication.getInstance().getMyLocation().longitude);
-				Log.e("endLoc", point.getLat() +"," + point.getLng());
 				mNaviEnd = new NaviLatLng(point.getLat(), point.getLng());
 				calculateFootRoute();
                 naviView.setVisibility(View.GONE);

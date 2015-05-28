@@ -60,7 +60,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
 	
-	private ArrayList<ScenicModel> scenicLists;
+	private ArrayList<ScenicAreaJson> scenicLists;
 	private ArrayList<PointsClusterEntity> mClusterDatas;
 	private ClusterUtils utils;
     @InjectView(R.id.image_cancel_back)
@@ -73,7 +73,6 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
     public void cacelBackClick() {
         Intent intent = new Intent(ClusterActivity.this,MainActivity.class);
         startActivity(intent);
-
     }
 
     @OnClick(R.id.text_choose_city)
@@ -142,7 +141,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 	 * 初始化AMap对象
 	 */
 	private void init() {
-		scenicLists = new ArrayList<ScenicModel>();
+		scenicLists = new ArrayList<ScenicAreaJson>();
 		mClusterDatas = new ArrayList<PointsClusterEntity>();
 		
 		if (mMap == null) {
@@ -171,13 +170,14 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 	        	for(ScenicAreaJson each:result) {
                   //  Log.d("-------","datasize"+each.getLat()+"---"+each.getLng());
                   //  Log.d("-------",each.getScenicName());
-                    ScenicModel object = new ScenicModel();
+//                    ScenicModel object = new ScenicModel();
                     if(each.getLat() != null && each.getLat()>0
                             && each.getLng() != null && each.getLng()>0) {
-                        object.setLatLng(new LatLng(each.getLat(), each.getLng()));
-
-                        object.setScenicName(each.getScenicName());
-                        scenicLists.add(object);
+//                        object.setLatLng(new LatLng(each.getLat(), each.getLng()));
+//						object.setScenicId(each.getScenicId());
+//
+//                        object.setScenicName(each.getScenicName());
+                        scenicLists.add(each);
                     }
 	        	}
 	        	clusterShow();
@@ -216,6 +216,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 		mMap.setMyLocationStyle(myLocationStyle);// 将自定义的 myLocationStyle 对象添加到地图上
 		mMap.setLocationSource(this);// 设置定位监听 //设置定位资源。如果不设置此定位资源则定位按钮不可点击。
 		mMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
+
 		mMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
  
 	}
@@ -358,7 +359,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 			PointsClusterEntity result = (PointsClusterEntity)arg0.getObject();
 			if(result.getClusterCount() == 1) {
 				Intent intent = new Intent(ClusterActivity.this, MapOnlineActivity.class);
-                intent.putExtra("scenicId", result.getSubScenicEntity().get(0).getScenicId());
+                intent.putExtra("scenicInfo", result.getSubScenicEntity().get(0));
 //				Intent intent = new Intent(ClusterActivity.this, MarkerActivity.class);
 				startActivity(intent);
 			} 
