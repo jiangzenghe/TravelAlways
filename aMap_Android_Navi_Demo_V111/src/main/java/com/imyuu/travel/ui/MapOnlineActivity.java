@@ -78,6 +78,7 @@ import com.imyuu.travel.util.Player;
 import com.imyuu.travel.util.ToastUtil;
 import com.imyuu.travel.view.ColumnHorizontalScrollView;
 import com.imyuu.travel.view.GridView;
+import com.imyuu.travel.view.RoutePopView;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -107,7 +108,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
 	private AMapNavi mAMapNavi;
-//	private ColumnHorizontalScrollView mColumnHorizontalScrollView;
+	private RoutePopView popView;
 	private LinearLayout mRoute_layout;
 	private RelativeLayout rl_column;
 	private TextView redAlert;
@@ -122,9 +123,9 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	private Marker mMarkerRouteEnd;
 
 	// 规划线路
-//	private RouteOverLay mRouteOverLay;
 	private Polyline lineDraw;
     private ScenicAreaJson scenic;
+	private String scenicId = "";
 
 	/** 分类列表*/
 	private ArrayList<RecommendLine> routeList=new ArrayList<RecommendLine>();
@@ -154,6 +155,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		if(scenic != null) {
 			String tvl_url = TVL_URL_ROOT +scenic.getScenicId()+"/%d/%d/%d.png";
 			MapsInitializer.replaceURL(tvl_url, "OnLine");
+			scenicId = scenic.getScenicId();
 		}
 
 		mapView = (MapView) findViewById(R.id.map);
@@ -191,7 +193,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		redAlert = (TextView) findViewById(R.id.text_redalert);
 		layout_redalert = (LinearLayout) findViewById(R.id.layout_redalert);
 		mRoute_layout = (LinearLayout) findViewById(R.id.layout_route);
-//		mColumnHorizontalScrollView = (ColumnHorizontalScrollView) findViewById(R.id.mColumnHorizontalScrollView);
 		cilckText = (TextView) findViewById(R.id.help);
 		layoutShow = (GridView) findViewById(R.id.layout_show);
 		routeText = (TextView) findViewById(R.id.route);
@@ -207,22 +208,17 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		
 		LayoutInflater inflater = LayoutInflater.from(this); 
         // 引入窗口配置文件 
-        final View view = inflater.inflate(R.layout.main_top_right_dialog, null); 
+        final View view = inflater.inflate(R.layout.main_top_right_dialog, null);
         // 创建PopupWindow对象 
-        final PopupWindow pop = new PopupWindow(view, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, false); 
-        // 需要设置一下此参数，点击外边可消失 
-        pop.setBackgroundDrawable(new BitmapDrawable()); 
-        //设置点击窗口外边窗口消失 
-        pop.setOutsideTouchable(true); 
-        // 设置此参数获得焦点，否则无法点击 
-        pop.setFocusable(true); 
+		popView = new RoutePopView(MapOnlineActivity.this, scenicId, view);
+
         routeText.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				if (pop.isShowing()) {
+				if (popView.isShowing()) {
 					// 隐藏窗口，如果设置了点击窗口外小时即不需要此方式隐藏
-					pop.dismiss();
+					popView.dismiss();
 				} else {
 					if (rl_column.getVisibility() == View.VISIBLE) {
 						Drawable nav_up = getResources().getDrawable(R.drawable.uparrow);
@@ -235,89 +231,8 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 					int[] location = new int[2];
 					v.getLocationOnScreen(location);
 					int mWindowHeight = CommonUtils.getWindowsHeight(MapOnlineActivity.this);
-					pop.showAtLocation(v, Gravity.LEFT | Gravity.BOTTOM, 0, mWindowHeight - location[1] + pop.getHeight());
-					final LinearLayout classic_route = (LinearLayout) view.findViewById(R.id.classic_route);
-					final LinearLayout classic_good = (LinearLayout) view.findViewById(R.id.good_route);
+					popView.showAtLocation(v, Gravity.LEFT | Gravity.BOTTOM, 0, mWindowHeight - location[1] + popView.getHeight());
 
-					classic_route.setOnClickListener(new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							if (pop.isShowing()) pop.dismiss();
-
-							removeRoute();
-							initColumn("1");
-							Drawable nav_down = getResources().getDrawable(R.drawable.downarrow);
-							nav_down.setBounds(0, 0, nav_down.getMinimumWidth(), nav_down.getMinimumHeight());
-							routeText.setCompoundDrawables(nav_down, null, null, null);
-							rl_column.setVisibility(View.GONE);
-							Animation mShowAction = AnimationUtils.loadAnimation(MapOnlineActivity.this, R.anim.right_in);
-							rl_column.setAnimation(mShowAction);
-							rl_column.setVisibility(View.VISIBLE);
-
-							ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
-							for (SpotInfo each : spotList) {
-								arg1.add(new LatLng(each.getLat(), each.getLng()));
-//	    						mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).position(new LatLng(each.getLatitude(),each.getLongitude())));
-							}
-							if (arg1.size() != 0) {
-								lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
-										.addAll(arg1).color(Color.RED).visible(true));
-//								if(mCurrentVirtualPoint == null) {
-								mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
-										.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));
-//								}
-								mCurrentVirtualPoint.setPosition(arg1.get(0));
-								mCurrentVirtualPoint.setObject(0);
-//								mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-//										arg1.get(0), 19));  //37.5206,121.358
-								mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-										arg1.get(0), 19), 2000, null);  //37.5206,121.358
-							} else {
-								rl_column.setVisibility(View.GONE);
-							}
-						}
-
-					});
-
-					classic_good.setOnClickListener(new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							if (pop.isShowing()) pop.dismiss();
-							removeRoute();
-							initColumn("2");
-							Drawable nav_down = getResources().getDrawable(R.drawable.downarrow);
-							nav_down.setBounds(0, 0, nav_down.getMinimumWidth(), nav_down.getMinimumHeight());
-							routeText.setCompoundDrawables(nav_down, null, null, null);
-							rl_column.setVisibility(View.GONE);
-							Animation mShowAction = AnimationUtils.loadAnimation(MapOnlineActivity.this, R.anim.right_in);
-							rl_column.setAnimation(mShowAction);
-							rl_column.setVisibility(View.VISIBLE);
-
-							ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
-							for (SpotInfo each : spotList) {
-								arg1.add(new LatLng(each.getLat(), each.getLng()));
-							}
-							if (arg1.size() != 0) {
-								lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
-										.addAll(arg1).color(Color.RED).visible(true));
-								if (mCurrentVirtualPoint == null) {
-									mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
-											.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));
-								}
-								mCurrentVirtualPoint.setPosition(arg1.get(0));
-								mCurrentVirtualPoint.setObject(0);
-//								mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-//										arg1.get(0), 19));  //37.5206,121.358
-								mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-										arg1.get(0), 19), 2000, null);  //37.5206,121.358
-							} else {
-								rl_column.setVisibility(View.GONE);
-							}
-						}
-
-					});
 				}
 
 			}
@@ -329,25 +244,42 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				if (layoutShow.getVisibility() == View.VISIBLE) {
-					TranslateAnimation mHideAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
-							Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-							0.0f, Animation.RELATIVE_TO_SELF, 1.0f);
-					mHideAction.setDuration(50);
-					layoutShow.setAnimation(mHideAction);
-					layoutShow.setVisibility(View.GONE);
-				} else {
-					TranslateAnimation mShowAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
-							Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-							1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
-					mShowAction.setDuration(50);
-					layoutShow.setAnimation(mShowAction);
-					layoutShow.setVisibility(View.VISIBLE);
-				}
+				indicateAnimation(layoutShow, null, 1);
 			}
 		});
 		
 		initGridView();
+	}
+
+	public void indicateAnimation(View view, TextView flag,int type) {
+
+		if(type == 0) {//horizontal
+			Drawable nav_down = getResources().getDrawable(R.drawable.downarrow);
+			nav_down.setBounds(0, 0, nav_down.getMinimumWidth(), nav_down.getMinimumHeight());
+			flag.setCompoundDrawables(nav_down, null, null, null);
+			view.setVisibility(View.GONE);
+			Animation mShowAction = AnimationUtils.loadAnimation(MapOnlineActivity.this, R.anim.right_in);
+			view.setAnimation(mShowAction);
+			view.setVisibility(View.VISIBLE);
+
+		} else { //vertical
+			TranslateAnimation mHideAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+					Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+					0.0f, Animation.RELATIVE_TO_SELF, 1.0f);
+			TranslateAnimation mShowAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+					Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+					1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+			if (view.getVisibility() == View.VISIBLE) {
+				mHideAction.setDuration(50);
+				view.setAnimation(mHideAction);
+				view.setVisibility(View.GONE);
+			} else {
+				mShowAction.setDuration(50);
+				view.setAnimation(mShowAction);
+				view.setVisibility(View.VISIBLE);
+			}
+		}
+
 	}
 
 	public void movePoint(final Marker marker, final ArrayList<SpotModel> temp) {

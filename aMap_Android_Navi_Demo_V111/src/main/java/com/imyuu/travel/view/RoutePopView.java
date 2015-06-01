@@ -1,7 +1,10 @@
 package com.imyuu.travel.view;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +14,18 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.maps2d.CameraUpdateFactory;
+import com.amap.api.maps2d.model.BitmapDescriptorFactory;
 import com.amap.api.maps2d.model.LatLng;
+import com.amap.api.maps2d.model.MarkerOptions;
+import com.amap.api.maps2d.model.PolylineOptions;
 import com.imyuu.travel.R;
 import com.imyuu.travel.api.ApiClient;
 import com.imyuu.travel.bean.SpotModel;
 import com.imyuu.travel.model.RecommendLine;
+import com.imyuu.travel.model.SpotInfo;
 import com.imyuu.travel.ui.MapOnlineActivity;
+import com.imyuu.travel.util.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +45,7 @@ import retrofit.client.Response;
 public class RoutePopView extends PopupWindow {
 
 	private String scenicId;
-	private Context context;
+	private MapOnlineActivity context;
 	private ArrayList<RecommendLine> routeList=new ArrayList<RecommendLine>();
 	private LayoutInflater inflater;
 
@@ -47,7 +56,7 @@ public class RoutePopView extends PopupWindow {
 	 * 构造器
 
 	 */
-	public RoutePopView(Context context, String scenicId, View view) {
+	public RoutePopView(MapOnlineActivity context, String scenicId, View view) {
 
 		super(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, false);
 		this.scenicId = scenicId;
@@ -57,15 +66,18 @@ public class RoutePopView extends PopupWindow {
 	}
 
 	public void onCreate() {
-		MapOnlineActivity activity = (MapOnlineActivity)context;
+		// 需要设置一下此参数，点击外边可消失
+		this.setBackgroundDrawable(new BitmapDrawable());
+		//设置点击窗口外边窗口消失
+		this.setOutsideTouchable(true);
+		// 设置此参数获得焦点，否则无法点击
+		this.setFocusable(true);
+
 //		mRoute_layout = (LinearLayout) activity.findViewById(R.id.layout_route);
 		initRouteList(scenicId);
-		inflater = LayoutInflater.from(context);
-		// 引入窗口配置文件
-		final View view = inflater.inflate(R.layout.main_top_right_dialog, null);
-		mPopView_layout = (LinearLayout)view.findViewById(R.id.main_dialog_layout);
-		// 创建PopupWindow对象
-//		final PopupWindow pop = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, false);
+
+		mPopView_layout = (LinearLayout)rootview.findViewById(R.id.main_dialog_layout);
+
 	}
 
 	private void initRouteList(String scenicId) {
@@ -119,5 +131,79 @@ public class RoutePopView extends PopupWindow {
 			mRoute_layout.addView(linearLayoutMapLineItem);
 
 		}
+	}
+
+	public void aaa() {
+		final LinearLayout classic_route = (LinearLayout) view.findViewById(R.id.classic_route);
+		final LinearLayout classic_good = (LinearLayout) view.findViewById(R.id.good_route);
+
+		classic_route.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				if (popView.isShowing()) popView.dismiss();
+
+				removeRoute();
+				initColumn("1");
+				indicateAnimation(rl_column, routeText, 0);
+
+				ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
+				for (SpotInfo each : spotList) {
+					arg1.add(new LatLng(each.getLat(), each.getLng()));
+//	    						mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).position(new LatLng(each.getLatitude(),each.getLongitude())));
+				}
+				if (arg1.size() != 0) {
+					lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
+							.addAll(arg1).color(Color.RED).visible(true));
+//								if(mCurrentVirtualPoint == null) {
+					mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
+							.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));
+//								}
+					mCurrentVirtualPoint.setPosition(arg1.get(0));
+					mCurrentVirtualPoint.setObject(0);
+//								mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//										arg1.get(0), 19));  //37.5206,121.358
+					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+							arg1.get(0), 19), 2000, null);  //37.5206,121.358
+				} else {
+					rl_column.setVisibility(View.GONE);
+				}
+			}
+
+		});
+
+		classic_good.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				if (popView.isShowing()) popView.dismiss();
+				removeRoute();
+				initColumn("2");
+				//设置rl_column的显示，设置routeText的图片。
+				indicateAnimation(rl_column, routeText, 0);
+
+				ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
+				for (SpotInfo each : spotList) {
+					arg1.add(new LatLng(each.getLat(), each.getLng()));
+				}
+				if (arg1.size() != 0) {
+					lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
+							.addAll(arg1).color(Color.RED).visible(true));
+					if (mCurrentVirtualPoint == null) {
+						mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
+								.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));
+					}
+					mCurrentVirtualPoint.setPosition(arg1.get(0));
+					mCurrentVirtualPoint.setObject(0);
+//								mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//										arg1.get(0), 19));  //37.5206,121.358
+					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+							arg1.get(0), 19), 2000, null);  //37.5206,121.358
+				} else {
+					rl_column.setVisibility(View.GONE);
+				}
+			}
+
+		});
 	}
 }
