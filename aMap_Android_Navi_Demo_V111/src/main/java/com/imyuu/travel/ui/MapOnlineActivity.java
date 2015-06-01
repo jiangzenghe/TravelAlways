@@ -62,6 +62,7 @@ import com.amap.api.navi.model.AMapNaviPath;
 import com.amap.api.navi.model.NaviInfo;
 import com.amap.api.navi.model.NaviLatLng;
 import com.imyuu.travel.R;
+import com.imyuu.travel.TTSController;
 import com.imyuu.travel.adapters.GridAdapter;
 import com.imyuu.travel.api.ApiClient;
 import com.imyuu.travel.bean.SpotModel;
@@ -113,6 +114,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	private LinearLayout layout_redalert;
 	
 	private float zoom;
+	private String mCurPalyingURL = "";
 	private NaviLatLng mNaviEnd;
 	private NaviLatLng mNaviStart;
 	private Marker mCurrentVirtualPoint;
@@ -180,7 +182,11 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	private void initView() {
 
 		mAMapNavi = AMapNavi.getInstance(this);
+		TTSController ttsManager = TTSController.getInstance(this);// 初始化语音模块
+		ttsManager.init();
+		AMapNavi.getInstance(this).setAMapNaviListener(ttsManager);// 设置语音模块播报
 		mAMapNavi.setAMapNaviListener(this);
+
 		rl_column = (RelativeLayout) findViewById(R.id.rl_column);
 		redAlert = (TextView) findViewById(R.id.text_redalert);
 		layout_redalert = (LinearLayout) findViewById(R.id.layout_redalert);
@@ -259,7 +265,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 										.addAll(arg1).color(Color.RED).visible(true));
 //								if(mCurrentVirtualPoint == null) {
 								mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
-										.icon(BitmapDescriptorFactory.fromResource(R.drawable.m210)));
+										.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));
 //								}
 								mCurrentVirtualPoint.setPosition(arg1.get(0));
 								mCurrentVirtualPoint.setObject(0);
@@ -298,7 +304,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 										.addAll(arg1).color(Color.RED).visible(true));
 								if (mCurrentVirtualPoint == null) {
 									mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
-											.icon(BitmapDescriptorFactory.fromResource(R.drawable.m210)));
+											.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));
 								}
 								mCurrentVirtualPoint.setPosition(arg1.get(0));
 								mCurrentVirtualPoint.setObject(0);
@@ -352,6 +358,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 		handler.post(new Runnable() {
 			int each = 0;
+
 			@Override
 			public void run() {
 
@@ -530,7 +537,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 						if(mCurrentVirtualPoint == null) {
 							mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
-									.icon(BitmapDescriptorFactory.fromResource(R.drawable.m210)));
+									.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));
 						}
 						mCurrentVirtualPoint.setPosition(posi);
 					}
@@ -762,6 +769,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		super.onPause();
 		mapView.onPause();
 		deactivate();
+		AMapNavi.getInstance(this).stopNavi();
 	}
 
 	/**
@@ -779,7 +787,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-
+		TTSController.getInstance(this).stopSpeaking();
 		mapView.onDestroy();
 	}
 	
@@ -845,9 +853,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
 		// TODO Auto-generated method stub
-//		if(arg0.getObject() != null) {//1marker
-//
-//		}
+
 		return false;
 	}
 
@@ -859,23 +865,26 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		final TextView naviView = (TextView) view.findViewById(R.id.navi);
 		
 		final ScenicPointJson point = (ScenicPointJson)marker.getObject();
-//		String point = (String)marker.getObject();
 		if(point.getSpotType().equals("1")) {//point.getSpotType()
-			voiceView.setTag(point.getScenicId());
+			voiceView.setTag(point.getAudioUrl());
 			voiceView.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
                     Player player = ApplicationHelper.getInstance().getPlayer();
-					if(player.getStatus() != 0 && scenic != null) {
-                        String url = point.getAudioUrl();
-						player.playUrl(Config.IMAGE_SERVER_ADDR + url);
-
-					} else if(player.getStatus() == 0) {
+					if(player.getStatus() == 0 && !point.getAudioUrl().equals(mCurPalyingURL)) {
 						player.stop();
 					}
-
+					if(scenic == null) return;
+					if(!point.getAudioUrl().equals(mCurPalyingURL) || player.getStatus() == 3
+							|| player.getStatus() == 1) {
+						String url = point.getAudioUrl();
+						player.playUrl(Config.IMAGE_SERVER_ADDR + url);
+						mCurPalyingURL = point.getAudioUrl();
+					} else {
+						player.pause();
+					}
 				}
 			
 			});
@@ -959,7 +968,12 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 //			mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).position(new LatLng(each.getLatitude(),each.getLongitude())));
 		}
 		lineDraw = mMap.addPolyline(new PolylineOptions().addAll(arg1).color(Color.RED).visible(true).zIndex(10));
-		
+
+		TTSController.getInstance(this).startSpeaking();
+		// 设置模拟速度
+		AMapNavi.getInstance(this).setEmulatorNaviSpeed(100);
+		// 开启模拟导航
+		AMapNavi.getInstance(this).startNavi(AMapNavi.EmulatorNaviMode);
 	}
 
 	@Override
