@@ -42,7 +42,6 @@ public class ApiClient {
     }
 
 //    public  static void uploadFile(File file,String imagename) {
-//
 //        String mimeType = "image/jpg";
 //        TypedFile fileToSend = new TypedFile(mimeType, file);
 //        IuuApiInterface fileWebService =  getIuuApiClient();

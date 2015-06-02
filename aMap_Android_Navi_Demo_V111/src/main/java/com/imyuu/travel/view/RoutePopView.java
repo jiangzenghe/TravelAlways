@@ -1,9 +1,13 @@
 package com.imyuu.travel.view;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,13 +15,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.maps2d.AMap;
 import com.amap.api.maps2d.CameraUpdateFactory;
 import com.amap.api.maps2d.model.BitmapDescriptorFactory;
 import com.amap.api.maps2d.model.LatLng;
+import com.amap.api.maps2d.model.Marker;
 import com.amap.api.maps2d.model.MarkerOptions;
+import com.amap.api.maps2d.model.Polyline;
 import com.amap.api.maps2d.model.PolylineOptions;
 import com.imyuu.travel.R;
 import com.imyuu.travel.api.ApiClient;
@@ -47,10 +55,18 @@ public class RoutePopView extends PopupWindow {
 	private String scenicId;
 	private MapOnlineActivity context;
 	private ArrayList<RecommendLine> routeList=new ArrayList<RecommendLine>();
+	private ArrayList<SpotInfo> spotList=new ArrayList<SpotInfo>();
 	private LayoutInflater inflater;
 
 	private LinearLayout mPopView_layout;
-	private View rootview;
+	private LinearLayout mRoute_layout;
+	private TextView routeText;
+	private RelativeLayout rl_column;
+	private View rootview;  //R.layout.main_top_right_dialog
+	private AMap mMap;
+
+	private Polyline lineDraw;
+	private Marker mCurrentVirtualPoint;
 
 	/**
 	 * 构造器
@@ -62,6 +78,7 @@ public class RoutePopView extends PopupWindow {
 		this.scenicId = scenicId;
 		this.context = context;
 		this.rootview = view;
+		this.mMap = context.getmMap();
 		onCreate();
 	}
 
@@ -73,10 +90,12 @@ public class RoutePopView extends PopupWindow {
 		// 设置此参数获得焦点，否则无法点击
 		this.setFocusable(true);
 
-//		mRoute_layout = (LinearLayout) activity.findViewById(R.id.layout_route);
-		initRouteList(scenicId);
-
+		inflater = LayoutInflater.from(context);
 		mPopView_layout = (LinearLayout)rootview.findViewById(R.id.main_dialog_layout);
+		mRoute_layout = (LinearLayout) context.findViewById(R.id.layout_route);
+		rl_column = (RelativeLayout) context.findViewById(R.id.rl_column);
+		routeText = (TextView) context.findViewById(R.id.route);
+		initRouteList(scenicId);
 
 	}
 
@@ -90,12 +109,12 @@ public class RoutePopView extends PopupWindow {
 					Toast.makeText(context, "结果为空", Toast.LENGTH_SHORT).show();
 				}
 				for (RecommendLine each : resultJson) {
-					if (each.getLineName().equals("经典路线")) {
-						routeList.add(0, each);
-					} else {
-						routeList.add(1, each);
-					}
+					routeList.add(each);
 				}
+				if (routeList.size() > 0) {
+					initItemForRoute(routeList.size());
+				}
+
 			}
 
 			@Override
@@ -106,6 +125,80 @@ public class RoutePopView extends PopupWindow {
 	}
 
 	private void initItemForRoute(int count) {
+		for(int i = 0; i< count; i++){
+			// 动态添加景点布局
+			final LinearLayout linearLayoutMapPopItem = (LinearLayout)
+					inflater.inflate(R.layout.map_pop_item, mPopView_layout, false);
+			if(i==count -1) {
+				LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+						LinearLayout.LayoutParams.WRAP_CONTENT);
+				lp.setMargins(0,0,0,15);
+				linearLayoutMapPopItem.setLayoutParams(lp);
+			}
+			linearLayoutMapPopItem.setTag(i);
+			final TextView textMapLineTitle = (TextView) linearLayoutMapPopItem
+					.findViewById(R.id.text_map_pop_title);
+			textMapLineTitle.setText(routeList.get(i).getLineName());
+			setOnClickListener(linearLayoutMapPopItem);
+			mPopView_layout.addView(linearLayoutMapPopItem);
+		}
+	}
+
+	public void setOnClickListener(final LinearLayout in) {
+
+		in.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				if (RoutePopView.this.isShowing()) RoutePopView.this.dismiss();
+
+				context.removeRoute();
+				initColumn((int)in.getTag());
+				context.indicateAnimation(rl_column, routeText, 0);
+
+				ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
+				for (SpotInfo each : spotList) {
+					arg1.add(new LatLng(each.getLat(), each.getLng()));
+				}
+				if (arg1.size() != 0) {
+					lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
+							.addAll(arg1).color(Color.RED).visible(true));
+					mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
+							.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));
+					mCurrentVirtualPoint.setPosition(arg1.get(0));
+					mCurrentVirtualPoint.setObject(0);
+//					mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//						arg1.get(0), 19));  //37.5206,121.358
+					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+							arg1.get(0), 19), 2000, null);  //37.5206,121.358
+				} else {
+					rl_column.setVisibility(View.GONE);
+				}
+			}
+
+		});
+
+	}
+
+	/**
+	 *  初始化Column栏目项
+	 * */
+	private void initColumn(int type) { //"1"经典  "2"畅游
+		mRoute_layout.removeAllViews();
+		spotList.clear();
+		RecommendLine line;
+		if(routeList == null || routeList.size() == 0) return;
+
+		line = routeList.get(type);
+
+		int count = 0;
+		if(line!=null && line.getLineSectionList()!=null) {
+			for(SpotInfo each : line.getLineSectionList()) {
+				spotList.add(each);
+			}
+			count =  line.getLineSectionList().size();
+		}
+
 		for(int i = 0; i< count; i++){
 			// 动态添加景点布局
 			LinearLayout linearLayoutMapLineItem = (LinearLayout)
@@ -128,82 +221,81 @@ public class RoutePopView extends PopupWindow {
 				imageMapLinePoint
 						.setImageResource(R.drawable.img_map_point);
 			}
+			linearLayoutMapLineItem
+					.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							for (int i = 0; i < mRoute_layout.getChildCount(); i++) {
+								View view = mRoute_layout.getChildAt(i);
+								if (view.getTag().toString()
+										.equals(v.getTag().toString())) {
+									ImageView imageMapLinePoint = (ImageView) v.findViewById(R.id.image_map_line_point);
+									imageMapLinePoint
+											.setImageResource(R.drawable.img_map_point_choice);
+									LatLng center = new LatLng(spotList.get(i).getLat(), spotList.get(i).getLng());
+//                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//											center, 19));  //37.5206,121.358
+
+									ArrayList<SpotModel> temp = new ArrayList<SpotModel>();
+									int flag = (int)mCurrentVirtualPoint.getObject();
+									if(flag<i) {
+										int j = 0;
+										for(int key = flag;key<=i;key++) {
+											LatLng latlng = new LatLng(spotList.get(key).getLat(), spotList.get(key).getLng());
+											SpotModel model = new SpotModel(j, key, latlng);
+											temp.add(model);
+											j++;
+										}
+									} else {
+										int j = 0;
+										for(int key = flag;key>=i;key--) {
+											LatLng latlng = new LatLng(spotList.get(key).getLat(), spotList.get(key).getLng());
+											SpotModel model = new SpotModel(j, key, latlng);
+											temp.add(model);
+											j++;
+										}
+									}
+
+									if(temp.size() > 0) {
+										movePoint(mCurrentVirtualPoint, temp);
+									}
+
+								}
+							}
+						}
+					});
 			mRoute_layout.addView(linearLayoutMapLineItem);
 
 		}
 	}
 
-	public void aaa() {
-		final LinearLayout classic_route = (LinearLayout) view.findViewById(R.id.classic_route);
-		final LinearLayout classic_good = (LinearLayout) view.findViewById(R.id.good_route);
+	public void movePoint(final Marker marker, final ArrayList<SpotModel> temp) {
+		final Handler handler = new Handler();
+		final long start = SystemClock.uptimeMillis();
+		final LatLng startLatLng = marker.getPosition();
+		final long duration = 2000;
 
-		classic_route.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if (popView.isShowing()) popView.dismiss();
-
-				removeRoute();
-				initColumn("1");
-				indicateAnimation(rl_column, routeText, 0);
-
-				ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
-				for (SpotInfo each : spotList) {
-					arg1.add(new LatLng(each.getLat(), each.getLng()));
-//	    						mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).position(new LatLng(each.getLatitude(),each.getLongitude())));
-				}
-				if (arg1.size() != 0) {
-					lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
-							.addAll(arg1).color(Color.RED).visible(true));
-//								if(mCurrentVirtualPoint == null) {
-					mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
-							.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));
-//								}
-					mCurrentVirtualPoint.setPosition(arg1.get(0));
-					mCurrentVirtualPoint.setObject(0);
-//								mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-//										arg1.get(0), 19));  //37.5206,121.358
-					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-							arg1.get(0), 19), 2000, null);  //37.5206,121.358
-				} else {
-					rl_column.setVisibility(View.GONE);
-				}
-			}
-
-		});
-
-		classic_good.setOnClickListener(new View.OnClickListener() {
+		handler.post(new Runnable() {
+			int each = 0;
 
 			@Override
-			public void onClick(View v) {
-				if (popView.isShowing()) popView.dismiss();
-				removeRoute();
-				initColumn("2");
-				//设置rl_column的显示，设置routeText的图片。
-				indicateAnimation(rl_column, routeText, 0);
+			public void run() {
 
-				ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
-				for (SpotInfo each : spotList) {
-					arg1.add(new LatLng(each.getLat(), each.getLng()));
-				}
-				if (arg1.size() != 0) {
-					lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
-							.addAll(arg1).color(Color.RED).visible(true));
-					if (mCurrentVirtualPoint == null) {
-						mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
-								.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));
-					}
-					mCurrentVirtualPoint.setPosition(arg1.get(0));
-					mCurrentVirtualPoint.setObject(0);
-//								mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-//										arg1.get(0), 19));  //37.5206,121.358
-					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-							arg1.get(0), 19), 2000, null);  //37.5206,121.358
+				Log.e("each", each + "");
+				marker.setPosition(temp.get(each).getLatLng());
+				marker.setObject(temp.get(each).getRouteIndex());
+				mMap.invalidate();// 刷新地图
+				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+						temp.get(each).getLatLng(), 19), 500, null);  //37.5206,121.358
+
+				if(each != temp.size()-1) {
+					each+=1;
+					handler.postDelayed(this, duration);
 				} else {
-					rl_column.setVisibility(View.GONE);
+					handler.removeCallbacks(this);
 				}
 			}
-
 		});
+
 	}
 }

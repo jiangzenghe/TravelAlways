@@ -65,6 +65,7 @@ import com.imyuu.travel.R;
 import com.imyuu.travel.TTSController;
 import com.imyuu.travel.adapters.GridAdapter;
 import com.imyuu.travel.api.ApiClient;
+import com.imyuu.travel.base.AppApplication;
 import com.imyuu.travel.bean.SpotModel;
 import com.imyuu.travel.model.RecommendLine;
 import com.imyuu.travel.model.ScenicAreaJson;
@@ -98,19 +99,43 @@ import retrofit.client.Response;
 public final class MapOnlineActivity extends Activity implements AMap.OnMarkerClickListener, AMap.OnInfoWindowClickListener,
 		AMap.InfoWindowAdapter, AMap.OnCameraChangeListener, AMap.OnMapLoadedListener, LocationSource,
 	AMapLocationListener, AMapNaviListener {
-	private static final String TVL_URL_ROOT = "http://imyuu.com:9100/tiles/";
 
 	private AMap mMap;
 	private MapView mapView;
 	private TextView cilckText;
-	private TextView routeText;
 	private GridView layoutShow;
+	private TextView routeText;
+	private RelativeLayout rl_column;
+
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
 	private AMapNavi mAMapNavi;
 	private RoutePopView popView;
-	private LinearLayout mRoute_layout;
-	private RelativeLayout rl_column;
+
+	public AMap getmMap() {
+		return mMap;
+	}
+
+	public void setmMap(AMap mMap) {
+		this.mMap = mMap;
+	}
+
+	public Polyline getLineDraw() {
+		return lineDraw;
+	}
+
+	public void setLineDraw(Polyline lineDraw) {
+		this.lineDraw = lineDraw;
+	}
+
+	public Marker getmCurrentVirtualPoint() {
+		return mCurrentVirtualPoint;
+	}
+
+	public void setmCurrentVirtualPoint(Marker mCurrentVirtualPoint) {
+		this.mCurrentVirtualPoint = mCurrentVirtualPoint;
+	}
+
 	private TextView redAlert;
 	private LinearLayout layout_redalert;
 	
@@ -118,21 +143,21 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	private String mCurPalyingURL = "";
 	private NaviLatLng mNaviEnd;
 	private NaviLatLng mNaviStart;
-	private Marker mCurrentVirtualPoint;
 	private Marker mMarkerRouteStart;
 	private Marker mMarkerRouteEnd;
 
 	// 规划线路
 	private Polyline lineDraw;
+	private Marker mCurrentVirtualPoint;
     private ScenicAreaJson scenic;
 	private String scenicId = "";
 
 	/** 分类列表*/
-	private ArrayList<RecommendLine> routeList=new ArrayList<RecommendLine>();
-	private ArrayList<SpotInfo> spotList=new ArrayList<SpotInfo>();
 	private ArrayList<ScenicPointJson> markerList=new ArrayList<ScenicPointJson>();
 	private MarkerUtilsFor2D markerUtilsFor2D;
 
+	@InjectView(R.id.layout_function)
+	LinearLayout layout_function;
     @InjectView(R.id.image_cancel_back)
     ImageView vm_cancel;
     @InjectView(R.id.text_label)
@@ -144,6 +169,11 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
         startActivity(intent);
     }
 
+	@OnClick(R.id.layout_function)
+	public void callFuncAlert() {
+
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -153,7 +183,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
         scenic   = (ScenicAreaJson)getIntent().getExtras().getSerializable("scenicInfo");
 
 		if(scenic != null) {
-			String tvl_url = TVL_URL_ROOT +scenic.getScenicId()+"/%d/%d/%d.png";
+			String tvl_url = Config.TVL_URL_ROOT +scenic.getScenicId()+"/%d/%d/%d.png";
 			MapsInitializer.replaceURL(tvl_url, "OnLine");
 			scenicId = scenic.getScenicId();
 		}
@@ -165,7 +195,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		initView();
 	}
 
-	private void removeRoute() {
+	public void removeRoute() {
 		if(lineDraw != null) {
 			lineDraw.remove();
 		}
@@ -176,7 +206,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 //			mCurrentVirtualPoint.remove();
 //		}
 		if(mMarkerRouteEnd!=null) {
-//			mRouteOverLay.removeFromMap();
 			mMarkerRouteEnd.remove();
 		}
 	}
@@ -190,18 +219,17 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		mAMapNavi.setAMapNaviListener(this);
 
 		rl_column = (RelativeLayout) findViewById(R.id.rl_column);
-		redAlert = (TextView) findViewById(R.id.text_redalert);
-		layout_redalert = (LinearLayout) findViewById(R.id.layout_redalert);
-		mRoute_layout = (LinearLayout) findViewById(R.id.layout_route);
+		routeText = (TextView) findViewById(R.id.route);
 		cilckText = (TextView) findViewById(R.id.help);
 		layoutShow = (GridView) findViewById(R.id.layout_show);
-		routeText = (TextView) findViewById(R.id.route);
+		redAlert = (TextView) findViewById(R.id.text_redalert);
+		layout_redalert = (LinearLayout) findViewById(R.id.layout_redalert);
 		layout_redalert.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				redAlert.setVisibility(View.VISIBLE);
+//				redAlert.setVisibility(View.VISIBLE);
 			}
 			
 		});
@@ -251,6 +279,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		initGridView();
 	}
 
+	//隐藏与显示的动画效果
 	public void indicateAnimation(View view, TextView flag,int type) {
 
 		if(type == 0) {//horizontal
@@ -280,131 +309,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			}
 		}
 
-	}
-
-	public void movePoint(final Marker marker, final ArrayList<SpotModel> temp) {
-		final Handler handler = new Handler();
-		final long start = SystemClock.uptimeMillis();
-		final LatLng startLatLng = marker.getPosition();
-		final long duration = 2000;
-
-		handler.post(new Runnable() {
-			int each = 0;
-
-			@Override
-			public void run() {
-
-				Log.e("each", each + "");
-				marker.setPosition(temp.get(each).getLatLng());
-				marker.setObject(temp.get(each).getRouteIndex());
-				mMap.invalidate();// 刷新地图
-				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-						temp.get(each).getLatLng(), 19), 500, null);  //37.5206,121.358
-
-				if(each != temp.size()-1) {
-					each+=1;
-					handler.postDelayed(this, duration);
-				} else {
-					handler.removeCallbacks(this);
-				}
-			}
-		});
-
-	}
-
-	/** 
-	 *  初始化Column栏目项
-	 * */
-	private void initColumn(String type) { //"1"经典  "2"畅游
-		mRoute_layout.removeAllViews();
-		spotList.clear();
-		RecommendLine line;
-		if(type.equals("1")&&routeList!=null) {
-			line = routeList.get(0);
-		} else {
-			if(routeList.size()>1) {				
-				line = routeList.get(1);
-			} else {
-				return;
-			}
-		}
-		int count = 0;
-		if(line!=null&&line.getLineSectionList()!=null) {
-			for(SpotInfo each : line.getLineSectionList()) {
-				spotList.add(each);
-			}
-			count =  line.getLineSectionList().size();
-		}
-		LayoutInflater  inflater=LayoutInflater.from(this);
-
-		for(int i = 0; i< count; i++){
-			// 动态添加景点布局
-            LinearLayout linearLayoutMapLineItem = (LinearLayout)
-                    inflater.inflate(R.layout.map_line_item, mRoute_layout, false);
-            linearLayoutMapLineItem.setTag(i);
-            TextView textMapLineTitle = (TextView) linearLayoutMapLineItem
-                    .findViewById(R.id.text_map_line_title);
-            textMapLineTitle.setText(spotList.get(i).getSpotName());
-            ImageView imageMapLinePoint = (ImageView) linearLayoutMapLineItem
-                    .findViewById(R.id.image_map_line_point);
-         // index等于0代表为线路上的第一个点
-            if (i == 0) {
-                imageMapLinePoint
-                        .setImageResource(R.drawable.img_map_point_choice);
-                imageMapLinePoint
-                        .setBackgroundResource(R.drawable.img_map_line_r_half);
-            } else if(i==count-1) {
-            	imageMapLinePoint.setBackgroundResource(R.drawable.img_map_line_l_half);
-            } else {
-                imageMapLinePoint
-                        .setImageResource(R.drawable.img_map_point);
-            }
-            linearLayoutMapLineItem
-                    .setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                        	for (int i = 0; i < mRoute_layout.getChildCount(); i++) {                        		
-                        		View view = mRoute_layout.getChildAt(i);
-                        		if (view.getTag().toString()
-                        				.equals(v.getTag().toString())) {
-                        			ImageView imageMapLinePoint = (ImageView) v.findViewById(R.id.image_map_line_point);
-                                    imageMapLinePoint
-											.setImageResource(R.drawable.img_map_point_choice);
-                                    LatLng center = new LatLng(spotList.get(i).getLat(), spotList.get(i).getLng());
-//                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-//											center, 19));  //37.5206,121.358
-
-									ArrayList<SpotModel> temp = new ArrayList<SpotModel>();
-									int flag = (int)mCurrentVirtualPoint.getObject();
-									if(flag<i) {
-										int j = 0;
-										for(int key = flag;key<=i;key++) {
-											LatLng latlng = new LatLng(spotList.get(key).getLat(), spotList.get(key).getLng());
-											SpotModel model = new SpotModel(j, key, latlng);
-											temp.add(model);
-											j++;
-										}
-									} else {
-										int j = 0;
-										for(int key = flag;key>=i;key--) {
-											LatLng latlng = new LatLng(spotList.get(key).getLat(), spotList.get(key).getLng());
-											SpotModel model = new SpotModel(j, key, latlng);
-											temp.add(model);
-											j++;
-										}
-									}
-
-									if(temp.size() > 0) {
-										movePoint(mCurrentVirtualPoint, temp);
-									}
-
-                        		}
-                        	}
-                        }
-					});
-			mRoute_layout.addView(linearLayoutMapLineItem);
-			
-		}
 	}
 	
 	private void initGridView() {
@@ -474,12 +378,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 						mCurrentVirtualPoint.setPosition(posi);
 					}
 				}
-				TranslateAnimation mHideAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
-						Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-						0.0f, Animation.RELATIVE_TO_SELF, 1.0f);
-				mHideAction.setDuration(50);
-				layoutShow.setAnimation(mHideAction);
-				layoutShow.setVisibility(View.GONE);
+				indicateAnimation(layoutShow, null, 1);
 
 			}
 			
@@ -533,8 +432,8 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		myLocationStyle.strokeWidth(1.0f);// 设置圆形的边框粗细
 		mMap.setMyLocationStyle(myLocationStyle);// 将自定义的 myLocationStyle 对象添加到地图上
 		mMap.setLocationSource(this);// 设置定位监听 //设置定位资源。如果不设置此定位资源则定位按钮不可点击。
-		mMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
-		mMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
+		mMap.getUiSettings().setMyLocationButtonEnabled(false);// 设置默认定位按钮是否显示
+		mMap.setMyLocationEnabled(false);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
  
 	}
 	
@@ -613,33 +512,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 //			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
 //					new LatLng(scenic.getLat(), scenic.getLng()), 19));  //37.5206,121.358
 			getScenicSpotsNet(scenic.getScenicId());
-			initRouteList(scenic.getScenicId());
 		}
-	}
-
-	private void initRouteList(String scenicId) {
-		routeList.clear();
-		ApiClient.getIuuApiClient().queryRecommendLines(scenicId, new Callback<List<RecommendLine>>() {
-			@Override
-			public void success(List<RecommendLine> resultJson, Response response) {
-				Toast.makeText(MapOnlineActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
-				if (resultJson == null) {
-					Toast.makeText(MapOnlineActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
-				}
-				for (RecommendLine each : resultJson) {
-					if (each.getLineName().equals("经典路线")) {
-						routeList.add(0, each);
-					} else {
-						routeList.add(1, each);
-					}
-				}
-			}
-
-			@Override
-			public void failure(RetrofitError error) {
-				Toast.makeText(MapOnlineActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
-			}
-		});
 	}
 
 	private void getScenicSpotsNet(String scenicId) {
@@ -834,8 +707,8 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 				mNaviStart.setLatitude(36.138143);//120.674922,36.138143
 				mNaviStart.setLongitude(120.674922);
 
-        //        mNaviStart.setLatitude(AppApplication.getInstance().getMyLocation().latitude);
-        //        mNaviStart.setLongitude(AppApplication.getInstance().getMyLocation().longitude);
+//                mNaviStart.setLatitude(AppApplication.getInstance().getMyLocation().latitude);
+//                mNaviStart.setLongitude(AppApplication.getInstance().getMyLocation().longitude);
 				Log.e("endLoc", point.getLat() +"," + point.getLng());
 				mNaviEnd = new NaviLatLng(point.getLat(), point.getLng());
 				calculateFootRoute();
@@ -886,9 +759,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		List<NaviLatLng> arg0 = naviPath.getCoordList();
 		ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
 		// 获取路径规划线路，显示到地图上
-//		mRouteOverLay.setRouteInfo(naviPath);
-//		mRouteOverLay.addToMap();
-//		mRouteOverLay.drawArrow(arg0);
 		mMarkerRouteStart = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
 				.icon(BitmapDescriptorFactory.fromResource(R.drawable.start))
 				.position(new LatLng(mNaviStart.getLatitude(),mNaviStart.getLongitude())));
@@ -897,7 +767,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 				.position(new LatLng(mNaviEnd.getLatitude(),mNaviEnd.getLongitude())));
 		for(NaviLatLng each:arg0) {
 			arg1.add(new LatLng(each.getLatitude(),each.getLongitude()));
-//			mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).position(new LatLng(each.getLatitude(),each.getLongitude())));
 		}
 		lineDraw = mMap.addPolyline(new PolylineOptions().addAll(arg1).color(Color.RED).visible(true).zIndex(10));
 

@@ -11,6 +11,7 @@ public class Config
     public static final int PHOTOALBUM_PROPORTION_DENOMINATOR = 640;
     public static final int PHOTOALBUM_PROPORTION_MOLECULE = 450;
     public static final String SERVER_ADDR = "http://imyuu.com:8900/api/";
+    public static final String TVL_URL_ROOT = "http://imyuu.com:9100/tiles/";
     public static final String MAP_SERVER_ADDR = "http://imyuu.com:9100/map/";
     public static final String IMAGE_SERVER_ADDR = "http://imyuu.com:9100/images/";
     public static final String  jsonFile= ".json";

@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="10"
+        android:minSdkVersion="14"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -54,6 +54,12 @@
         <activity android:name=".ui.ClusterActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".ui.MapActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".ui.MapOnlineActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".ui."
+            android:theme="@style/MyDialogStyleTop" >
+        </activity>
+
+        <activity android:name=".ui.MapOnlineTestActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <activity android:name=".ui.QueryCityActivity"/>
         <service android:name=".base.LocationService" android:exported="false"/>

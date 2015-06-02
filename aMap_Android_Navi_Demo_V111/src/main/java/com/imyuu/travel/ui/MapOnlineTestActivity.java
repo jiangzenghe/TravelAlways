@@ -215,9 +215,11 @@ public final class MapOnlineTestActivity extends Activity implements AMap.OnMark
                 	int[] location = new int[2];  
                     v.getLocationOnScreen(location);  
                     int mWindowHeight = CommonUtils.getWindowsHeight(MapOnlineTestActivity.this);
-                    pop.showAtLocation(v, Gravity.LEFT | Gravity.BOTTOM, 0, mWindowHeight-location[1]+pop.getHeight()); 
-                    final LinearLayout classic_route = (LinearLayout)view.findViewById(R.id.classic_route);
-                    final LinearLayout classic_good = (LinearLayout)view.findViewById(R.id.good_route);
+                    pop.showAtLocation(v, Gravity.LEFT | Gravity.BOTTOM, 0, mWindowHeight-location[1]+pop.getHeight());
+//                    final LinearLayout classic_route = (LinearLayout)view.findViewById(R.id.classic_route);
+//                    final LinearLayout classic_good = (LinearLayout)view.findViewById(R.id.good_route);
+					final LinearLayout classic_route = null;
+					final LinearLayout classic_good = null;
                     
                     classic_route.setOnClickListener(new OnClickListener() {
 

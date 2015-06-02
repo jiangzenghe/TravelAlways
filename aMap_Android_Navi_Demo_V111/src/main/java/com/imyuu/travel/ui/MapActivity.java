@@ -254,8 +254,10 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
                     v.getLocationOnScreen(location);  
                     int mWindowHeight = CommonUtils.getWindowsHeight(MapActivity.this);
                     pop.showAtLocation(v, Gravity.LEFT | Gravity.BOTTOM, 0, mWindowHeight-location[1]+pop.getHeight()); 
-                    final LinearLayout classic_route = (LinearLayout)view.findViewById(R.id.classic_route);
-                    final LinearLayout classic_good = (LinearLayout)view.findViewById(R.id.good_route);
+//                    final LinearLayout classic_route = (LinearLayout)view.findViewById(R.id.classic_route);
+//                    final LinearLayout classic_good = (LinearLayout)view.findViewById(R.id.good_route);
+					final LinearLayout classic_route = null;
+					final LinearLayout classic_good = null;
                     
                     classic_route.setOnClickListener(new OnClickListener() {
 
