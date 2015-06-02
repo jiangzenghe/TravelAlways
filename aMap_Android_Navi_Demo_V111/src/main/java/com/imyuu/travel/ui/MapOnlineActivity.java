@@ -120,26 +120,12 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		this.mMap = mMap;
 	}
 
-	public Polyline getLineDraw() {
-		return lineDraw;
-	}
-
-	public void setLineDraw(Polyline lineDraw) {
-		this.lineDraw = lineDraw;
-	}
-
-	public Marker getmCurrentVirtualPoint() {
-		return mCurrentVirtualPoint;
-	}
-
-	public void setmCurrentVirtualPoint(Marker mCurrentVirtualPoint) {
-		this.mCurrentVirtualPoint = mCurrentVirtualPoint;
-	}
-
 	private TextView redAlert;
 	private LinearLayout layout_redalert;
 	
 	private float zoom;
+	private boolean isGPSAuto = false;
+	private boolean isSpeakingAuto = false;
 	private String mCurPalyingURL = "";
 	private NaviLatLng mNaviEnd;
 	private NaviLatLng mNaviStart;
@@ -171,7 +157,10 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 	@OnClick(R.id.layout_function)
 	public void callFuncAlert() {
-
+		Intent intent = new Intent(MapOnlineActivity.this, FunctionCallOutActivity.class);
+		intent.putExtra("isGPSAuto", isGPSAuto);
+		intent.putExtra("isSpeakingAuto", isSpeakingAuto);
+		startActivityForResult(intent, 1000);
 	}
 
 	@Override
@@ -195,28 +184,37 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		initView();
 	}
 
-	public void removeRoute() {
+	private void removeRoute() {
 		if(lineDraw != null) {
 			lineDraw.remove();
 		}
 		if(mMarkerRouteStart!=null) {			
 			mMarkerRouteStart.remove();
 		}
-//		if(mCurrentVirtualPoint!=null) {
-//			mCurrentVirtualPoint.remove();
-//		}
+
 		if(mMarkerRouteEnd!=null) {
 			mMarkerRouteEnd.remove();
 		}
 	}
-	
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == 1000 && resultCode == RESULT_OK) {
+			isGPSAuto = data.getExtras().getBoolean("autoGps");
+			isSpeakingAuto = data.getExtras().getBoolean("autoSound");
+			super.onActivityResult(requestCode, resultCode, data);
+		}
+	}
+
 	private void initView() {
 
 		mAMapNavi = AMapNavi.getInstance(this);
 		TTSController ttsManager = TTSController.getInstance(this);// 初始化语音模块
 		ttsManager.init();
-		AMapNavi.getInstance(this).setAMapNaviListener(ttsManager);// 设置语音模块播报
-		mAMapNavi.setAMapNaviListener(this);
+		if(mAMapNavi != null) {
+			AMapNavi.getInstance(this).setAMapNaviListener(ttsManager);// 设置语音模块播报
+			mAMapNavi.setAMapNaviListener(this);
+		}
 
 		rl_column = (RelativeLayout) findViewById(R.id.rl_column);
 		routeText = (TextView) findViewById(R.id.route);
@@ -574,6 +572,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		super.onPause();
 		mapView.onPause();
 		deactivate();
+
 		AMapNavi.getInstance(this).stopNavi();
 	}
 
@@ -594,6 +593,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		super.onDestroy();
 		TTSController.getInstance(this).stopSpeaking();
 		mapView.onDestroy();
+		AMapNavi.getInstance(this).destroy();
 	}
 	
 	@Override

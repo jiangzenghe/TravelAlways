@@ -43,14 +43,13 @@
 			android:layout_marginRight="10dp"
 			android:id="@+id/layout_function"
 			android:layout_width="wrap_content"
-			android:layout_height="40dp"
+			android:layout_height="50dp"
 			android:orientation="horizontal"
-			android:background="@color/color_white"
 			android:layout_gravity="top|right"
 			android:padding="5dp">
 			<ImageView
-				android:layout_width="30dp"
-				android:layout_height="30dp"
+				android:layout_width="40dp"
+				android:layout_height="40dp"
 				android:src="@drawable/func_control"/>
 		</LinearLayout>
 
@@ -59,19 +58,18 @@
 	       android:layout_marginLeft="10dp"
 	       android:id="@+id/layout_redalert"
 		    android:layout_width="wrap_content"
-		    android:layout_height="40dp"
+		    android:layout_height="50dp"
 		    android:orientation="horizontal"
-		    android:background="@color/color_white"
 		    android:layout_gravity="top|left"
 		    android:padding="5dp">
-		    <ImageView 
-		       android:layout_width="30dp"
-		       android:layout_height="30dp"
+		    <ImageView
+		       android:layout_width="40dp"
+		       android:layout_height="40dp"
 		       android:src="@drawable/ic_detail_waring"/>
 		    <TextView 
 		        android:id="@+id/text_redalert"
 		        android:layout_width="wrap_content"
-		       android:layout_height="30dp"
+		       android:layout_height="40dp"
 		       android:text="红色警报,2500/1500人"
 		       android:visibility="gone"/>
 		</LinearLayout>

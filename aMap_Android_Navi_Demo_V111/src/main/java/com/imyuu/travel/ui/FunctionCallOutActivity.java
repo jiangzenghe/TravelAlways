@@ -22,10 +22,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.imyuu.travel.R;
+import com.imyuu.travel.util.ToastUtil;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 
@@ -43,25 +46,32 @@ public class FunctionCallOutActivity extends Activity implements OnClickListener
 	ImageView dialogCancel;
 	@InjectView(R.id.popActivity)
 	LinearLayout popLayout;
+	@InjectView(R.id.switch_gps)
+	Switch gpsSwitch;
+	@InjectView(R.id.switch_sound)
+	Switch soundSwitch;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.function_callout_dialog);
+		ButterKnife.inject(this);
 
 		initViewValue();
 		dialogCancel.setOnClickListener(this);
+		gpsSwitch.setOnClickListener(this);
+		soundSwitch.setOnClickListener(this);
 
 	}
 	
 	private void initViewValue(){
 		Intent intent = getIntent();
 
-		String gps = intent.getExtras().getString("");
-		String sound = intent.getExtras().getString("");
-		if(gps == null || gps.equals("") || sound.equals("") || sound == null){
-			return;
-		}
+		boolean gps = intent.getExtras().getBoolean("isGPSAuto");
+		boolean sound = intent.getExtras().getBoolean("isSpeakingAuto");
+
+		gpsSwitch.setChecked(gps);
+		soundSwitch.setChecked(sound);
 
 	}
 
@@ -73,13 +83,41 @@ public class FunctionCallOutActivity extends Activity implements OnClickListener
 			finish();
 			return;
 		}
-        
-		Intent intent = new Intent();
 
-		intent.putExtra("autoGps", 0);
-		intent.putExtra("autoSound", 0);
-		setResult(Activity.RESULT_OK, intent);
-		finish();
+		if(v.getId() == R.id.switch_gps) {
+			Intent intent = new Intent();
+
+			intent.putExtra("autoGps", gpsSwitch.isChecked());
+			intent.putExtra("autoSound", soundSwitch.isChecked());
+			setResult(Activity.RESULT_OK, intent);
+			finish();
+		}
+
+		if(v.getId() == R.id.switch_sound) {
+			Intent intent = new Intent();
+
+			if(!gpsSwitch.isChecked()) {
+				gpsSwitch.setChecked(true);
+				ToastUtil.show(FunctionCallOutActivity.this, "开启自动讲解需要先开启定位");
+			}
+			intent.putExtra("autoGps", gpsSwitch.isChecked());
+			intent.putExtra("autoSound", soundSwitch.isChecked());
+			setResult(Activity.RESULT_OK, intent);
+			finish();
+		}
+//		if(v.getId() == R.id.ok_btn) {
+//			Intent intent = new Intent();
+//
+//			if(!gpsSwitch.isChecked() && soundSwitch.isChecked()) {
+//				gpsSwitch.setChecked(true);
+//				ToastUtil.show(FunctionCallOutActivity.this, "开启自动讲解需要先开启定位");
+//			}
+//			intent.putExtra("autoGps", gpsSwitch.isChecked());
+//			intent.putExtra("autoSound", soundSwitch.isChecked());
+//			setResult(Activity.RESULT_OK, intent);
+//			finish();
+//		}
+
 	}
 
 	@Override

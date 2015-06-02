@@ -3,6 +3,7 @@
     android:id="@+id/popActivity"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
+    android:background="@drawable/shape_round_no_corner"
     android:gravity="center"
     android:orientation="vertical" >
 
@@ -24,30 +25,10 @@
             android:text="功能"/>
         <ImageView
             android:id="@+id/cancel_dialogCancel"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/chahao"
             android:layout_gravity="right"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/diglog_sound"
-        android:layout_gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="3"
-            android:paddingLeft="10dp"
-            android:gravity="left|center"
-            android:text="自动讲解" />
-        <Switch
-            android:id="@+id/switch_sound"
-            android:layout_width="0dp"
-            android:layout_weight="1.5"
-            android:layout_height="match_parent" />
     </LinearLayout>
 
     <LinearLayout
@@ -67,9 +48,40 @@
         <Switch
             android:id="@+id/switch_gps"
             android:layout_width="0dp"
-            android:layout_weight="1.5"
+            android:layout_weight="2"
+            android:paddingRight="10dp"
             android:layout_height="match_parent" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/diglog_sound"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
 
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:paddingLeft="10dp"
+            android:gravity="left|center"
+            android:text="自动讲解" />
+        <Switch
+            android:id="@+id/switch_sound"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:paddingRight="10dp"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/ok_btn"
+        android:layout_gravity="center"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:text="确定"
+        android:visibility="gone"/>
 </LinearLayout>

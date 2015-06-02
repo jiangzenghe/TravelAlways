@@ -152,7 +152,7 @@ public class RoutePopView extends PopupWindow {
 			public void onClick(View v) {
 				if (RoutePopView.this.isShowing()) RoutePopView.this.dismiss();
 
-				context.removeRoute();
+				removeRoute();
 				initColumn((int)in.getTag());
 				context.indicateAnimation(rl_column, routeText, 0);
 
@@ -163,8 +163,10 @@ public class RoutePopView extends PopupWindow {
 				if (arg1.size() != 0) {
 					lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
 							.addAll(arg1).color(Color.RED).visible(true));
-					mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
-							.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));
+					if(mCurrentVirtualPoint == null) {
+						mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
+								.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));
+					}
 					mCurrentVirtualPoint.setPosition(arg1.get(0));
 					mCurrentVirtualPoint.setObject(0);
 //					mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
@@ -297,5 +299,14 @@ public class RoutePopView extends PopupWindow {
 			}
 		});
 
+	}
+
+	public void removeRoute() {
+		if(lineDraw != null) {
+			lineDraw.remove();
+		}
+//		if(mCurrentVirtualPoint!=null) {
+//			mCurrentVirtualPoint.remove();
+//		}
 	}
 }
