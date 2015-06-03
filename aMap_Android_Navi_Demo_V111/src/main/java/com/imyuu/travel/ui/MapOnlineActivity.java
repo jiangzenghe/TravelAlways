@@ -127,6 +127,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	private boolean isGPSAuto = false;
 	private boolean isSpeakingAuto = false;
 	private String mCurPalyingURL = "";
+	private Player player;
 	private NaviLatLng mNaviEnd;
 	private NaviLatLng mNaviStart;
 	private Marker mMarkerRouteStart;
@@ -179,6 +180,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
+		player = ApplicationHelper.getInstance().getPlayer();
 		
 		initMap();
 		initView();
@@ -202,6 +204,11 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		if(requestCode == 1000 && resultCode == RESULT_OK) {
 			isGPSAuto = data.getExtras().getBoolean("autoGps");
 			isSpeakingAuto = data.getExtras().getBoolean("autoSound");
+			if(isGPSAuto) {
+				mMap.setMyLocationEnabled(true);
+			} else if(mAMapLocationManager!=null){
+				mAMapLocationManager.removeUpdates(this);
+			}
 			super.onActivityResult(requestCode, resultCode, data);
 		}
 	}
@@ -431,7 +438,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		mMap.setMyLocationStyle(myLocationStyle);// 将自定义的 myLocationStyle 对象添加到地图上
 		mMap.setLocationSource(this);// 设置定位监听 //设置定位资源。如果不设置此定位资源则定位按钮不可点击。
 		mMap.getUiSettings().setMyLocationButtonEnabled(false);// 设置默认定位按钮是否显示
-		mMap.setMyLocationEnabled(false);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
+		mMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
  
 	}
 	
@@ -441,7 +448,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	@Override
 	public void onLocationChanged(AMapLocation aLocation) {
 
-		if(scenic != null) {
+		if(scenic != null && mListener != null && aLocation != null) {
 
 			double lat_left = 36.1379;
 			double lng_left = 120.6739;
@@ -451,15 +458,18 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			LatLngBounds bounds = new LatLngBounds.Builder()
 					.include(new LatLng(lat_left,lng_left))
 					.include(new LatLng(lat_right,lng_right)).build();
+			LatLng curPosition = new LatLng(aLocation.getLatitude(), aLocation.getLongitude());
 
-			if(!bounds.contains(new LatLng(aLocation.getLatitude(), aLocation.getLongitude()))) {
+			if(!bounds.contains(curPosition)) {
 				ToastUtil.show(this, "定位位置离本景点太远，请到达景点再定位使用此功能");
 				return;
 			}
 
-			if (mListener != null && aLocation != null ) {
-				mListener.onLocationChanged(aLocation);// 显示系统小蓝点
-				mNaviStart = new NaviLatLng(aLocation.getLatitude(), aLocation.getLongitude());
+			mListener.onLocationChanged(aLocation);// 显示系统小蓝点
+			mNaviStart = new NaviLatLng(aLocation.getLatitude(), aLocation.getLongitude());
+			if(isSpeakingAuto) {
+				markerUtilsFor2D.getNearestSpot(curPosition);
+				//play
 			}
 
 		}
@@ -480,8 +490,11 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			 * API定位采用GPS和网络混合定位方式
 			 * ，第一个参数是定位provider，第二个参数时间最短是2000毫秒，第三个参数距离间隔单位是米，第四个参数是定位监听者
 			 */
-			mAMapLocationManager.requestLocationUpdates(
-					LocationProviderProxy.AMapNetwork, 10 * 2000, 10, this);
+			mAMapLocationManager.requestLocationData(
+					LocationProviderProxy.AMapNetwork, -1, 10, this);
+		} else {
+			mAMapLocationManager.requestLocationData(
+					LocationProviderProxy.AMapNetwork, 3 * 2000, 10, this);
 		}
 	}
 
@@ -503,6 +516,8 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		zoom = mMap.getCameraPosition().zoom;
 		// 设置所有maker显示在View中
 		if(scenic != null) {
+			double centerLat = scenic.getLat()/2;
+			double centerLng = scenic.getLng()/2;
 			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
 					new LatLng(36.139143, 120.674922), 19));  //37.5206,121.358
 			mNaviStart = new NaviLatLng(36.138143, 120.674922);
@@ -548,7 +563,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
     	zoom = cameraPosition.zoom;
 		if(mMap == null) return;
 
-    	if(markerUtilsFor2D !=null && zoom < 19 ) {
+    	if(markerUtilsFor2D !=null && zoom < 18 ) {
     		markerUtilsFor2D.setAllUnVisible();
     	} else if(markerUtilsFor2D !=null) {
     		markerUtilsFor2D.setAllVisible();
@@ -677,7 +692,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-                    Player player = ApplicationHelper.getInstance().getPlayer();
 					if(player.getStatus() == 0 && !point.getAudioUrl().equals(mCurPalyingURL)) {
 						player.stop();
 					}

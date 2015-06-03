@@ -90,6 +90,32 @@ public class MarkerUtilsFor2D {
 		}
 	}
 
+	public ScenicPointJson getNearestSpot(LatLng curPosition) {
+
+		ScenicPointJson result = null;
+		if(pointsList!=null) {
+
+//			for(ScenicPointJson each:pointsList) {
+//				if(each.getSpotType().equals(type)) {
+//					LatLng end = new LatLng(each.getLat(), each.getLng());
+//
+//					float distance  = AMapUtils.calculateLineDistance(curPosition, end);
+//					if(temp == 0.0) {
+//						temp = distance;
+//						result = new LatLng(each.getLat(), each.getLng());
+//					} else {
+//						temp = temp>distance?distance:temp;
+//						if(temp>distance) {
+//							result = new LatLng(each.getLat(), each.getLng());
+//						}
+//					}
+//				}
+//			}
+
+		}
+		return result;
+	}
+
 	public LatLng moveToNearestPosition(LatLng curPosition, String type) {
 
 		float temp = 0.0f;

@@ -3,6 +3,7 @@ package com.imyuu.travel.view;
 import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -185,7 +186,7 @@ public class RoutePopView extends PopupWindow {
 	/**
 	 *  初始化Column栏目项
 	 * */
-	private void initColumn(int type) { //"1"经典  "2"畅游
+	private void initColumn(int type) { //"1"经典  "2"畅游...
 		mRoute_layout.removeAllViews();
 		spotList.clear();
 		RecommendLine line;
@@ -241,20 +242,16 @@ public class RoutePopView extends PopupWindow {
 									ArrayList<SpotModel> temp = new ArrayList<SpotModel>();
 									int flag = (int)mCurrentVirtualPoint.getObject();
 									if(flag<i) {
-										int j = 0;
 										for(int key = flag;key<=i;key++) {
 											LatLng latlng = new LatLng(spotList.get(key).getLat(), spotList.get(key).getLng());
-											SpotModel model = new SpotModel(j, key, latlng);
+											SpotModel model = new SpotModel(key, latlng);
 											temp.add(model);
-											j++;
 										}
 									} else {
-										int j = 0;
 										for(int key = flag;key>=i;key--) {
 											LatLng latlng = new LatLng(spotList.get(key).getLat(), spotList.get(key).getLng());
-											SpotModel model = new SpotModel(j, key, latlng);
+											SpotModel model = new SpotModel(key, latlng);
 											temp.add(model);
-											j++;
 										}
 									}
 
@@ -275,7 +272,31 @@ public class RoutePopView extends PopupWindow {
 		final Handler handler = new Handler();
 		final long start = SystemClock.uptimeMillis();
 		final LatLng startLatLng = marker.getPosition();
-		final long duration = 2000;
+		final long duration = 500;
+
+		final ArrayList<SpotModel> addtional = new ArrayList<SpotModel>();
+		if(temp.size() > 0) {
+			SpotModel last = new SpotModel(temp.get(0).getRouteIndex(),temp.get(0).getLatLng());
+			addtional.add(last);
+			for(int i = 0;i<temp.size();i++) {
+
+				if(i>0) {
+					Point nowPoint = mMap.getProjection().toScreenLocation(temp.get(i).getLatLng());
+					Point lastPoint = mMap.getProjection().toScreenLocation(last.getLatLng());
+					int count = Math.abs(nowPoint.x-lastPoint.x) + Math.abs(nowPoint.y-lastPoint.y);
+					count=(count-count%50)/50 + 1;
+					double add_lat = (temp.get(i).getLatLng().latitude - last.getLatLng().latitude)/count;
+					double add_lon = (temp.get(i).getLatLng().longitude - last.getLatLng().longitude)/count;
+					for(int j=1;j<count;j++) {
+						LatLng tempLatlng = new LatLng(last.getLatLng().latitude + j*add_lat, last.getLatLng().longitude + j*add_lon);
+						SpotModel each = new SpotModel(temp.get(i).getRouteIndex(), tempLatlng);
+						addtional.add(each);
+					}
+					addtional.add(temp.get(i));
+				}
+				last = new SpotModel(temp.get(i).getRouteIndex(),temp.get(i).getLatLng());
+			}
+		}
 
 		handler.post(new Runnable() {
 			int each = 0;
@@ -284,13 +305,15 @@ public class RoutePopView extends PopupWindow {
 			public void run() {
 
 				Log.e("each", each + "");
-				marker.setPosition(temp.get(each).getLatLng());
-				marker.setObject(temp.get(each).getRouteIndex());
+				marker.setPosition(addtional.get(each).getLatLng());
+				marker.setObject(addtional.get(each).getRouteIndex());
 				mMap.invalidate();// 刷新地图
+//				mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//						addtional.get(each).getLatLng(), 19));  //37.5206,121.358
 				mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-						temp.get(each).getLatLng(), 19), 500, null);  //37.5206,121.358
+						addtional.get(each).getLatLng(), 19), 50, null);  //37.5206,121.358
 
-				if(each != temp.size()-1) {
+				if(each != addtional.size()-1) {
 					each+=1;
 					handler.postDelayed(this, duration);
 				} else {

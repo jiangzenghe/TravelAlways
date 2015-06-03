@@ -5,8 +5,8 @@ import com.amap.api.maps2d.model.LatLng;
 
 public class SpotModel {
 
-    public SpotModel(int id, int routeIndex, LatLng latlng) {
-        this.id = id;
+    public SpotModel(int routeIndex, LatLng latlng) {
+//        this.id = id;
         this.routeIndex = routeIndex;
         this.latLng = latlng;
     }
