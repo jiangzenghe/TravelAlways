@@ -14,6 +14,8 @@ import com.amap.api.maps2d.AMap;
 import com.amap.api.maps2d.AMapUtils;
 import com.amap.api.maps2d.CameraUpdateFactory;
 import com.amap.api.maps2d.model.BitmapDescriptorFactory;
+import com.amap.api.maps2d.model.Circle;
+import com.amap.api.maps2d.model.CircleOptions;
 import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.Marker;
 import com.amap.api.maps2d.model.MarkerOptions;
@@ -40,7 +42,7 @@ public class MarkerUtilsFor2D {
 		ArrayList<Marker> markerList = (ArrayList)aMap.getMapScreenMarkers();
 		if(markerList!=null) {
 			for(Marker each:markerList) {
-				if(each.getObject() != null) {
+				if(each.getObject() != null && each.getObject() instanceof ScenicPointJson) {
 					each.setVisible(false);
 				}
 			}
@@ -52,7 +54,7 @@ public class MarkerUtilsFor2D {
 			ArrayList<Marker> markerList = (ArrayList)aMap.getMapScreenMarkers();
 			if(markerList!=null) {
 				for(Marker each:markerList) {
-					if(each.getObject() != null) {
+					if(each.getObject() != null && each.getObject() instanceof ScenicPointJson) {
 						each.setVisible(true);
 					}
 				}
@@ -64,7 +66,7 @@ public class MarkerUtilsFor2D {
 		ArrayList<Marker> markerList = (ArrayList)aMap.getMapScreenMarkers();
 		if(markerList!=null) {
 			for(Marker each:markerList) {
-				if(each.getObject() != null) {
+				if(each.getObject() != null && each.getObject() instanceof ScenicPointJson) {
 					ScenicPointJson point = (ScenicPointJson)each.getObject();
 					if(point.getSpotType().equals(spotType))
 					each.setVisible(false);
@@ -94,23 +96,21 @@ public class MarkerUtilsFor2D {
 
 		ScenicPointJson result = null;
 		if(pointsList!=null) {
-
-//			for(ScenicPointJson each:pointsList) {
-//				if(each.getSpotType().equals(type)) {
-//					LatLng end = new LatLng(each.getLat(), each.getLng());
-//
-//					float distance  = AMapUtils.calculateLineDistance(curPosition, end);
-//					if(temp == 0.0) {
-//						temp = distance;
-//						result = new LatLng(each.getLat(), each.getLng());
-//					} else {
-//						temp = temp>distance?distance:temp;
-//						if(temp>distance) {
-//							result = new LatLng(each.getLat(), each.getLng());
-//						}
-//					}
-//				}
-//			}
+			for(ScenicPointJson each: pointsList) {
+				if(each.getSpotType().equals("1")) {
+					LatLng center = new LatLng(each.getLat(), each.getLng());
+					Circle circle = aMap.addCircle(new CircleOptions().center(center).radius(100));
+					circle.setVisible(false);
+					if(circle.contains(curPosition)) {
+						result = each;
+						circle.remove();
+						break;
+//					Toast.makeText(MainActivity.this, "已进入" +each.getSpotName()
+//							, Toast.LENGTH_SHORT).show();
+					}
+					if(circle != null) circle.remove();
+				}
+			}
 
 		}
 		return result;

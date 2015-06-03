@@ -204,6 +204,9 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		if(requestCode == 1000 && resultCode == RESULT_OK) {
 			isGPSAuto = data.getExtras().getBoolean("autoGps");
 			isSpeakingAuto = data.getExtras().getBoolean("autoSound");
+			if(!isSpeakingAuto) {
+				if(player.getStatus() == 0) player.stop();
+			}
 			if(isGPSAuto) {
 				mMap.setMyLocationEnabled(true);
 			} else if(mAMapLocationManager!=null){
@@ -236,7 +239,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 				// TODO Auto-generated method stub
 //				redAlert.setVisibility(View.VISIBLE);
 			}
-			
+
 		});
 		
 		LayoutInflater inflater = LayoutInflater.from(this); 
@@ -468,7 +471,15 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			mListener.onLocationChanged(aLocation);// 显示系统小蓝点
 			mNaviStart = new NaviLatLng(aLocation.getLatitude(), aLocation.getLongitude());
 			if(isSpeakingAuto) {
-				markerUtilsFor2D.getNearestSpot(curPosition);
+				ScenicPointJson spot = markerUtilsFor2D.getNearestSpot(curPosition);
+				if(spot != null && spot.getAudioUrl() != null) {
+					if(!mCurPalyingURL.equals(spot.getAudioUrl())) {
+						if(player.getStatus() == 0)  player.stop();
+						String url = spot.getAudioUrl();
+						player.playUrl(Config.IMAGE_SERVER_ADDR + url);
+						mCurPalyingURL = spot.getAudioUrl();
+					}
+				};
 				//play
 			}
 
@@ -494,7 +505,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 					LocationProviderProxy.AMapNetwork, -1, 10, this);
 		} else {
 			mAMapLocationManager.requestLocationData(
-					LocationProviderProxy.AMapNetwork, 3 * 2000, 10, this);
+					LocationProviderProxy.AMapNetwork, 5 * 2000, 10, this);
 		}
 	}
 
@@ -665,9 +676,9 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	 */
 	@Override
 	public void onInfoWindowClick(Marker marker) {
-		if(ApplicationHelper.getInstance().getPlayer().getStatus() == 0) {
-            ApplicationHelper.getInstance().getPlayer().stop();
-		}
+//		if(ApplicationHelper.getInstance().getPlayer().getStatus() == 0) {
+//            ApplicationHelper.getInstance().getPlayer().stop();
+//		}
 	}
 	
 	@Override
