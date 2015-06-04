@@ -70,6 +70,8 @@ public class ApiClient {
         void downloadMap(@Query("scenicId") String scenicId, Callback<List<RecommendLine>> callback);
         @GET("/home/citylist.do")
         void getCityList( Callback<List<CityInfoJson>> callback);
+        @GET("/home/hotcity.do")
+        void getHotCityList( Callback<List<CityInfoJson>> callback);
         @GET("/detail/tips.do")
         void queryScenicTips(@Query("scenicId") String scenicId, Callback<ScenicTipJson> callback);
 

@@ -13,6 +13,11 @@
         android:hint="@string/search_hint"
         android:singleLine="true" />
 
+    <com.imyuu.travel.view.GridView
+        android:id="@+id/hot_citys"
+        android:layout_width="fill_parent"
+        android:numColumns="4"
+        android:layout_height="wrap_content"/>
     <FrameLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

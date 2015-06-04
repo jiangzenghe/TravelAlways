@@ -3,10 +3,14 @@ package com.imyuu.travel.ui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -14,21 +18,38 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.Filter;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import android.app.Activity;
+import android.widget.Toast;
 
+import com.amap.api.maps.model.LatLng;
 import com.imyuu.travel.R;
+import com.imyuu.travel.api.ApiClient;
 import  com.imyuu.travel.bean.City;
 import com.imyuu.travel.adapters.PinnedHeaderAdapter;
+import com.imyuu.travel.bean.ScenicModel;
+import com.imyuu.travel.model.CityInfoJson;
+import com.imyuu.travel.model.ScenicPointJson;
 import com.imyuu.travel.util.CityScenicUtils;
+import com.imyuu.travel.util.MarkerUtilsFor2D;
+import com.imyuu.travel.view.GridView;
 import com.imyuu.travel.view.IndexBarView;
 import com.imyuu.travel.view.PinnedHeaderListView;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * 搜索功能
@@ -65,6 +86,8 @@ public class QueryCityActivity extends Activity{
 		// search box
 		EditText mSearchView;
 
+		GridView mGridView;
+
 		// loading view
 		ProgressBar mLoadingView;
 
@@ -81,42 +104,102 @@ public class QueryCityActivity extends Activity{
 		// UI elements
 		setupViews();
 
-		original_items = CityScenicUtils.createCities();
+		getCitys(savedInstanceState);
+//		original_items = CityScenicUtils.createCities();
 		// Array to ArrayList
 //		mItems = new ArrayList<String>(Arrays.asList(ITEMS));
-		mItems = new ArrayList<String>();
-		for(City each:original_items) {
-			mItems.add(each.getCityPY());
-		}
-		mListSectionPos = new ArrayList<Integer>();
-		mListItems = new ArrayList<String>();
-		mListShowItems = new ArrayList<String>();
 
-		// for handling configuration change
-		if (savedInstanceState != null) {
-			mListItems = savedInstanceState.getStringArrayList("mListItems");
-			mListSectionPos = savedInstanceState.getIntegerArrayList("mListSectionPos");
-			mListShowItems = savedInstanceState.getStringArrayList("mListShowItems");
-			if (mListItems != null && mListItems.size() > 0 && mListSectionPos != null && mListSectionPos.size() > 0) {
-				setListAdaptor();
-			}
-
-			String constraint = savedInstanceState.getString("constraint");
-			if (constraint != null && constraint.length() > 0) {
-				mSearchView.setText(constraint);
-				setIndexBarViewVisibility(constraint);
-			}
-		} else {
-			new Poplulate().execute(mItems);
-		}
 	}
-	
+
+	private void getCitys(final Bundle savedInstanceState) {
+		ApiClient.getIuuApiClient().getCityList(new Callback<List<CityInfoJson>>() {
+			@Override
+			public void success(List<CityInfoJson> resultJson, Response response) {
+				Toast.makeText(QueryCityActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
+				if (resultJson == null) {
+					Toast.makeText(QueryCityActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
+				}
+
+				original_items = new ArrayList<City>();
+				for(CityInfoJson each:resultJson) {
+					City object0 = new City(each.getCityname(), each.getPinyin());
+					original_items.add(object0);
+				}
+
+				mItems = new ArrayList<String>();
+				for(City each:original_items) {
+					mItems.add(each.getCityPY());
+				}
+				mListSectionPos = new ArrayList<Integer>();
+				mListItems = new ArrayList<String>();
+				mListShowItems = new ArrayList<String>();
+				// for handling configuration change
+				if (savedInstanceState != null) {
+					mListItems = savedInstanceState.getStringArrayList("mListItems");
+					mListSectionPos = savedInstanceState.getIntegerArrayList("mListSectionPos");
+					mListShowItems = savedInstanceState.getStringArrayList("mListShowItems");
+					if (mListItems != null && mListItems.size() > 0 && mListSectionPos != null && mListSectionPos.size() > 0) {
+						setListAdaptor();
+					}
+
+					String constraint = savedInstanceState.getString("constraint");
+					if (constraint != null && constraint.length() > 0) {
+						mSearchView.setText(constraint);
+						setIndexBarViewVisibility(constraint);
+					}
+				} else {
+					new Poplulate().execute(mItems);
+				}
+			}
+
+			@Override
+			public void failure(RetrofitError error) {
+				Toast.makeText(QueryCityActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+			}
+		});
+	}
+
+	private void getHotCitys() {
+		ApiClient.getIuuApiClient().getHotCityList(new Callback<List<CityInfoJson>>() {
+			@Override
+			public void success(List<CityInfoJson> resultJson, Response response) {
+				Toast.makeText(QueryCityActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
+				if (resultJson == null) {
+					Toast.makeText(QueryCityActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
+				}
+				ArrayList<CityInfoJson> hotCitys = new ArrayList<CityInfoJson>();
+				hotCitys = (ArrayList<CityInfoJson>)resultJson;
+				final CityAdapter adapter = new CityAdapter(QueryCityActivity.this, hotCitys);
+				mGridView.setAdapter(adapter);
+				mGridView.setOnItemClickListener(new OnItemClickListener() {
+					@Override
+					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						Intent intent = new Intent();
+						CityInfoJson bean = (CityInfoJson)mGridView.getAdapter().getItem(position);
+						City city = new City(bean.getCityname(), bean.getPinyin());
+
+						intent.putExtra("cityResult", city);
+						setResult(-1, intent);
+						finish();
+					}
+				});
+			}
+
+			@Override
+			public void failure(RetrofitError error) {
+				Toast.makeText(QueryCityActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+			}
+		});
+	}
+
 	private void setupViews() {
 		setContentView(R.layout.main_act);
 		mSearchView = (EditText) findViewById(R.id.search_view);
+		mGridView = (GridView) findViewById(R.id.hot_citys);
 		mLoadingView = (ProgressBar) findViewById(R.id.loading_view);
 		mListView = (PinnedHeaderListView) findViewById(R.id.list_view);
 		mEmptyView = (TextView) findViewById(R.id.empty_view);
+		getHotCitys();
 		mListView.setOnItemClickListener(new OnItemClickListener(){
 
 			@Override
@@ -362,4 +445,63 @@ public class QueryCityActivity extends Activity{
 		}
 		super.onSaveInstanceState(outState);
 	}
+}
+
+class CityAdapter extends BaseAdapter {
+
+	private LayoutInflater mInflater;
+
+	public CityAdapter(Activity activity, ArrayList<CityInfoJson> data) {
+		this.data = data;
+		mInflater = LayoutInflater.from(activity);
+	}
+
+	public CityAdapter(Context context){
+		this.mInflater = LayoutInflater.from(context);
+	}
+	private ArrayList<CityInfoJson> data;
+
+	@Override
+	public int getCount() {
+		return data.size();
+	}
+
+	@Override
+	public Object getItem(int arg0) {
+		return data.get(arg0);
+	}
+
+	 @Override
+	 public long getItemId(int arg0) {
+	 // TODO Auto-generated method stub
+		 return arg0;
+	 }
+
+	@SuppressLint("SdCardPath")
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		final ViewHolder mHolder;
+		View view = convertView;
+		if (view == null) {
+			//一张图片的布局
+			view = mInflater.inflate(R.layout.item_hot_city, null);
+			mHolder = new ViewHolder();
+			mHolder.center_title = (TextView)view.findViewById(R.id.city_name);
+
+			view.setTag(mHolder);
+		} else {
+			mHolder = (ViewHolder) view.getTag();
+		}
+		//获取position对应的数据
+		CityInfoJson bean = (CityInfoJson)getItem(position);
+		mHolder.center_title.setText(bean.getCityname());
+
+		return view;
+
+	}
+
+	static class ViewHolder {
+		TextView center_title;
+	}
+
 }
