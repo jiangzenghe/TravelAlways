@@ -16,6 +16,7 @@ import java.util.List;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.client.Response;
+import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.Headers;
 import retrofit.http.Multipart;
@@ -78,6 +79,8 @@ public class ApiClient {
         @GET("/detail/updatefavor.do")
         void sendFavors(@Query("scenicId") String scenicId,@Query("userId") String userId, Callback<ServiceState> callback);
 
+//        @POST("user/reportlocation.do")
+//        void reportUserLocation(@Body UserLocationModel locationModel, Callback<ServiceState> callback);
 
         @Multipart
         @Headers({"Content-Type: image/jpeg"})

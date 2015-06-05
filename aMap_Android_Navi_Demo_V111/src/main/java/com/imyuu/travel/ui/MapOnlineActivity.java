@@ -453,10 +453,14 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 		if(scenic != null && mListener != null && aLocation != null) {
 
-			double lat_left = 36.1379;
-			double lng_left = 120.6739;
-			double lat_right = 36.14150;
-			double lng_right = 120.6773;
+//			double lat_left = 36.1379;
+//			double lng_left = 120.6739;
+//			double lat_right = 36.14150;
+//			double lng_right = 120.6773;
+			double lat_left = scenic.getLat();
+			double lng_left = scenic.getLng();
+			double lat_right = scenic.getRight_lat();
+			double lng_right = scenic.getRigh_lng();
 
 			LatLngBounds bounds = new LatLngBounds.Builder()
 					.include(new LatLng(lat_left,lng_left))
@@ -474,13 +478,13 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 				ScenicPointJson spot = markerUtilsFor2D.getNearestSpot(curPosition);
 				if(spot != null && spot.getAudioUrl() != null) {
 					if(!mCurPalyingURL.equals(spot.getAudioUrl())) {
+						//play
 						if(player.getStatus() == 0)  player.stop();
 						String url = spot.getAudioUrl();
 						player.playUrl(Config.IMAGE_SERVER_ADDR + url);
 						mCurPalyingURL = spot.getAudioUrl();
 					}
 				};
-				//play
 			}
 
 		}
@@ -527,11 +531,13 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		zoom = mMap.getCameraPosition().zoom;
 		// 设置所有maker显示在View中
 		if(scenic != null) {
-			double centerLat = scenic.getLat()/2;
-			double centerLng = scenic.getLng()/2;
+			double centerLat = (scenic.getLat()+scenic.getRight_lat())/2;
+			double centerLng = (scenic.getLng()+scenic.getRigh_lng())/2;
 			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-					new LatLng(36.139143, 120.674922), 19));  //37.5206,121.358
-			mNaviStart = new NaviLatLng(36.138143, 120.674922);
+					new LatLng(centerLat, centerLng), 19));  //37.5206,121.358
+//			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//					new LatLng(36.139143, 120.674922), 19));  //37.5206,121.358
+			mNaviStart = new NaviLatLng(centerLat, centerLng);
 
 //			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
 //					new LatLng(scenic.getLat(), scenic.getLng()), 19));  //37.5206,121.358
@@ -725,7 +731,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
+				// test data
 				if(mNaviStart==null) {
 					mNaviStart = new NaviLatLng(36.138143, 120.674922);
 				}

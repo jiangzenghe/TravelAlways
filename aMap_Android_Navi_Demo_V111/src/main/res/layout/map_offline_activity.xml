@@ -1,0 +1,155 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <LinearLayout
+        android:id="@+id/app_title_container"
+        style="@style/app_title_layout_theme" >
+        <ImageView
+            android:id="@+id/image_cancel_back"
+            android:layout_width="fill_parent"
+            android:layout_height="22dp"
+            android:layout_marginTop="5dp"
+
+            android:gravity="left|center_vertical"
+            android:layout_weight="5"
+            />
+        <TextView
+            android:gravity="center_horizontal|center_vertical"
+            android:drawableRight="@drawable/h74"
+            android:drawablePadding="5dp"
+            android:id="@+id/text_label"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@android:color/transparent"
+            android:text="地图"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:paddingRight="16dip"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+	<FrameLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent">
+	   <com.amap.api.maps2d.MapView
+	    xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:id="@+id/map"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent" />
+
+		<LinearLayout
+			android:layout_marginTop="10dp"
+			android:layout_marginRight="10dp"
+			android:id="@+id/layout_function"
+			android:layout_width="wrap_content"
+			android:layout_height="50dp"
+			android:orientation="horizontal"
+			android:layout_gravity="top|right"
+			android:padding="5dp">
+			<ImageView
+				android:layout_width="40dp"
+				android:layout_height="40dp"
+				android:src="@drawable/func_control"/>
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_marginTop="10dp"
+			android:layout_marginLeft="10dp"
+			android:id="@+id/layout_redalert"
+			android:layout_width="wrap_content"
+			android:layout_height="50dp"
+			android:orientation="horizontal"
+			android:layout_gravity="top|left"
+			android:padding="5dp">
+			<ImageView
+				android:layout_width="40dp"
+				android:layout_height="40dp"
+				android:src="@drawable/ic_detail_waring"/>
+			<TextView
+				android:id="@+id/text_redalert"
+				android:layout_width="wrap_content"
+				android:layout_height="40dp"
+				android:text="红色警报,2500/1500人"
+				android:visibility="gone"/>
+		</LinearLayout>
+	<LinearLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical"
+	    android:background="@color/color_white"
+	    android:layout_gravity="bottom"
+	    android:layout_margin="10dp">
+	    
+	    <RelativeLayout
+            android:id="@+id/rl_column"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:padding="5dp"
+            android:visibility="gone" >
+            
+		    <com.imyuu.travel.view.ColumnHorizontalScrollView
+	            android:id="@+id/mColumnHorizontalScrollView"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:scrollbars="none" >
+	
+	            <LinearLayout
+	                android:id="@+id/layout_route"
+	                android:layout_width="fill_parent"
+	                android:layout_height="wrap_content"
+	                android:layout_centerVertical="true"
+	                android:gravity="center_vertical"
+	                android:orientation="horizontal"
+	                android:paddingLeft="10dp"
+	                android:paddingRight="10dp" />
+	        </com.imyuu.travel.view.ColumnHorizontalScrollView>
+        </RelativeLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+			android:layout_height="1dp"
+			android:background="@drawable/divider"
+			android:orientation="horizontal">
+		</LinearLayout>
+		<LinearLayout 
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+		    <TextView 
+		        android:id="@+id/route"
+		        android:padding="15dp"
+		        android:layout_marginLeft="10dp"
+		        android:layout_width="0dp"
+		 		android:layout_height="match_parent"
+		 		android:layout_weight="1"
+		 		android:drawableLeft="@drawable/uparrow"
+		 		android:text="线路规划"/>
+		    <TextView 
+		        android:id="@+id/help"
+		        android:padding="15dp"
+		        android:layout_marginRight="10dp"
+		        android:gravity="right"
+		        android:layout_width="0dp"
+		 		android:layout_height="match_parent"
+		 		android:layout_weight="1"
+		 		android:text="助手"/>
+		</LinearLayout> 
+		<LinearLayout
+            android:layout_width="fill_parent"
+			android:layout_height="1dp"
+			android:background="@drawable/divider"
+			android:orientation="horizontal">
+		</LinearLayout>
+		<com.imyuu.travel.view.GridView
+		    android:id="@+id/layout_show"
+		    android:layout_width="fill_parent"
+		    android:numColumns="4"
+		 	android:layout_height="100dp"
+		 	android:visibility="gone"/>
+	</LinearLayout>
+   
+	    
+	</FrameLayout>
+    
+</LinearLayout>
