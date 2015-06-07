@@ -11,7 +11,7 @@
         android:id="@+id/dialog_title"
         android:layout_width="match_parent"
         android:layout_gravity="center"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         android:padding="10dp"
         android:orientation="horizontal">
 
@@ -21,21 +21,28 @@
             android:gravity="left|center"
             android:layout_gravity="center"
             android:layout_weight="3"
+            android:textColor="@color/black"
             android:paddingLeft="10dp"
             android:text="功能"/>
         <ImageView
             android:id="@+id/cancel_dialogCancel"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/chahao"
+            android:src="@drawable/cancel"
             android:layout_gravity="right"/>
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"/>
 
     <LinearLayout
         android:id="@+id/dialog_gps"
         android:layout_gravity="center"
+        android:padding="8dp"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <TextView
@@ -43,6 +50,7 @@
             android:layout_height="match_parent"
             android:paddingLeft="10dp"
             android:layout_weight="3"
+            android:textColor="@color/black"
             android:gravity="left|center"
             android:text="定位"/>
         <Switch
@@ -56,8 +64,9 @@
     <LinearLayout
         android:id="@+id/diglog_sound"
         android:layout_gravity="center"
+        android:padding="8dp"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <TextView
@@ -65,6 +74,7 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:paddingLeft="10dp"
+            android:textColor="@color/black"
             android:gravity="left|center"
             android:text="自动讲解" />
         <Switch

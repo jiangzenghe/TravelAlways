@@ -186,7 +186,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 		player = ApplicationHelper.getInstance().getPlayer();
 		
 		initMap();
-		
+
 		initView();
 	}
 
@@ -213,6 +213,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 			}
 			if(isGPSAuto) {
 				mMap.setMyLocationEnabled(true);
+				mMap.getUiSettings().setMyLocationButtonEnabled(false);// 设置默认定位按钮是否显示
 			} else if(mAMapLocationManager!=null){
 				mAMapLocationManager.removeUpdates(this);
 			}
@@ -460,7 +461,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 			double lat_left = scenic.getLat();
 			double lng_left = scenic.getLng();
 			double lat_right = scenic.getRight_lat();
-			double lng_right = scenic.getRigh_lng();
+			double lng_right = scenic.getRight_lng();
 
 			LatLngBounds bounds = new LatLngBounds.Builder()
 					.include(new LatLng(lat_left,lng_left))
@@ -505,11 +506,13 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 			 * API定位采用GPS和网络混合定位方式
 			 * ，第一个参数是定位provider，第二个参数时间最短是2000毫秒，第三个参数距离间隔单位是米，第四个参数是定位监听者
 			 */
-			mAMapLocationManager.requestLocationData(
-					LocationProviderProxy.AMapNetwork, -1, 10, this);
-		} else {
-			mAMapLocationManager.requestLocationData(
-					LocationProviderProxy.AMapNetwork, 5*2000, 10, this);
+			if(isGPSAuto) {
+				mAMapLocationManager.requestLocationData(
+						LocationProviderProxy.AMapNetwork, 5 * 2000, 10, this);
+			} else {
+				mAMapLocationManager.requestLocationData(
+						LocationProviderProxy.AMapNetwork, -1, 10, this);
+			}
 		}
 	}
 
@@ -531,16 +534,14 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 		zoom = mMap.getCameraPosition().zoom;
 		// 设置所有maker显示在View中
 		if(scenic != null) {
-			double centerLat = (scenic.getLat()+scenic.getRight_lat())/2;
-			double centerLng = (scenic.getLng()+scenic.getRigh_lng())/2;
+//			double centerLat = (scenic.getLat()+scenic.getRight_lat())/2;
+//			double centerLng = (scenic.getLng()+scenic.getRight_lng())/2;
+//			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//					new LatLng(centerLat, centerLng), 19));  //37.5206,121.358
 			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-					new LatLng(centerLat, centerLng), 19));  //37.5206,121.358
-//			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-//					new LatLng(36.139143, 120.674922), 19));  //37.5206,121.358
-			mNaviStart = new NaviLatLng(centerLat, centerLng);
+					new LatLng(36.139143, 120.674922), 19));  //37.5206,121.358
+//			mNaviStart = new NaviLatLng(centerLat, centerLng);
 
-//			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-//					new LatLng(scenic.getLat(), scenic.getLng()), 19));  //37.5206,121.358
 			getScenicSpotsNet(scenic.getScenicId());
 		}
 	}
@@ -747,6 +748,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 //                mNaviStart.setLongitude(AppApplication.getInstance().getMyLocation().longitude);
 				Log.e("endLoc", point.getLat() + "," + point.getLng());
 				mNaviEnd = new NaviLatLng(point.getLat(), point.getLng());
+				if(player.getStatus() == 0) {player.stop();}
 				calculateFootRoute();
 				view.setVisibility(View.GONE);
 			}

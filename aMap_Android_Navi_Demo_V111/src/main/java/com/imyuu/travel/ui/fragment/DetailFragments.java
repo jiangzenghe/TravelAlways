@@ -97,6 +97,8 @@ public class DetailFragments extends Fragment {
                 scenicAreaJson.setImageUrl(scenicDetailJson.getImageUrl());
                 scenicAreaJson.setLat(scenicDetailJson.getLat());
                 scenicAreaJson.setLng(scenicDetailJson.getLng());
+                scenicAreaJson.setRight_lat(scenicDetailJson.getRight_lat());
+                scenicAreaJson.setRight_lng(scenicDetailJson.getRight_lng());
                 // to be continued
                 if (true)
                     resultView.setText(scenicDetailJson.getMapSize());

@@ -68,6 +68,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
     @InjectView(R.id.text_choose_city)
     Button tx_chooseCity;
 	private float zoom; //记载缩放级别
+	private String curCity;
 
     @OnClick(R.id.image_cancel_back)
     public void cacelBackClick() {
@@ -78,6 +79,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
     @OnClick(R.id.text_choose_city)
     public void chooseCityClick() {
         Intent intent = new Intent(ClusterActivity.this,QueryCityActivity.class);
+		intent.putExtra("curCity", curCity);
         startActivityForResult(intent,0);
 
     }
@@ -229,6 +231,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 		if (mListener != null && aLocation != null) {
 			mListener.onLocationChanged(aLocation);// 显示系统小蓝点
             tx_chooseCity.setText(aLocation.getCity());
+			curCity = aLocation.getCity();
 		}
 	}
 

@@ -86,6 +86,8 @@ public class QueryCityActivity extends Activity{
 		// search box
 		EditText mSearchView;
 
+	   TextView mCurCityView;
+
 		GridView mGridView;
 
 		// loading view
@@ -194,6 +196,11 @@ public class QueryCityActivity extends Activity{
 
 	private void setupViews() {
 		setContentView(R.layout.main_act);
+		String curCity = this.getIntent().getExtras().getString("curCity");
+		mCurCityView = (TextView) findViewById(R.id.cur_city_view);
+		if(curCity != null && !curCity.equals("null")) {
+			mCurCityView.setText("当前城市："+curCity);
+		}
 		mSearchView = (EditText) findViewById(R.id.search_view);
 		mGridView = (GridView) findViewById(R.id.hot_citys);
 		mLoadingView = (ProgressBar) findViewById(R.id.loading_view);

@@ -75,7 +75,7 @@ public class IndexBarView extends View {
 
         // index bar item color and text size
         mIndexPaint = new Paint();
-        mIndexPaint.setColor(mContext.getResources().getColor(R.color.color_black));
+        mIndexPaint.setColor(mContext.getResources().getColor(R.color.material_deep_teal_500));
         mIndexPaint.setAntiAlias(true);
         mIndexPaint.setTextSize(mContext.getResources().getDimension(R.dimen.index_bar_view_text_size));
     }

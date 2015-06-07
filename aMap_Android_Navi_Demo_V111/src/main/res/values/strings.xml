@@ -32,7 +32,7 @@
     <string name="navi_strategy_nohighway">不走高速快速路</string>
     <string name="navi_strategy_timenojam">时间最短且躲避拥堵</string>
     <string name="navi_strategy_costnojam">避免收费且躲避拥堵</string>
-    <string name="search_hint">搜索</string>
+    <string name="search_hint">请输入城市名称或者拼音搜索</string>
     <string name="empty_list_msg">没有结果</string>
     <string name="theme_blue">经典蓝</string>
     <string name="theme_pink">可爱粉</string>
