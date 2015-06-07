@@ -46,17 +46,17 @@ public class ScenicAreaJson extends Model implements Serializable {
         this.right_lat = right_lat;
     }
 
-    public Double getRigh_lng() {
-        return righ_lng;
+    public Double getRight_lng() {
+        return right_lng;
     }
 
-    public void setRigh_lng(Double righ_lng) {
-        this.righ_lng = righ_lng;
+    public void setRight_lng(Double righ_lng) {
+        this.right_lng = righ_lng;
     }
 
     @Expose
     @Column(name = "right_lng")
-    private Double righ_lng;
+    private Double right_lng;
     @Expose
     @Column(name = "warning")
     private String warning;  // 0 ��ɫ 1����ɫ 2����ɫ 3����ɫԤ��

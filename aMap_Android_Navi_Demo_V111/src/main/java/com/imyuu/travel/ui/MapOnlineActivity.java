@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -124,6 +125,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	private LinearLayout layout_redalert;
 	
 	private float zoom;
+	private View curDisplayView;
 	private boolean isGPSAuto = false;
 	private boolean isSpeakingAuto = false;
 	private String mCurPalyingURL = "";
@@ -209,6 +211,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			}
 			if(isGPSAuto) {
 				mMap.setMyLocationEnabled(true);
+				mMap.getUiSettings().setMyLocationButtonEnabled(false);// 设置默认定位按钮是否显示
 			} else if(mAMapLocationManager!=null){
 				mAMapLocationManager.removeUpdates(this);
 			}
@@ -395,6 +398,18 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		float x = event.getX();
+		float y = event.getY();
+		int[] location = new int[2];
+		curDisplayView.getLocationOnScreen(location);
+
+		if((x>curDisplayView.getLeft()&&x<curDisplayView.getLeft()+curDisplayView.getWidth())
+				&&(y>curDisplayView.getTop() && y<curDisplayView.getTop()+curDisplayView.getHeight())){
+
+		} else {
+			curDisplayView.setVisibility(View.GONE);
+		}
+
 		return false;
 	}
 	
@@ -460,7 +475,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			double lat_left = scenic.getLat();
 			double lng_left = scenic.getLng();
 			double lat_right = scenic.getRight_lat();
-			double lng_right = scenic.getRigh_lng();
+			double lng_right = scenic.getRight_lng();
 
 			LatLngBounds bounds = new LatLngBounds.Builder()
 					.include(new LatLng(lat_left,lng_left))
@@ -505,11 +520,13 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			 * API定位采用GPS和网络混合定位方式
 			 * ，第一个参数是定位provider，第二个参数时间最短是2000毫秒，第三个参数距离间隔单位是米，第四个参数是定位监听者
 			 */
-			mAMapLocationManager.requestLocationData(
-					LocationProviderProxy.AMapNetwork, -1, 10, this);
-		} else {
-			mAMapLocationManager.requestLocationData(
-					LocationProviderProxy.AMapNetwork, 5 * 2000, 10, this);
+			if(isGPSAuto) {
+				mAMapLocationManager.requestLocationData(
+						LocationProviderProxy.AMapNetwork, 5 * 2000, 10, this);
+			} else {
+				mAMapLocationManager.requestLocationData(
+						LocationProviderProxy.AMapNetwork, -1, 10, this);
+			}
 		}
 	}
 
@@ -532,7 +549,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		// 设置所有maker显示在View中
 		if(scenic != null) {
 			double centerLat = (scenic.getLat()+scenic.getRight_lat())/2;
-			double centerLng = (scenic.getLng()+scenic.getRigh_lng())/2;
+			double centerLng = (scenic.getLng()+scenic.getRight_lng())/2;
 			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
 					new LatLng(centerLat, centerLng), 19));  //37.5206,121.358
 //			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
@@ -547,22 +564,22 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 	private void getScenicSpotsNet(String scenicId) {
 		ApiClient.getIuuApiClient().queryScenicSpotLists(scenicId, new Callback<List<ScenicPointJson>>() {
-	        @Override
-	        public void success(List<ScenicPointJson> resultJson, Response response) {
-	        	Toast.makeText(MapOnlineActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
-	        	if(resultJson == null) {
-	        		Toast.makeText(MapOnlineActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
-	        	}
-	        	markerList = (ArrayList)resultJson;
-	        	markerUtilsFor2D = new MarkerUtilsFor2D(MapOnlineActivity.this, mMap, markerList);
-	        	addMarkerFunc("1");
-	        }
+			@Override
+			public void success(List<ScenicPointJson> resultJson, Response response) {
+				Toast.makeText(MapOnlineActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
+				if (resultJson == null) {
+					Toast.makeText(MapOnlineActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
+				}
+				markerList = (ArrayList) resultJson;
+				markerUtilsFor2D = new MarkerUtilsFor2D(MapOnlineActivity.this, mMap, markerList);
+				addMarkerFunc("1");
+			}
 
-	        @Override
-	        public void failure(RetrofitError error) {
-	            Toast.makeText(MapOnlineActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
-	        }
-	    });
+			@Override
+			public void failure(RetrofitError error) {
+				Toast.makeText(MapOnlineActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+			}
+		});
 	}
 	
 	private void addMarkerFunc(String spotype) {
@@ -604,7 +621,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		super.onPause();
 		mapView.onPause();
 		deactivate();
-
 		AMapNavi.getInstance(this).stopNavi();
 	}
 
@@ -664,6 +680,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 	@Override
 	public View getInfoWindow(Marker marker) {
+		marker.getPosition();
 		// TODO Auto-generated method stub
 		if(marker.getObject() != null) {//1marker			
 			View infoWindow = getLayoutInflater().inflate(
@@ -698,9 +715,10 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	 * 自定义infowinfow窗口
 	 */
 	public void render(Marker marker,final View view) {
+		curDisplayView = view;
 		final TextView voiceView = (TextView) view.findViewById(R.id.voice);
 		final TextView naviView = (TextView) view.findViewById(R.id.navi);
-		
+
 		final ScenicPointJson point = (ScenicPointJson)marker.getObject();
 		if(point.getSpotType().equals("1")) {//point.getSpotType()
 			voiceView.setTag(point.getAudioUrl());
@@ -742,6 +760,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 //                mNaviStart.setLongitude(AppApplication.getInstance().getMyLocation().longitude);
 				Log.e("endLoc", point.getLat() +"," + point.getLng());
 				mNaviEnd = new NaviLatLng(point.getLat(), point.getLng());
+				if(player.getStatus() == 0) {player.stop();}
 				calculateFootRoute();
                 view.setVisibility(View.GONE);
 			}
@@ -761,7 +780,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			ToastUtil.show(this, "失败,起点或终点未设定");
 		}
 	}
-	
+
 	@Override
 	public void onArriveDestination() {
 		// TODO Auto-generated method stub
