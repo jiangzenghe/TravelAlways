@@ -398,17 +398,17 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		float x = event.getX();
-		float y = event.getY();
-		int[] location = new int[2];
-		curDisplayView.getLocationOnScreen(location);
-
-		if((x>curDisplayView.getLeft()&&x<curDisplayView.getLeft()+curDisplayView.getWidth())
-				&&(y>curDisplayView.getTop() && y<curDisplayView.getTop()+curDisplayView.getHeight())){
-
-		} else {
-			curDisplayView.setVisibility(View.GONE);
-		}
+//		float x = event.getX();
+//		float y = event.getY();
+//		int[] location = new int[2];
+//		curDisplayView.getLocationOnScreen(location);
+//
+//		if((x>curDisplayView.getLeft()&&x<curDisplayView.getLeft()+curDisplayView.getWidth())
+//				&&(y>curDisplayView.getTop() && y<curDisplayView.getTop()+curDisplayView.getHeight())){
+//
+//		} else {
+//			curDisplayView.setVisibility(View.GONE);
+//		}
 
 		return false;
 	}
@@ -466,7 +466,8 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	@Override
 	public void onLocationChanged(AMapLocation aLocation) {
 
-		if(scenic != null && mListener != null && aLocation != null) {
+		if(scenic != null && mListener != null && aLocation != null && scenic.getRight_lat !=null
+			scenic.getRight_lng!=null &&scenic.getLat!=null &&scenic.getLng!=null) {
 
 //			double lat_left = 36.1379;
 //			double lng_left = 120.6739;
@@ -547,7 +548,8 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	public void onMapLoaded() {
 		zoom = mMap.getCameraPosition().zoom;
 		// 设置所有maker显示在View中
-		if(scenic != null) {
+		if(scenic != null && scenic.getRight_lat !=null
+			scenic.getRight_lng!=null &&scenic.getLat!=null &&scenic.getLng!=null) {
 			double centerLat = (scenic.getLat()+scenic.getRight_lat())/2;
 			double centerLng = (scenic.getLng()+scenic.getRight_lng())/2;
 			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(

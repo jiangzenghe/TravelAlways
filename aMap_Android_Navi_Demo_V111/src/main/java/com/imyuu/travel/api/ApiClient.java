@@ -9,6 +9,7 @@ import com.imyuu.travel.model.ScenicTipJson;
 import com.imyuu.travel.model.ScenicTransportJson;
 import com.imyuu.travel.model.CityInfoJson;
 import com.imyuu.travel.model.ServiceState;
+import com.imyuu.travel.model.UserLocationModel;
 import com.imyuu.travel.util.Config;
 
 import java.util.List;
@@ -79,8 +80,8 @@ public class ApiClient {
         @GET("/detail/updatefavor.do")
         void sendFavors(@Query("scenicId") String scenicId,@Query("userId") String userId, Callback<ServiceState> callback);
 
-//        @POST("user/reportlocation.do")
-//        void reportUserLocation(@Body UserLocationModel locationModel, Callback<ServiceState> callback);
+        @POST("user/reportlocation.do")
+        void reportUserLocation(@Body UserLocationModel locationModel, Callback<ServiceState> callback);
 
         @Multipart
         @Headers({"Content-Type: image/jpeg"})
