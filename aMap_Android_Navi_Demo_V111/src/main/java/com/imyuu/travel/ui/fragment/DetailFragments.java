@@ -22,15 +22,18 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.imyuu.travel.R;
 import com.imyuu.travel.activity.DownloadActivity;
 
+import com.imyuu.travel.activity.DownloadOldActivity;
 import com.imyuu.travel.api.ApiClient;
 import com.imyuu.travel.model.Recommend;
 import com.imyuu.travel.model.ScenicAreaJson;
 import com.imyuu.travel.model.ScenicDetailJson;
 import com.imyuu.travel.model.ServiceState;
 import com.imyuu.travel.ui.MapActivity;
+import com.imyuu.travel.ui.MapOldActivity;
 import com.imyuu.travel.ui.MapOnlineActivity;
 import com.imyuu.travel.ui.ScenicAreaActivity;
 import com.imyuu.travel.util.Config;
+import com.imyuu.travel.util.ConstantsOld;
 import com.imyuu.travel.util.LogUtil;
 
 import java.util.ArrayList;
@@ -179,8 +182,10 @@ public class DetailFragments extends Fragment {
     @OnClick(R.id.bt_enter)
     public void enterClick() {
         Log.d(TAG,"enterClick");
-        Intent intent = new Intent(getActivity(),MapOnlineActivity.class);
-        intent.putExtra("scenicInfo",scenicAreaJson);
+//        Intent intent = new Intent(getActivity(),MapOnlineActivity.class);
+//        intent.putExtra("scenicInfo",scenicAreaJson);
+        Intent intent = new Intent(getActivity(), MapOldActivity.class);
+        intent.putExtra(ConstantsOld.SCIENCE_ID_KEY, scenicId);
         startActivity(intent);
     }
     @OnClick(R.id.bt_favor)
@@ -206,10 +211,14 @@ public class DetailFragments extends Fragment {
     }
 
     DownloadActivity   downloadActivity = null;
+    DownloadOldActivity downloadOldActivity = null;
+
     @OnClick(R.id.button_download)
     public void downloadClick() {
-         downloadActivity = new DownloadActivity();
-        downloadActivity.download(scenicAreaJson.getScenicId(), myhandler,progressBar);
+        downloadOldActivity = new DownloadOldActivity();
+        downloadOldActivity.download(this.getActivity(), scenicId);
+//         downloadActivity = new DownloadActivity();
+//        downloadActivity.download(scenicAreaJson.getScenicId(), myhandler,progressBar);
     }
 
     private Handler myhandler = new Handler(){

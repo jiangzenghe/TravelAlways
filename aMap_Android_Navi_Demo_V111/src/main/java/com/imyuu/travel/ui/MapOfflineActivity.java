@@ -625,6 +625,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 		super.onDestroy();
 		TTSController.getInstance(this).stopSpeaking();
 		AMapNavi.getInstance(this).destroy();
+		ApplicationHelper.getInstance().getPlayer();
 		if(server != null) server.stop();
 		mapView.onDestroy();
 	}

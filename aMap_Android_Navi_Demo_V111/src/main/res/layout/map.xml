@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:gesture-image="http://schemas.polites.com/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/img_main_bg" >
+
+    <RelativeLayout
+        android:id="@+id/relativelayout_map_top"
+        style="@style/app_title_layout_theme" >
+
+        <ImageView
+            android:id="@+id/image_map_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:src="@drawable/img_search_back" />
+
+        <TextView
+            android:id="@+id/text_map_title"
+            style="@style/app_title_theme"/>
+
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:visibility="gone"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/linearlayout_map_bottom_menu"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_alignParentBottom="true"
+        android:background="#5557C4FA"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/button_map_menu_choice"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:drawableLeft="@drawable/img_map_line_choice"
+            android:gravity="left|center_vertical"
+            android:paddingLeft="15dip"
+            android:text="@string/map_bottom_menu_line"
+            android:textColor="@color/darkgrey" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:drawableRight="@drawable/img_map_service"
+            android:gravity="right|center_vertical"
+            android:paddingRight="15dip"
+            android:text="@string/map_bottom_menu_service"
+            android:textColor="@color/darkgrey" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearlayout_map_map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#AAFFFFFF"
+        android:layout_above="@id/linearlayout_map_bottom_menu"
+        android:layout_below="@id/relativelayout_map_top" >
+
+        <com.imyuu.travel.polites.GestureImageView
+            android:id="@+id/image_map_map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            gesture-image:max-scale="4.0"
+            gesture-image:min-scale="1.0"
+            gesture-image:strict="false" />
+
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/horizontalscrollview_map_line"
+        android:layout_width="match_parent"
+        android:layout_height="60dip"
+        android:layout_above="@id/linearlayout_map_bottom_menu"
+        android:background="#5557C4FA"
+        android:scrollbars="none"
+        android:fillViewport="true" >
+
+        <LinearLayout
+            android:id="@+id/linearlayout_map_line"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <RelativeLayout
+        android:id="@+id/relativelayout_map_advert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/horizontalscrollview_map_line"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dip" >
+
+        <ImageView
+            android:id="@+id/image_map_advert_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="5dip"
+            android:src="@drawable/img_map_close" />
+
+        <com.imyuu.travel.view.SlideShowView
+            android:id="@+id/slideshowview_advert"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_below="@id/image_map_advert_close"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
+</RelativeLayout>

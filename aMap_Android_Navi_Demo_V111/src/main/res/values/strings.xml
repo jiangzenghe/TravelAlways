@@ -94,4 +94,7 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_download">DownloadActivity</string>
+
+    <string name="index_loading_fail">数据加载失败</string>
+    <string name="map_loading_fail">地图加载失败</string>
 </resources>
