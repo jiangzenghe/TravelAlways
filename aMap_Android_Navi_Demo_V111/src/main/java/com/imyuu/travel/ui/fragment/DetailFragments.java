@@ -30,6 +30,7 @@ import com.imyuu.travel.model.ScenicDetailJson;
 import com.imyuu.travel.model.ServiceState;
 import com.imyuu.travel.ui.MapActivity;
 import com.imyuu.travel.ui.MapOldActivity;
+import com.imyuu.travel.ui.MapOldActivity2;
 import com.imyuu.travel.ui.MapOnlineActivity;
 import com.imyuu.travel.ui.ScenicAreaActivity;
 import com.imyuu.travel.util.Config;
@@ -184,7 +185,7 @@ public class DetailFragments extends Fragment {
         Log.d(TAG,"enterClick");
 //        Intent intent = new Intent(getActivity(),MapOnlineActivity.class);
 //        intent.putExtra("scenicInfo",scenicAreaJson);
-        Intent intent = new Intent(getActivity(), MapOldActivity.class);
+        Intent intent = new Intent(getActivity(), MapOldActivity2.class);
         intent.putExtra(ConstantsOld.SCIENCE_ID_KEY, scenicId);
         startActivity(intent);
     }

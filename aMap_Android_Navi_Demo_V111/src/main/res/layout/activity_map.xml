@@ -1,27 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/img_main_bg"
     android:orientation="vertical" >
-
-    <RelativeLayout android:id="@id/dragView" android:focusable="false"
-        android:clickable="true" android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-        <com.imyuu.travel.view.ImageMapView android:id="@id/amp_view"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
-        <ImageButton android:id="@id/drop_tag"
-            android:background="@drawable/drawer_bar"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="45.0dip"
-            android:layout_alignTop="@id/amp_view"
-            android:contentDescription="@string/nothing" />
-        <Button android:id="@id/touch_btn" android:background="#00000000"
-            android:visibility="visible" android:layout_width="fill_parent"
-            android:layout_height="fill_parent" android:layout_marginTop="45.0dip"
-            android:text="" android:layout_alignTop="@id/amp_view" />
-    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/app_title_container"
@@ -40,7 +22,15 @@
             android:id="@+id/text_app_title"
             style="@style/app_title_theme" />
 
-
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:visibility="visible" />
     </RelativeLayout>
 
     <LinearLayout
@@ -76,14 +66,19 @@
             android:textColor="@color/darkgrey" />
     </LinearLayout>
 
-
+    <RelativeLayout
+        android:id="@+id/travel_map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/linearlayout_map_bottom_menu"
+        android:layout_below="@id/app_title_container" >
+    </RelativeLayout>
     
     <HorizontalScrollView
         android:id="@+id/horizontalscrollview_map_line"
         android:layout_width="match_parent"
         android:layout_height="60dip"
         android:layout_above="@id/linearlayout_map_bottom_menu"
-        android:layout_below="@+id/routemap"
         android:background="#5557C4FA"
         android:scrollbars="none"
         android:fillViewport="true" >
@@ -95,11 +90,4 @@
             android:orientation="horizontal" >
         </LinearLayout>
     </HorizontalScrollView>
-
-    <com.amap.api.maps.MapView android:id="@id/routemap"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_below="@id/app_title_container"
-        android:layout_above="@+id/linearlayout_map_bottom_menu"/>
-
 </RelativeLayout>

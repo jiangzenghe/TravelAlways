@@ -81,7 +81,8 @@ public class MapOldActivity extends Activity {
         initView();
         Intent intent = getIntent();
         if (intent != null) {
-            scenicId = intent.getStringExtra(ConstantsOld.SCIENCE_ID_KEY);
+//            scenicId = intent.getStringExtra(ConstantsOld.SCIENCE_ID_KEY);
+            scenicId="221";
         }
         if (TextUtils.isEmpty(scenicId)) {
             Toast.makeText(MapOldActivity.this, R.string.index_loading_fail, Toast.LENGTH_SHORT).show();
