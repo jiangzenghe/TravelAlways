@@ -184,7 +184,8 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 	private void initData() {
 		Intent intent = getIntent();
 		if (intent != null) {
-			scenicId = intent.getStringExtra(ConstantsOld.SCIENCE_ID_KEY);
+//			scenicId = intent.getStringExtra(ConstantsOld.SCIENCE_ID_KEY);
+		scenicId = "221";
 		}
 
 		if (TextUtils.isEmpty(scenicId)) {

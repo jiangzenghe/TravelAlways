@@ -230,6 +230,8 @@ public class RoutePopView extends PopupWindow {
 						public void onClick(View v) {
 							for (int i = 0; i < mRoute_layout.getChildCount(); i++) {
 								View view = mRoute_layout.getChildAt(i);
+								ImageView eachMapLinePoint = (ImageView) view.findViewById(R.id.image_map_line_point);
+								eachMapLinePoint.setImageResource(R.drawable.img_map_point);
 								if (view.getTag().toString()
 										.equals(v.getTag().toString())) {
 									ImageView imageMapLinePoint = (ImageView) v.findViewById(R.id.image_map_line_point);

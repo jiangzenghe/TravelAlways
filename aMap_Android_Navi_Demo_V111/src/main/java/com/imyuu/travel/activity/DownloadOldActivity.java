@@ -45,6 +45,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import retrofit.Callback;
@@ -76,8 +77,8 @@ public class DownloadOldActivity extends Activity {
      */
     public void download(final Activity activity, final String scenicId) {
         this.activity = activity;
-//        this.scenicId = scenicId;
-        this.scenicId = "221";
+        this.scenicId = scenicId;
+//        this.scenicId = "221";
 
         ScenicRecommendLineDataHelper scenicRecommendLineDataHelper = new ScenicRecommendLineDataHelper(activity);
         scenicRecommendLineModelList = scenicRecommendLineDataHelper.getListByScenicId(scenicId);
@@ -158,7 +159,7 @@ public class DownloadOldActivity extends Activity {
                                     @Override
                                     public void run() {
                                         HttpOldUtil HttpOldUtil = new HttpOldUtil();
-                                        int result = HttpOldUtil.downFile(ConstantsOld.API_SINGLE_SCENIC_DOWNLOAD + scenicId,
+                                        int result = HttpOldUtil.downFile(ConstantsOld.API_SINGLE_SCENIC_DOWNLOAD + "m" + scenicId,
                                                 ConstantsOld.SCENIC_ROUTER_FILE_PATH, ConstantsOld.SCENIC + scenicId + ConstantsOld.ALL_SCENIC_ZIP);
                                         Message message = new Message();
                                         Bundle bundle = new Bundle();
@@ -218,7 +219,7 @@ public class DownloadOldActivity extends Activity {
                                 @Override
                                 public void run() {
                                     HttpOldUtil HttpOldUtil = new HttpOldUtil();
-                                    int result = HttpOldUtil.downFile(ConstantsOld.API_SINGLE_SCENIC_DOWNLOAD + scenicId,
+                                    int result = HttpOldUtil.downFile(ConstantsOld.API_SINGLE_SCENIC_DOWNLOAD + "m" + scenicId,
                                             ConstantsOld.SCENIC_ROUTER_FILE_PATH, ConstantsOld.SCENIC + scenicId + ConstantsOld.ALL_SCENIC_ZIP);
                                     Message message = new Message();
                                     Bundle bundle = new Bundle();
@@ -374,6 +375,7 @@ public class DownloadOldActivity extends Activity {
                         }
                         progressDialog.dismiss();
                     } catch (Exception e) {
+                        Log.e("error-here",e.getMessage().toString());
                         Toast.makeText(activity, R.string.index_loading_fail, Toast.LENGTH_SHORT).show();
                         progressDialog.dismiss();
                     }

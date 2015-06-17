@@ -69,8 +69,16 @@ public class ZipUtil {
         ZipFile zf = new ZipFile(zipFile);
         for (Enumeration<?> entries = zf.entries(); entries.hasMoreElements(); ) {
             ZipEntry entry = ((ZipEntry) entries.nextElement());
+            String str = folderPath + entry.getName();
+            if (entry.isDirectory()) {
+                File desFile = new File(str);
+                File fileParentDir = desFile.getParentFile();
+                if (!fileParentDir.exists()) {
+                    fileParentDir.mkdirs();
+                }
+                continue;
+            }
             InputStream in = zf.getInputStream(entry);
-            String str = folderPath + File.separator + entry.getName();
             str = new String(str.getBytes("8859_1"), "GB2312");
             File desFile = new File(str);
             if (!desFile.exists()) {

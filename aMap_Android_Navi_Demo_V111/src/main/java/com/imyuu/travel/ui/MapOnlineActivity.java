@@ -409,7 +409,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 //		} else {
 //			curDisplayView.setVisibility(View.GONE);
 //		}
-
 		return false;
 	}
 	
@@ -575,6 +574,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 				markerList = (ArrayList) resultJson;
 				markerUtilsFor2D = new MarkerUtilsFor2D(MapOnlineActivity.this, mMap, markerList);
 				addMarkerFunc("1");
+				getScenicAdvertNet(scenic.getScenicId());
 			}
 
 			@Override
@@ -583,7 +583,26 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			}
 		});
 	}
-	
+
+	private void getScenicAdvertNet(String scenicId) {
+		ApiClient.getIuuApiClient().queryScenicSpotLists(scenicId, new Callback<List<ScenicPointJson>>() {
+			@Override
+			public void success(List<ScenicPointJson> resultJson, Response response) {
+				Toast.makeText(MapOnlineActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
+				if (resultJson == null) {
+					Toast.makeText(MapOnlineActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
+				}
+				markerList = (ArrayList) resultJson;
+//				markerUtilsFor2D.addMarkerGrphic();
+			}
+
+			@Override
+			public void failure(RetrofitError error) {
+				Toast.makeText(MapOnlineActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+			}
+		});
+	}
+
 	private void addMarkerFunc(String spotype) {
 		markerUtilsFor2D.addMarkerGrphic(spotype);
 	}
