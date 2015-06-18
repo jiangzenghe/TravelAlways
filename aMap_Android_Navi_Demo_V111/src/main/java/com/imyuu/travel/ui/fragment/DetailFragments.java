@@ -182,12 +182,19 @@ public class DetailFragments extends Fragment {
 
     @OnClick(R.id.bt_enter)
     public void enterClick() {
-        Log.d(TAG,"enterClick");
-//        Intent intent = new Intent(getActivity(),MapOnlineActivity.class);
-//        intent.putExtra("scenicInfo",scenicAreaJson);
-        Intent intent = new Intent(getActivity(), MapOldActivity2.class);
-        intent.putExtra(ConstantsOld.SCIENCE_ID_KEY, scenicId);
-        startActivity(intent);
+        Log.d(TAG, "enterClick");
+        if(true) {
+            Intent intent = new Intent(getActivity(),MapOnlineActivity.class);
+            intent.putExtra("scenicInfo",scenicAreaJson);
+            startActivity(intent);
+        } else if (true){
+            Intent intent = new Intent(getActivity(), MapOldActivity2.class);
+            intent.putExtra(ConstantsOld.SCIENCE_ID_KEY, scenicId);
+            startActivity(intent);
+        } else {
+
+        }
+
     }
     @OnClick(R.id.bt_favor)
     public void bt_favorClick() {
@@ -216,10 +223,13 @@ public class DetailFragments extends Fragment {
 
     @OnClick(R.id.button_download)
     public void downloadClick() {
-        downloadOldActivity = new DownloadOldActivity();
-        downloadOldActivity.download(this.getActivity(), scenicId);
-//         downloadActivity = new DownloadActivity();
-//        downloadActivity.download(scenicAreaJson.getScenicId(), myhandler,progressBar);
+        if(true) {
+            downloadActivity = new DownloadActivity();
+            downloadActivity.download(scenicAreaJson.getScenicId(), myhandler,progressBar);
+        } else {
+            downloadOldActivity = new DownloadOldActivity();
+            downloadOldActivity.download(this.getActivity(), scenicId);
+        }
     }
 
     private Handler myhandler = new Handler(){
