@@ -2,6 +2,7 @@ package com.imyuu.travel.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -58,6 +59,8 @@ import com.imyuu.travel.R;
 import com.imyuu.travel.TTSController;
 import com.imyuu.travel.adapters.GridAdapter;
 import com.imyuu.travel.api.ApiClient;
+import com.imyuu.travel.bean.ScenicAdvertOldModel;
+import com.imyuu.travel.database.ScenicAdvertDataHelper;
 import com.imyuu.travel.localhttp.SimpleWebServer;
 import com.imyuu.travel.model.RecommendLine;
 import com.imyuu.travel.model.ScenicAreaJson;
@@ -74,6 +77,7 @@ import com.imyuu.travel.view.ColumnHorizontalScrollView;
 import com.imyuu.travel.view.GridView;
 import com.imyuu.travel.view.RoutePopView;
 import com.imyuu.travel.view.RoutePopViewOffline;
+import com.imyuu.travel.view.SlideShowView;
 
 import java.io.File;
 import java.io.IOException;
@@ -102,7 +106,9 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 	private GridView layoutShow;
 	private TextView routeText;
 	private RelativeLayout rl_column;
-
+	private ImageView imageMapAdvertClose;
+	private SlideShowView slideshowviewAdvert;
+	private RelativeLayout relativelayoutMapAdvert;
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
 	private AMapNavi mAMapNavi;
@@ -134,6 +140,8 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 	private Marker mCurrentVirtualPoint;
 	private ScenicAreaJson scenic;
 	private String scenicId = "";
+	//广告
+	private ImageView[] imageViews;
 
 	/** 分类列表*/
 	private ArrayList<ScenicPointJson> markerList=new ArrayList<ScenicPointJson>();
@@ -231,6 +239,9 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 			mAMapNavi.setAMapNaviListener(this);
 		}
 
+		imageMapAdvertClose = (ImageView) findViewById(R.id.image_map_advert_close);
+		relativelayoutMapAdvert = (RelativeLayout) findViewById(R.id.relativelayout_map_advert);
+		slideshowviewAdvert = (SlideShowView) findViewById(R.id.slideshowview_advert);
 		rl_column = (RelativeLayout) findViewById(R.id.rl_column);
 		routeText = (TextView) findViewById(R.id.route);
 		cilckText = (TextView) findViewById(R.id.help);
@@ -559,6 +570,57 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 	}
 
 	private void getScenicAdvertNet(String scenicId) {
+		ScenicAdvertDataHelper scenicAdvertDataHelper = new ScenicAdvertDataHelper(
+				MapOfflineActivity.this);
+		List<ScenicAdvertOldModel> scenicAdvertModelList = scenicAdvertDataHelper
+				.getListByScenicId(scenicId);
+		scenicAdvertDataHelper.close();
+		// 广告加载
+		if (scenicAdvertModelList.size() > 0) {
+			relativelayoutMapAdvert.setVisibility(View.VISIBLE);
+			imageViews = new ImageView[scenicAdvertModelList.size()];
+			WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+			int width = wm.getDefaultDisplay().getWidth();
+			int height = 0;
+			Bitmap bitmap = null;
+			for (int i = 0; i < scenicAdvertModelList.size(); i++) {
+				ScenicAdvertModel scenicAdvertModel = scenicAdvertModelList
+						.get(i);
+				// 加载广告图片
+				imageViews[i] = new ImageView(MapOfflineActivity.this);
+				bitmap = BitmapFactory
+						.decodeFile(Constants.SCENIC_ADVERT_FILE_PATH
+								+ scenicId + "/"
+								+ scenicAdvertModel.getAdvertPic());
+				imageViews[i].setImageBitmap(bitmap);
+				height = width * bitmap.getHeight() / bitmap.getWidth();
+				imageViews[i].setTag(scenicAdvertModel
+						.getAdvertscenicId());
+				imageViews[i]
+						.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								Intent intent = new Intent();
+								intent.setClass(MapOfflineActivity.this,
+										ScenicInfoActivity.class);
+								intent.putExtra(
+										Constants.SCIENCE_ID_KEY, v
+												.getTag().toString());
+								startActivity(intent);
+								finish();
+							}
+						});
+			}
+			LayoutParams params = slideshowviewAdvert.getLayoutParams();
+			params.width = width;
+			params.height = height;
+
+			slideshowviewAdvert.setImageViews(imageViews);
+			slideshowviewAdvert.invalidate();
+			slideshowviewAdvert.setLayoutParams(params);
+		} else {
+			relativelayoutMapAdvert.setVisibility(View.GONE);
+		}
 //		markerUtilsFor2D.addMarkerGrphic();
 	}
 	

@@ -6,9 +6,9 @@ import java.io.Serializable;
  * Created by administor on 2015/5/11.
  */
 public class Food implements Serializable {
-    private  String s_photo_url;
-    private  String avg_price;
-    private  String rating_s_img_url;
+    private String s_photo_url;
+    private String avg_price;
+    private String rating_s_img_url;
     private String name;
     private String address;
     private String distance;

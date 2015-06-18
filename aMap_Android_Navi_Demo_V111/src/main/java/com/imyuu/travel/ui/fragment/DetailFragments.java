@@ -29,13 +29,17 @@ import com.imyuu.travel.model.ScenicAreaJson;
 import com.imyuu.travel.model.ScenicDetailJson;
 import com.imyuu.travel.model.ServiceState;
 import com.imyuu.travel.ui.MapActivity;
+import com.imyuu.travel.ui.MapOfflineActivity;
 import com.imyuu.travel.ui.MapOldActivity;
 import com.imyuu.travel.ui.MapOldActivity2;
 import com.imyuu.travel.ui.MapOnlineActivity;
 import com.imyuu.travel.ui.ScenicAreaActivity;
 import com.imyuu.travel.util.Config;
 import com.imyuu.travel.util.ConstantsOld;
+import com.imyuu.travel.util.FileUtil;
+import com.imyuu.travel.util.FileUtils;
 import com.imyuu.travel.util.LogUtil;
+import com.imyuu.travel.util.ToastUtil;
 
 import java.util.ArrayList;
 
@@ -103,6 +107,7 @@ public class DetailFragments extends Fragment {
                 scenicAreaJson.setLng(scenicDetailJson.getLng());
                 scenicAreaJson.setRight_lat(scenicDetailJson.getRight_lat());
                 scenicAreaJson.setRight_lng(scenicDetailJson.getRight_lng());
+                scenicAreaJson.setCanNavi(scenicDetailJson.getCanNavi());
                 // to be continued
                 if (true)
                     resultView.setText(scenicDetailJson.getMapSize());
@@ -183,16 +188,23 @@ public class DetailFragments extends Fragment {
     @OnClick(R.id.bt_enter)
     public void enterClick() {
         Log.d(TAG, "enterClick");
-        if(true) {
-            Intent intent = new Intent(getActivity(),MapOnlineActivity.class);
-            intent.putExtra("scenicInfo",scenicAreaJson);
-            startActivity(intent);
-        } else if (true){
+        if(scenicAreaJson.getCanNavi().equals("0")) {
+            if(!FileUtils.isExist(Config.NEW_FILEPATH+"scenic"+scenicId+"/scenic"+scenicId+"_files")) {
+                ToastUtil.show(getActivity(), "请先下载地图~");
+                return;
+            }
             Intent intent = new Intent(getActivity(), MapOldActivity2.class);
             intent.putExtra(ConstantsOld.SCIENCE_ID_KEY, scenicId);
             startActivity(intent);
+        } else if (scenicAreaJson.getCanNavi().equals("1")
+                && FileUtils.isExist(Config.NEW_FILEPATH+scenicId+"/tiles")){
+            Intent intent = new Intent(getActivity(),MapOfflineActivity.class);
+            intent.putExtra("scenicInfo",scenicAreaJson);
+            startActivity(intent);
         } else {
-
+            Intent intent = new Intent(getActivity(),MapOnlineActivity.class);
+            intent.putExtra("scenicInfo",scenicAreaJson);
+            startActivity(intent);
         }
 
     }
@@ -223,7 +235,7 @@ public class DetailFragments extends Fragment {
 
     @OnClick(R.id.button_download)
     public void downloadClick() {
-        if(true) {
+        if(scenicAreaJson.getCanNavi().equals("1")) {
             downloadActivity = new DownloadActivity();
             downloadActivity.download(scenicAreaJson.getScenicId(), myhandler,progressBar);
         } else {

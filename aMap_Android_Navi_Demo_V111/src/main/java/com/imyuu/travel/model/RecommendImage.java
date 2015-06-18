@@ -9,8 +9,8 @@ import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import java.util.List;
 
-@Table(name = "scenic_recommend")
-public class Recommend extends Model implements Serializable {
+@Table(name = "scenic_recommend_image")
+public class RecommendImage extends Model implements Serializable {
     public String getScenicId() {
         return scenicId;
     }
@@ -28,9 +28,8 @@ public class Recommend extends Model implements Serializable {
     }
 
     @Expose
-    @Column(name = "recommend_id", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "recommendId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private String recommendId;
-
     @Expose
     @Column(name = "scenicId")
     private String scenicId;
@@ -80,10 +79,10 @@ public class Recommend extends Model implements Serializable {
     public static void remove(String ScenicId) {
         try {
 
-            List<Recommend> lineList = new Select().from(Recommend.class)
+            List<RecommendImage> lineList = new Select().from(RecommendImage.class)
                     .where("scenicId = ?", ScenicId).execute();
             if (lineList != null && lineList.size() > 0)
-                for (Recommend recommend : lineList)
+                for (RecommendImage recommend : lineList)
                     recommend.delete();
 
         } catch (Exception e) {
@@ -92,10 +91,10 @@ public class Recommend extends Model implements Serializable {
 
     }
 
-    public static List<Recommend> load(String ScenicId) {
+    public static List<RecommendImage> load(String ScenicId) {
         try {
 
-            List<Recommend> lineList = new Select().from(Recommend.class)
+            List<RecommendImage> lineList = new Select().from(RecommendImage.class)
                     .where("scenicId = ?", ScenicId).execute();
 
                 return lineList;

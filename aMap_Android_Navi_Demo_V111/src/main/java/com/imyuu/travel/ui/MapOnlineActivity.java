@@ -68,8 +68,10 @@ import com.imyuu.travel.TTSController;
 import com.imyuu.travel.adapters.GridAdapter;
 import com.imyuu.travel.api.ApiClient;
 import com.imyuu.travel.base.AppApplication;
+import com.imyuu.travel.bean.ScenicAdvertOldModel;
 import com.imyuu.travel.bean.SpotModel;
 import com.imyuu.travel.model.RecommendLine;
+import com.imyuu.travel.model.ScenicAdvertJson;
 import com.imyuu.travel.model.ScenicAreaJson;
 import com.imyuu.travel.model.ScenicPointJson;
 import com.imyuu.travel.model.SpotInfo;
@@ -141,7 +143,8 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	private Marker mCurrentVirtualPoint;
     private ScenicAreaJson scenic;
 	private String scenicId = "";
-
+	//广告
+	private ImageView[] imageViews;
 	/** 分类列表*/
 	private ArrayList<ScenicPointJson> markerList=new ArrayList<ScenicPointJson>();
 	private MarkerUtilsFor2D markerUtilsFor2D;
@@ -587,15 +590,15 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	}
 
 	private void getScenicAdvertNet(String scenicId) {
-		ApiClient.getIuuApiClient().queryScenicSpotLists(scenicId, new Callback<List<ScenicPointJson>>() {
+		ApiClient.getIuuApiClient().queryScenicAdvertLists(scenicId, new Callback<List<ScenicAdvertJson>>() {
 			@Override
-			public void success(List<ScenicPointJson> resultJson, Response response) {
+			public void success(List<ScenicAdvertJson> resultJson, Response response) {
 				Toast.makeText(MapOnlineActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
 				if (resultJson == null) {
 					Toast.makeText(MapOnlineActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
 					return;
 				}
-				markerList = (ArrayList) resultJson;
+				ArrayList<ScenicAdvertJson> markerAdvertList = (ArrayList) resultJson;
 //				markerUtilsFor2D.addMarkerGrphic();
 			}
 

@@ -4,6 +4,7 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
+import com.activeandroid.util.SQLiteUtils;
 import com.google.gson.annotations.Expose;
 
 import java.io.Serializable;
@@ -17,7 +18,7 @@ import java.util.List;
 @Table(name = "scenicAreaJson")
 public class ScenicAreaJson extends Model implements Serializable {
     @Expose
-    @Column(name = "scenicId")
+    @Column(name = "scenicId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private String scenicId;
     @Expose
     @Column(name = "scenicName")
@@ -75,6 +76,17 @@ public class ScenicAreaJson extends Model implements Serializable {
     @Column(name = "desc")
     private String desc;
 
+    public Integer getShowOrder() {
+        return showOrder;
+    }
+
+    public void setShowOrder(Integer showOrder) {
+        this.showOrder = showOrder;
+    }
+
+    @Expose
+    @Column(name = "showOrder")
+    private Integer showOrder;
     public String getMapSize() {
         return mapSize;
     }
@@ -108,6 +120,10 @@ public class ScenicAreaJson extends Model implements Serializable {
     private String scenicLevel;  //5A 4A ��
     private String distance;
 
+    @Expose
+    @Column(name = "canNavi")
+    private String canNavi;
+
     public ScenicAreaJson() {
         distance = "";
     }
@@ -136,21 +152,42 @@ public class ScenicAreaJson extends Model implements Serializable {
         this.distance = distance;
     }
 
-    @Override
-    public String toString() {
-        return "ScenicAreaJson [Id=" + scenicId + ", scenicName=" + scenicName
-                + ", scenicLocation=" + scenicLocation + ", smallImage="
-                + smallImage + ", lat=" + lat + ", lng=" + lng + ", warning="
-                + warning + ", city=" + city + ", desc=" + desc
-                + ", scenicType=" + scenicType + ", commentsNum=" + commentsNum
-                + "]";
-    }
-
-
     public String getScenicType() {
         return scenicType;
     }
 
+    public String getCanNavi() {
+        return canNavi;
+    }
+
+    public void setCanNavi(String canNavi) {
+        this.canNavi = canNavi;
+    }
+
+    @Override
+    public String toString() {
+        return "ScenicAreaJson{" +
+                "scenicId='" + scenicId + '\'' +
+                ", scenicName='" + scenicName + '\'' +
+                ", scenicLocation='" + scenicLocation + '\'' +
+                ", smallImage='" + smallImage + '\'' +
+                ", lat=" + lat +
+                ", lng=" + lng +
+                ", right_lat=" + right_lat +
+                ", right_lng=" + right_lng +
+                ", warning='" + warning + '\'' +
+                ", city='" + city + '\'' +
+                ", mapSize='" + mapSize + '\'' +
+                ", province='" + province + '\'' +
+                ", desc='" + desc + '\'' +
+                ", scenicType='" + scenicType + '\'' +
+                ", commentsNum=" + commentsNum +
+                ", favourNum=" + favourNum +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", scenicLevel='" + scenicLevel + '\'' +
+                ", distance='" + distance + '\'' +
+                '}';
+    }
 
     public void setScenicType(String scenicType) {
         this.scenicType = scenicType;
@@ -286,7 +323,7 @@ public class ScenicAreaJson extends Model implements Serializable {
         this.scenicLevel = scenicLevel;
     }
 
-    public ScenicAreaJson load(String ScenicId) {
+    public static ScenicAreaJson load(String ScenicId) {
         try {
 
             List<ScenicAreaJson> lineList = new Select().from(ScenicAreaJson.class)
@@ -300,6 +337,54 @@ public class ScenicAreaJson extends Model implements Serializable {
         return null;
     }
 
+    public static List<ScenicAreaJson> find(String key) {
+        try {
+
+//            List<ScenicAreaJson> lineList = new Select().from(ScenicAreaJson.class)
+//                    .where("city = ? or province=? or scenicName LIKE ?", key).execute();
+//
+//                return lineList;
+
+            List<ScenicAreaJson>  mRecordList = SQLiteUtils.rawQuery(ScenicAreaJson.class,
+                    "SELECT * from scenicAreaJson where city LIKE ? or province LIKE ?  or scenicName LIKE ?",
+                    new String[]{'%' + key + '%'});
+            return mRecordList;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<ScenicAreaJson> load() {
+        try {
+
+            List<ScenicAreaJson> lineList = new Select().from(ScenicAreaJson.class)
+                    .execute();
+            return lineList;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<ScenicAreaJson> load(int limit,int offset) {
+        try {
+
+            List<ScenicAreaJson> lineList = new Select().from(ScenicAreaJson.class)
+                    .limit(limit).offset(offset).orderBy(" showOrder  ASC")
+                    .execute();
+            return lineList;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static int count()
+    {
+        return new Select().from(ScenicAreaJson.class).execute().size();
+    }
     public void remove(String ScenicId) {
         try {
 

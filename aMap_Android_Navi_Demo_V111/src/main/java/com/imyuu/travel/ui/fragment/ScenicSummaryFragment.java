@@ -13,14 +13,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
 import com.imyuu.travel.R;
 import com.imyuu.travel.api.ApiClient;
 import com.imyuu.travel.model.Recommend;
+import com.imyuu.travel.model.RecommendImage;
 import com.imyuu.travel.model.ScenicIntroductionJson;
 import com.imyuu.travel.util.Config;
+import com.imyuu.travel.util.FrescoFactory;
 import com.imyuu.travel.util.LogUtil;
-import com.imyuu.travel.view.JustifyTextView;
 
 import java.util.ArrayList;
 
@@ -32,7 +35,7 @@ import retrofit.client.Response;
  * Created by administor on 2015/5/3.
  */
 public class ScenicSummaryFragment extends Fragment {
-      private TextView scenicSummary;
+    private com.imyuu.travel.view.JustifyTextView scenicSummary;
     private TextView scenicName;
     private TextView scenicLevel;
     private TextView scenicType;
@@ -42,7 +45,7 @@ public class ScenicSummaryFragment extends Fragment {
     /**
      * 景区简介图
      */
-    private ArrayList<Recommend>  imageList;
+    private ArrayList<RecommendImage> imageList;
 
 
     @Override
@@ -50,19 +53,19 @@ public class ScenicSummaryFragment extends Fragment {
                              Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         View view = inflater.inflate(R.layout.fragment_scenicsummary, container, false);
-        scenicSummary = (TextView) view.findViewById(R.id.tv_summary_scenic);
+        scenicSummary = (com.imyuu.travel.view.JustifyTextView) view.findViewById(R.id.tv_summary_scenic);
         scenicName = (TextView) view.findViewById(R.id.tv_summary_scenicname);
         scenicLevel = (TextView) view.findViewById(R.id.tv_summary_sceniclevel);
         scenicType = (TextView) view.findViewById(R.id.tv_summary_scenictype);
-        Intent intent=getActivity().getIntent();
-        String url=intent.getStringExtra("URL");
-        String scenicId=intent.getStringExtra("scenicId");
-        Log.d("ScenicSummaryFragment",scenicId+" is called");
+        Intent intent = getActivity().getIntent();
+        String url = intent.getStringExtra("URL");
+        String scenicId = intent.getStringExtra("scenicId");
+        Log.d("ScenicSummaryFragment", scenicId + " is called");
         scenicName.setText(intent.getStringExtra("scenicName"));
         imageList = new ArrayList<>();
         adaptor = new ScenicSummaryAdaptor();
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_summary_scenic);
-        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(),2);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adaptor);
         initData(scenicId);
@@ -71,59 +74,82 @@ public class ScenicSummaryFragment extends Fragment {
 
     /**
      * 向网络发起请求初始化数据
+     *
      * @param scenicId
      */
-    private void initData(String scenicId) {
+    private void initData(final String scenicId) {
 
         ApiClient.getIuuApiClient().queryScenicIntro(scenicId, new Callback<ScenicIntroductionJson>() {
             @Override
             public void success(ScenicIntroductionJson scenicIntroductionJson, Response response) {
                 LogUtil.v(scenicIntroductionJson.toString());
-                scenicLevel.setText(scenicIntroductionJson.getScenicLevel());
-                scenicType.setText(scenicIntroductionJson.getScenicType());
-                scenicSummary.setText(scenicIntroductionJson.getDesc());
+                setIntroductionInfo(scenicIntroductionJson);
                 imageList.addAll(scenicIntroductionJson.getImageList());
-                Log.d("ScenicIntroductionJson",scenicIntroductionJson.toString());
-                adaptor.notifyDataSetChanged();
+                for(RecommendImage recommend: scenicIntroductionJson.getImageList())
+                {
+                    recommend.setScenicId(scenicId);
+                    recommend.save();
+                }
+                scenicIntroductionJson.save();
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Toast.makeText(getActivity(), "加载景区简介数据失败", Toast.LENGTH_SHORT).show();
+                ScenicIntroductionJson scenicIntroductionJson = ScenicIntroductionJson.load(scenicId);
+                if(null != scenicIntroductionJson) {
+                    setIntroductionInfo(scenicIntroductionJson);
+                    imageList.clear();
+                    imageList.addAll(RecommendImage.load(scenicId));
+                }else
+                Toast.makeText(getActivity(), "在线加载景区简介数据失败", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    class  ScenicSummaryAdaptor extends RecyclerView.Adapter<ViewHolder>{
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view =LayoutInflater.from(parent.getContext()).inflate(R.layout.item_scenicsummary,parent,false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.scenic.setImageURI(Uri.parse(Config.IMAGE_SERVER_ADDR+imageList.get(position).getImageUrl()));
-        }
-
-        @Override
-        public int getItemCount() {
-            return imageList.size();
-        }
+    private void setIntroductionInfo(ScenicIntroductionJson scenicIntroductionJson) {
+        scenicLevel.setText(scenicIntroductionJson.getScenicLevel());
+        scenicType.setText(scenicIntroductionJson.getScenicType());
+        scenicSummary.setText(scenicIntroductionJson.getDesc());
+        Log.d("ScenicIntroductionJson", scenicIntroductionJson.toString());
+        adaptor.notifyDataSetChanged();
     }
-
 
     /**
      * 自定义ViewHolder
      */
-    private  static class ViewHolder extends RecyclerView.ViewHolder{
+    private static class ViewHolder extends RecyclerView.ViewHolder {
 
         private SimpleDraweeView scenic;
 
         public ViewHolder(View itemView) {
             super(itemView);
             scenic = (SimpleDraweeView) itemView.findViewById(R.id.item_scenic_image);
+        }
+    }
+
+    class ScenicSummaryAdaptor extends RecyclerView.Adapter<ViewHolder> {
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_scenicsummary, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+           // holder.scenic.setImageURI(Uri.parse(Config.IMAGE_SERVER_ADDR + imageList.get(position).getImageUrl()));
+
+            ImageRequest request = FrescoFactory.getImageRequest(holder.scenic, Config.IMAGE_SERVER_ADDR + imageList.get(position).getImageUrl());
+
+            DraweeController draweeController =  FrescoFactory.getPipelineControllder(request, holder.scenic);
+            holder.scenic.setController(draweeController);
+
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return imageList.size();
         }
     }
 }

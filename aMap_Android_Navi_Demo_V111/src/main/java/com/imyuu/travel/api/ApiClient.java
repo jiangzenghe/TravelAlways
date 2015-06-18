@@ -1,6 +1,8 @@
 package com.imyuu.travel.api;
 
+import com.imyuu.travel.bean.ScenicAdvertOldModel;
 import com.imyuu.travel.model.RecommendLine;
+import com.imyuu.travel.model.ScenicAdvertJson;
 import com.imyuu.travel.model.ScenicAreaJson;
 import com.imyuu.travel.model.ScenicDetailJson;
 import com.imyuu.travel.model.ScenicIntroductionJson;
@@ -82,6 +84,9 @@ public class ApiClient {
 
         @POST("user/reportlocation.do")
         void reportUserLocation(@Body UserLocationModel locationModel, Callback<ServiceState> callback);
+
+        @GET("/map/adverts.do")
+        void queryScenicAdvertLists(@Query("scenicId") String scenicId, Callback<List<ScenicAdvertJson>> callback);
 
         @Multipart
         @Headers({"Content-Type: image/jpeg"})

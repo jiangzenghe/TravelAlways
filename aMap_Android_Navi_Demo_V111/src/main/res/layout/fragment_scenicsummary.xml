@@ -27,6 +27,7 @@
             android:text="AAAA"
             android:textColor="@color/red"
             android:textSize="10sp" />
+
         <TextView
             android:id="@+id/tv_summary_scenictype"
             android:layout_width="wrap_content"
@@ -38,15 +39,16 @@
             android:textSize="10sp" />
     </LinearLayout>
 
-    <TextView
+    <com.imyuu.travel.view.JustifyTextView
         android:id="@+id/tv_summary_scenic"
-        android:layout_marginLeft="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_summary_scenic"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
 </LinearLayout>
