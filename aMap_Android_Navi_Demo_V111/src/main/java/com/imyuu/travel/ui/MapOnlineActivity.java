@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.media.Image;
 import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Handler;
@@ -570,6 +571,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 				Toast.makeText(MapOnlineActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
 				if (resultJson == null) {
 					Toast.makeText(MapOnlineActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
+					return;
 				}
 				markerList = (ArrayList) resultJson;
 				markerUtilsFor2D = new MarkerUtilsFor2D(MapOnlineActivity.this, mMap, markerList);
@@ -591,6 +593,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 				Toast.makeText(MapOnlineActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
 				if (resultJson == null) {
 					Toast.makeText(MapOnlineActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
+					return;
 				}
 				markerList = (ArrayList) resultJson;
 //				markerUtilsFor2D.addMarkerGrphic();
@@ -663,7 +666,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		TTSController.getInstance(this).stopSpeaking();
 		mapView.onDestroy();
 		AMapNavi.getInstance(this).destroy();
-		ApplicationHelper.getInstance().getPlayer().stop();
+		ApplicationHelper.getInstance().getPlayer().ondestroy();
 	}
 	
 	@Override
@@ -740,6 +743,13 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		curDisplayView = view;
 		final TextView voiceView = (TextView) view.findViewById(R.id.voice);
 		final TextView naviView = (TextView) view.findViewById(R.id.navi);
+		final ImageView cancelView = (ImageView) view.findViewById(R.id.pop_cancel_btn);
+		cancelView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				view.setVisibility(View.GONE);
+			}
+		});
 
 		final ScenicPointJson point = (ScenicPointJson)marker.getObject();
 		if(point.getSpotType().equals("1")) {//point.getSpotType()

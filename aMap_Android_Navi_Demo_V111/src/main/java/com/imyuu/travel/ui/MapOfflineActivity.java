@@ -482,7 +482,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 						//play
 						if(player.getStatus() == 0)  player.stop();
 						String url = spot.getAudioUrl();
-						player.playUrl(Config.IMAGE_SERVER_ADDR + url);
+						player.playUrl(Config.NEW_FILEPATH + scenicId +"/" + url);
 						mCurPalyingURL = spot.getAudioUrl();
 					}
 				};
@@ -547,23 +547,19 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 	}
 
 	private void getScenicSpotsNet(String scenicId) {
-		ApiClient.getIuuApiClient().queryScenicSpotLists(scenicId, new Callback<List<ScenicPointJson>>() {
-	        @Override
-	        public void success(List<ScenicPointJson> resultJson, Response response) {
-	        	Toast.makeText(MapOfflineActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
-	        	if(resultJson == null) {
-	        		Toast.makeText(MapOfflineActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
-	        	}
-	        	markerList = (ArrayList)resultJson;
-	        	markerUtilsFor2D = new MarkerUtilsFor2D(MapOfflineActivity.this, mMap, markerList);
-	        	addMarkerFunc("1");
-	        }
+		markerList = (ArrayList)ScenicPointJson.loadAll(scenicId);
+		if (markerList == null) {
+			Toast.makeText(MapOfflineActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		markerUtilsFor2D = new MarkerUtilsFor2D(MapOfflineActivity.this, mMap, markerList);
+		addMarkerFunc("1");
+		getScenicAdvertNet(scenic.getScenicId());
 
-	        @Override
-	        public void failure(RetrofitError error) {
-	            Toast.makeText(MapOfflineActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
-	        }
-	    });
+	}
+
+	private void getScenicAdvertNet(String scenicId) {
+//		markerUtilsFor2D.addMarkerGrphic();
 	}
 	
 	private void addMarkerFunc(String spotype) {
@@ -625,7 +621,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 		super.onDestroy();
 		TTSController.getInstance(this).stopSpeaking();
 		AMapNavi.getInstance(this).destroy();
-		ApplicationHelper.getInstance().getPlayer();
+		ApplicationHelper.getInstance().getPlayer().ondestroy();
 		if(server != null) server.stop();
 		mapView.onDestroy();
 	}
@@ -704,7 +700,14 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 	public void render(Marker marker, final View view) {
 		final TextView voiceView = (TextView) view.findViewById(R.id.voice);
 		final TextView naviView = (TextView) view.findViewById(R.id.navi);
-		
+		final ImageView cancelView = (ImageView) view.findViewById(R.id.pop_cancel_btn);
+		cancelView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				view.setVisibility(View.GONE);
+			}
+		});
+
 		final ScenicPointJson point = (ScenicPointJson)marker.getObject();
 		if(point.getSpotType().equals("1")) {//point.getSpotType()
 			voiceView.setTag(point.getScenicId());
@@ -722,7 +725,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 					if(!point.getAudioUrl().equals(mCurPalyingURL) || player.getStatus() == 3
 							|| player.getStatus() == 1) {
 						String url = point.getAudioUrl();
-						player.playUrl(Config.IMAGE_SERVER_ADDR + url);
+						player.playUrl(Config.NEW_FILEPATH + scenicId +"/" + url);
 						mCurPalyingURL = point.getAudioUrl();
 					} else {
 						player.pause();

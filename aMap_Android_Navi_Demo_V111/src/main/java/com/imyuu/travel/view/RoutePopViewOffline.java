@@ -27,6 +27,7 @@ import com.amap.api.maps2d.model.PolylineOptions;
 import com.imyuu.travel.R;
 import com.imyuu.travel.api.ApiClient;
 import com.imyuu.travel.bean.SpotModel;
+import com.imyuu.travel.model.Recommend;
 import com.imyuu.travel.model.RecommendLine;
 import com.imyuu.travel.model.SpotInfo;
 import com.imyuu.travel.ui.MapOfflineActivity;
@@ -96,29 +97,19 @@ public class RoutePopViewOffline extends PopupWindow {
 
 	}
 
-	private void initRouteList(String scenicId) {
+	private void initRouteList(final String scenicId) {
 		routeList.clear();
-		ApiClient.getIuuApiClient().queryRecommendLines(scenicId, new Callback<List<RecommendLine>>() {
-			@Override
-			public void success(List<RecommendLine> resultJson, Response response) {
-				Toast.makeText(context, "加载成功", Toast.LENGTH_SHORT).show();
-				if (resultJson == null) {
-					Toast.makeText(context, "结果为空", Toast.LENGTH_SHORT).show();
-				}
-				for (RecommendLine each : resultJson) {
-					routeList.add(each);
-				}
-				if (routeList.size() > 0) {
-					initItemForRoute(routeList.size());
-				}
-
-			}
-
-			@Override
-			public void failure(RetrofitError error) {
-				Toast.makeText(context, "加载失败", Toast.LENGTH_SHORT).show();
-			}
-		});
+		List<RecommendLine> resultJson = RecommendLine.getAll(scenicId);
+		if (resultJson == null) {
+			Toast.makeText(context, "结果为空", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		for (RecommendLine each : resultJson) {
+			routeList.add(each);
+		}
+		if (routeList.size() > 0) {
+			initItemForRoute(routeList.size());
+		}
 	}
 
 	private void initItemForRoute(int count) {
