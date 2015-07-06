@@ -21,6 +21,7 @@ import com.imyuu.travel.database.RecommendLinesectionguideDataHelper;
 import com.imyuu.travel.database.ScenicDataHelper;
 import com.imyuu.travel.database.ScenicMapDataHelper;
 import com.imyuu.travel.database.ScenicRecommendLineDataHelper;
+import com.imyuu.travel.model.ScenicAreaJson;
 import com.imyuu.travel.util.ConstantsOld;
 import com.imyuu.travel.util.MediaHelper;
 import com.imyuu.travel.view.IuuMapWidget;
@@ -71,7 +72,7 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 	private IuuMapWidget map;
 	private IuuTitleModel title;
 	private String scenicId;
-	private ScenicOldModel scenicModel;
+	private ScenicAreaJson scenicModel;
 	String lineId;
 	private Point pointCur;
 	private HashMap<String, ScenicMapOldModel> scenicMapHashMap;
@@ -456,7 +457,7 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 							showShort(R.string.index_loading_fail);
 							finish();
 						} else {
-							scenicModel = (ScenicOldModel) msg.obj;
+							scenicModel = (ScenicAreaJson) msg.obj;
 							title.setTitle(scenicModel.getScenicName());
 						}
 					} else if (type == 1) {
@@ -506,20 +507,8 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 				int code = -1;
 				Object result = null;
 				if (type == 0) {
-					ScenicDataHelper scenicDataHelper = new ScenicDataHelper(
-							MapOldActivity2.this);
-					try {
-						result = scenicDataHelper.getModelByScenicId(scenicId);
-						code = 0;
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						try {
-							scenicDataHelper.close();
-						} catch (Exception e2) {
-							e2.printStackTrace();
-						}
-					}
+					result = ScenicAreaJson.load(scenicId);
+					code = 0;
 				} else if (type == 1) {
 					ScenicRecommendLineDataHelper scenicRecommendLineDataHelper = new ScenicRecommendLineDataHelper(
 							MapOldActivity2.this);

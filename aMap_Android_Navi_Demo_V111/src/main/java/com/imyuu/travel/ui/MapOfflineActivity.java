@@ -1,7 +1,9 @@
 package com.imyuu.travel.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -17,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
@@ -69,6 +72,7 @@ import com.imyuu.travel.model.SpotInfo;
 import com.imyuu.travel.util.ApplicationHelper;
 import com.imyuu.travel.util.CommonUtils;
 import com.imyuu.travel.util.Config;
+import com.imyuu.travel.util.ConstantsOld;
 import com.imyuu.travel.util.MarkerUtils;
 import com.imyuu.travel.util.MarkerUtilsFor2D;
 import com.imyuu.travel.util.Player;
@@ -584,12 +588,12 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 			int height = 0;
 			Bitmap bitmap = null;
 			for (int i = 0; i < scenicAdvertModelList.size(); i++) {
-				ScenicAdvertModel scenicAdvertModel = scenicAdvertModelList
+				ScenicAdvertOldModel scenicAdvertModel = scenicAdvertModelList
 						.get(i);
 				// 加载广告图片
 				imageViews[i] = new ImageView(MapOfflineActivity.this);
 				bitmap = BitmapFactory
-						.decodeFile(Constants.SCENIC_ADVERT_FILE_PATH
+						.decodeFile(ConstantsOld.SCENIC_ADVERT_FILE_PATH
 								+ scenicId + "/"
 								+ scenicAdvertModel.getAdvertPic());
 				imageViews[i].setImageBitmap(bitmap);
@@ -602,9 +606,9 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 							public void onClick(View v) {
 								Intent intent = new Intent();
 								intent.setClass(MapOfflineActivity.this,
-										ScenicInfoActivity.class);
+										MapOfflineActivity.class);
 								intent.putExtra(
-										Constants.SCIENCE_ID_KEY, v
+										ConstantsOld.SCIENCE_ID_KEY, v
 												.getTag().toString());
 								startActivity(intent);
 								finish();

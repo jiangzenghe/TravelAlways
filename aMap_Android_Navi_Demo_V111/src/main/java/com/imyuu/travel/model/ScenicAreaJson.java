@@ -39,6 +39,38 @@ public class ScenicAreaJson extends Model implements Serializable {
     @Column(name = "right_lat")
     private Double right_lat;  //γ��
 
+    @Expose
+    @Column(name= "maxx")
+    private Integer maxx;
+
+    @Expose
+    @Column(name= "maxy")
+    private Integer maxy;
+
+    public Integer getScenicmapMaxy() {
+        return maxy;
+    }
+
+    public Integer getScenicmapMaxx() {
+        return maxx;
+    }
+
+    public Integer getMaxx() {
+        return maxx;
+    }
+
+    public void setMaxx(Integer maxx) {
+        this.maxx = maxx;
+    }
+
+    public Integer getMaxy() {
+        return maxy;
+    }
+
+    public void setMaxy(Integer maxy) {
+        this.maxy = maxy;
+    }
+
     public Double getRight_lat() {
         return right_lat;
     }

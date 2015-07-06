@@ -75,9 +75,9 @@ public class DownloadOldActivity extends Activity {
      * @param
      * @param
      */
-    public void download(final Activity activity, final String scenicId) {
+    public void download(final Activity activity, final String scId) {
         this.activity = activity;
-        this.scenicId = scenicId;
+        this.scenicId = scId;
 //        this.scenicId = "221";
 
         ScenicRecommendLineDataHelper scenicRecommendLineDataHelper = new ScenicRecommendLineDataHelper(activity);
@@ -98,147 +98,10 @@ public class DownloadOldActivity extends Activity {
                 Bundle bundle = new Bundle();
                 bundle.putInt(ConstantsOld.API_MESSAGE_KEY, result);
                 message.setData(bundle);
-                handler.sendMessage(message);
+                mapHandler.sendMessage(message);
             }
         }.start();
     }
-
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            Bundle bundle = msg.getData();
-            //获取api访问结果，-1为获取失败 0为下载成功；1为本地已经存在
-            int result = bundle.getInt(ConstantsOld.API_MESSAGE_KEY);
-            switch (result) {
-                case -1:
-                    Toast.makeText(activity, R.string.index_loading_fail, Toast.LENGTH_SHORT).show();
-                    progressDialog.dismiss();
-                    break;
-                case 0:
-                    try {
-                        //根据路径解压缩下载zip文件
-                        ZipUtil.upZipFile(new File(Environment.getExternalStorageDirectory() + "/" + ConstantsOld.SCENIC_ROUTER_FILE_PATH + ConstantsOld.SCENIC + ConstantsOld.ALL_SCENIC_ZIP), Environment.getExternalStorageDirectory() + "/" + ConstantsOld.SCENIC_ROUTER_FILE_PATH);
-                        //从解压出来的目录中读取json文件的内容
-                        String json = FileUtil.readFile(ConstantsOld.SCENIC_IMAGE_FILE_PATH + ConstantsOld.SCENIC + ConstantsOld.ALL_SCENIC_JSON);
-                        if (TextUtils.isEmpty(json)) {
-                            Toast.makeText(activity, R.string.index_loading_fail, Toast.LENGTH_SHORT).show();
-                        } else {
-                            //json解析并保存的手机的SQLite 数据库
-                            ScenicDataHelper dataHelper = new ScenicDataHelper(activity);
-                            try {
-                                JSONTokener jsonParser = new JSONTokener(json);
-                                JSONObject jsonObject = (JSONObject) jsonParser.nextValue();
-                                JSONArray jsonArray = jsonObject.getJSONArray("scenics");
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    String scenicId = jsonArray.getJSONObject(i).getString("id");
-                                    if (!TextUtils.isEmpty(scenicId)) {
-                                        if (dataHelper.getModelByScenicId(scenicId) == null) {
-                                            ScenicOldModel scenicModel = new ScenicOldModel();
-                                            scenicModel.setScenicId(scenicId);
-                                            scenicModel.setScenicName(jsonArray.getJSONObject(i).getString("scenicName"));
-                                            scenicModel.setScenicLocation(jsonArray.getJSONObject(i).getString("scenicLocation"));
-                                            scenicModel.setCenterabsoluteLongitude(jsonArray.getJSONObject(i).getDouble("centerabsoluteLongitude"));
-                                            scenicModel.setCenterabsoluteLatitude(jsonArray.getJSONObject(i).getDouble("centerabsoluteLatitude"));
-                                            scenicModel.setCenterrelativeLongitude(jsonArray.getJSONObject(i).getDouble("centerrelativeLongitude"));
-                                            scenicModel.setCenterrelativeLatitude(jsonArray.getJSONObject(i).getDouble("centerrelativeLatitude"));
-                                            scenicModel.setAbsoluteLongitude(jsonArray.getJSONObject(i).getDouble("absoluteLongitude"));
-                                            scenicModel.setAbsoluteLatitude(jsonArray.getJSONObject(i).getDouble("absoluteLatitude"));
-                                            scenicModel.setScenicNote(jsonArray.getJSONObject(i).getString("scenicNote"));
-                                            scenicModel.setScenicMapurl(jsonArray.getJSONObject(i).getString("scenicMapurl"));
-                                            scenicModel.setScenicSmallpic(jsonArray.getJSONObject(i).getString("scenicSmallpic"));
-                                            scenicModel.setScenicmapMaxx(jsonArray.getJSONObject(i).getInt("scenicmapMaxx"));
-                                            scenicModel.setScenicmapMaxy(jsonArray.getJSONObject(i).getInt("scenicmapMaxy"));
-                                            scenicModel.setLineColor(jsonArray.getJSONObject(i).getString("lineColor"));
-                                            dataHelper.saveModel(scenicModel);
-                                        }
-                                    }
-                                }
-                                //更新完景区基本资料以后继续更新ditu
-                                new Thread() {
-                                    @Override
-                                    public void run() {
-                                        HttpOldUtil HttpOldUtil = new HttpOldUtil();
-                                        int result = HttpOldUtil.downFile(ConstantsOld.API_SINGLE_SCENIC_DOWNLOAD + "m" + scenicId,
-                                                ConstantsOld.SCENIC_ROUTER_FILE_PATH, ConstantsOld.SCENIC + scenicId + ConstantsOld.ALL_SCENIC_ZIP);
-                                        Message message = new Message();
-                                        Bundle bundle = new Bundle();
-                                        bundle.putInt(ConstantsOld.API_MESSAGE_KEY, result);
-                                        message.setData(bundle);
-                                        mapHandler.sendMessage(message);
-                                    }
-                                }.start();
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                                Toast.makeText(activity, R.string.index_loading_fail, Toast.LENGTH_SHORT).show();
-                                progressDialog.dismiss();
-                            } finally {
-                                dataHelper.close();
-                            }
-                        }
-                    } catch (Exception e) {
-                        Toast.makeText(activity, R.string.index_loading_fail, Toast.LENGTH_SHORT).show();
-                        progressDialog.dismiss();
-                    }
-                    break;
-                default:
-                    String json = FileUtil.readFile(ConstantsOld.SCENIC_IMAGE_FILE_PATH + ConstantsOld.SCENIC + ConstantsOld.ALL_SCENIC_JSON);
-                    if (TextUtils.isEmpty(json)) {
-                        Toast.makeText(activity, R.string.index_loading_fail, Toast.LENGTH_SHORT).show();
-                    } else {
-                        ScenicDataHelper dataHelper = new ScenicDataHelper(activity);
-                        try {
-                            JSONTokener jsonParser = new JSONTokener(json);
-                            JSONObject jsonObject = (JSONObject) jsonParser.nextValue();
-                            JSONArray jsonArray = jsonObject.getJSONArray("scenics");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                String scenicId = jsonArray.getJSONObject(i).getString("id");
-                                if (!TextUtils.isEmpty(scenicId)) {
-                                    if (dataHelper.getModelByScenicId(scenicId) == null) {
-                                        ScenicOldModel scenicModel = new ScenicOldModel();
-                                        scenicModel.setScenicId(scenicId);
-                                        scenicModel.setScenicName(jsonArray.getJSONObject(i).getString("scenicName"));
-                                        scenicModel.setScenicLocation(jsonArray.getJSONObject(i).getString("scenicLocation"));
-                                        scenicModel.setCenterabsoluteLongitude(jsonArray.getJSONObject(i).getDouble("centerabsoluteLongitude"));
-                                        scenicModel.setCenterabsoluteLatitude(jsonArray.getJSONObject(i).getDouble("centerabsoluteLatitude"));
-                                        scenicModel.setCenterrelativeLongitude(jsonArray.getJSONObject(i).getDouble("centerrelativeLongitude"));
-                                        scenicModel.setCenterrelativeLatitude(jsonArray.getJSONObject(i).getDouble("centerrelativeLatitude"));
-                                        scenicModel.setAbsoluteLongitude(jsonArray.getJSONObject(i).getDouble("absoluteLongitude"));
-                                        scenicModel.setAbsoluteLatitude(jsonArray.getJSONObject(i).getDouble("absoluteLatitude"));
-                                        scenicModel.setScenicNote(jsonArray.getJSONObject(i).getString("scenicNote"));
-                                        scenicModel.setScenicMapurl(jsonArray.getJSONObject(i).getString("scenicMapurl"));
-                                        scenicModel.setScenicSmallpic(jsonArray.getJSONObject(i).getString("scenicSmallpic"));
-                                        scenicModel.setScenicmapMaxx(jsonArray.getJSONObject(i).getInt("scenicmapMaxx"));
-                                        scenicModel.setScenicmapMaxy(jsonArray.getJSONObject(i).getInt("scenicmapMaxy"));
-                                        scenicModel.setLineColor(jsonArray.getJSONObject(i).getString("lineColor"));
-                                        dataHelper.saveModel(scenicModel);
-                                    }
-                                }
-                            }
-                            new Thread() {
-                                @Override
-                                public void run() {
-                                    HttpOldUtil HttpOldUtil = new HttpOldUtil();
-                                    int result = HttpOldUtil.downFile(ConstantsOld.API_SINGLE_SCENIC_DOWNLOAD + "m" + scenicId,
-                                            ConstantsOld.SCENIC_ROUTER_FILE_PATH, ConstantsOld.SCENIC + scenicId + ConstantsOld.ALL_SCENIC_ZIP);
-                                    Message message = new Message();
-                                    Bundle bundle = new Bundle();
-                                    bundle.putInt(ConstantsOld.API_MESSAGE_KEY, result);
-                                    message.setData(bundle);
-                                    mapHandler.sendMessage(message);
-                                }
-                            }.start();
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                            Toast.makeText(activity, R.string.index_loading_fail, Toast.LENGTH_SHORT).show();
-                            progressDialog.dismiss();
-                        } finally {
-                            dataHelper.close();
-                        }
-                    }
-            }
-        }
-    };
 
     private Handler mapHandler = new Handler() {
         @Override
