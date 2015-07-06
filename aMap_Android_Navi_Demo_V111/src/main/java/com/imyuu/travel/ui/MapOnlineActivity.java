@@ -102,7 +102,7 @@ import retrofit.client.Response;
  */
 public final class MapOnlineActivity extends Activity implements AMap.OnMarkerClickListener, AMap.OnInfoWindowClickListener,
 		AMap.InfoWindowAdapter, AMap.OnCameraChangeListener, AMap.OnMapLoadedListener, LocationSource,
-	AMapLocationListener, AMapNaviListener {
+	AMapLocationListener, AMapNaviListener ,AMap.OnMapTouchListener {
 
 	private AMap mMap;
 	private MapView mapView;
@@ -399,11 +399,11 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			
 		});
 	}
-	
+
 	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-//		float x = event.getX();
-//		float y = event.getY();
+	public void onTouch(MotionEvent event) {
+		float x = event.getX();
+		float y = event.getY();
 //		int[] location = new int[2];
 //		curDisplayView.getLocationOnScreen(location);
 //
@@ -413,7 +413,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 //		} else {
 //			curDisplayView.setVisibility(View.GONE);
 //		}
-		return false;
 	}
 	
 	@Override
@@ -438,6 +437,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			mMap.setOnInfoWindowClickListener(this);// 设置点击infoWindow事件监听器
 			mMap.setInfoWindowAdapter(this);// 设置自定义InfoWindow样式
 			mMap.setOnCameraChangeListener(this);
+			mMap.setOnMapTouchListener(this);
 			mMap.getUiSettings().setCompassEnabled(false);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
 			
@@ -599,7 +599,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 					return;
 				}
 				ArrayList<ScenicAdvertJson> markerAdvertList = (ArrayList) resultJson;
-//				markerUtilsFor2D.addMarkerGrphic();
+				markerUtilsFor2D.addMarkerGrphic(markerAdvertList);
 			}
 
 			@Override

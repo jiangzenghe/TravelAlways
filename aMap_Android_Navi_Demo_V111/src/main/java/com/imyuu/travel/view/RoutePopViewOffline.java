@@ -180,10 +180,10 @@ public class RoutePopViewOffline extends PopupWindow {
 		if(routeList == null || routeList.size() == 0) return;
 
 		line = routeList.get(type);
-
+		List<SpotInfo> spottempList = line.getLineSpots();
 		int count = 0;
-		if(line!=null && line.getLineSectionList()!=null) {
-			for(SpotInfo each : line.getLineSectionList()) {
+		if(line!=null && spottempList!=null) {
+			for(SpotInfo each : spottempList) {
 				spotList.add(each);
 			}
 			count =  line.getLineSectionList().size();

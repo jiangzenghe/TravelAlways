@@ -66,6 +66,7 @@ import com.imyuu.travel.bean.ScenicAdvertOldModel;
 import com.imyuu.travel.database.ScenicAdvertDataHelper;
 import com.imyuu.travel.localhttp.SimpleWebServer;
 import com.imyuu.travel.model.RecommendLine;
+import com.imyuu.travel.model.ScenicAdvertJson;
 import com.imyuu.travel.model.ScenicAreaJson;
 import com.imyuu.travel.model.ScenicPointJson;
 import com.imyuu.travel.model.SpotInfo;
@@ -100,7 +101,7 @@ import retrofit.client.Response;
  */
 public final class MapOfflineActivity extends Activity implements AMap.OnMarkerClickListener, AMap.OnInfoWindowClickListener,
 		AMap.InfoWindowAdapter, AMap.OnCameraChangeListener, AMap.OnMapLoadedListener, LocationSource,
-	AMapLocationListener, AMapNaviListener {
+	AMapLocationListener, AMapNaviListener, AMap.OnMapTouchListener {
 	private static final String TVL_URL_ROOT = "http://localhost:8080/";
 	private SimpleWebServer server;
 
@@ -198,7 +199,6 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 		player = ApplicationHelper.getInstance().getPlayer();
 		
 		initMap();
-
 		initView();
 	}
 
@@ -412,10 +412,20 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 
 		});
 	}
-	
+
 	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		return false;
+	public void onTouch(MotionEvent event) {
+		float x = event.getX();
+		float y = event.getY();
+//		int[] location = new int[2];
+//		curDisplayView.getLocationOnScreen(location);
+//
+//		if((x>curDisplayView.getLeft()&&x<curDisplayView.getLeft()+curDisplayView.getWidth())
+//				&&(y>curDisplayView.getTop() && y<curDisplayView.getTop()+curDisplayView.getHeight())){
+//
+//		} else {
+//			curDisplayView.setVisibility(View.GONE);
+//		}
 	}
 	
 	@Override
@@ -440,6 +450,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 			mMap.setOnInfoWindowClickListener(this);// 设置点击infoWindow事件监听器
 			mMap.setInfoWindowAdapter(this);// 设置自定义InfoWindow样式
 			mMap.setOnCameraChangeListener(this);
+			mMap.setOnMapTouchListener(this);
 			mMap.getUiSettings().setCompassEnabled(false);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
 			
@@ -574,11 +585,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 	}
 
 	private void getScenicAdvertNet(String scenicId) {
-		ScenicAdvertDataHelper scenicAdvertDataHelper = new ScenicAdvertDataHelper(
-				MapOfflineActivity.this);
-		List<ScenicAdvertOldModel> scenicAdvertModelList = scenicAdvertDataHelper
-				.getListByScenicId(scenicId);
-		scenicAdvertDataHelper.close();
+		List<ScenicAdvertJson> scenicAdvertModelList = ScenicAdvertJson.load(scenicId);
 		// 广告加载
 		if (scenicAdvertModelList.size() > 0) {
 			relativelayoutMapAdvert.setVisibility(View.VISIBLE);
@@ -588,7 +595,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 			int height = 0;
 			Bitmap bitmap = null;
 			for (int i = 0; i < scenicAdvertModelList.size(); i++) {
-				ScenicAdvertOldModel scenicAdvertModel = scenicAdvertModelList
+				ScenicAdvertJson scenicAdvertModel = scenicAdvertModelList
 						.get(i);
 				// 加载广告图片
 				imageViews[i] = new ImageView(MapOfflineActivity.this);
@@ -598,8 +605,10 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 								+ scenicAdvertModel.getAdvertPic());
 				imageViews[i].setImageBitmap(bitmap);
 				height = width * bitmap.getHeight() / bitmap.getWidth();
+//				imageViews[i].setTag(scenicAdvertModel
+//						.getAdvertscenicId());
 				imageViews[i].setTag(scenicAdvertModel
-						.getAdvertscenicId());
+						.getAdvertScenicId());
 				imageViews[i]
 						.setOnClickListener(new View.OnClickListener() {
 							@Override
@@ -625,7 +634,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 		} else {
 			relativelayoutMapAdvert.setVisibility(View.GONE);
 		}
-//		markerUtilsFor2D.addMarkerGrphic();
+		markerUtilsFor2D.addMarkerGrphic(scenicAdvertModelList);
 	}
 	
 	private void addMarkerFunc(String spotype) {

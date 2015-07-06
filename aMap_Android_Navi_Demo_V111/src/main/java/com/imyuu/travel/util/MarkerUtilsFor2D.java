@@ -2,6 +2,7 @@ package com.imyuu.travel.util;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -20,6 +21,7 @@ import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.Marker;
 import com.amap.api.maps2d.model.MarkerOptions;
 import com.imyuu.travel.R;
+import com.imyuu.travel.model.ScenicAdvertJson;
 import com.imyuu.travel.model.ScenicPointJson;
 
 public class MarkerUtilsFor2D {
@@ -147,6 +149,16 @@ public class MarkerUtilsFor2D {
 
 		}
 		return result;
+	}
+	public void addMarkerGrphic(List<ScenicAdvertJson> data) {
+		for (ScenicAdvertJson each : data){
+			MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
+					.position(new LatLng(each.getLat(), each.getLng()));
+			arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.img_map_voice));
+			arg0.title(each.getAdvertScenicName());
+			Marker eachMarker = aMap.addMarker(arg0);
+			eachMarker.setObject(each);//1--广告
+		}
 	}
 
 	public void addMarkerGrphic(String spotType) {
