@@ -111,6 +111,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 	private GridView layoutShow;
 	private TextView routeText;
 	private RelativeLayout rl_column;
+	private LinearLayout layout_map_routehelpe;
 	private ImageView imageMapAdvertClose;
 	private SlideShowView slideshowviewAdvert;
 	private RelativeLayout relativelayoutMapAdvert;
@@ -131,6 +132,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 	private LinearLayout layout_redalert;
 
 	private float zoom;
+	private View curDisplayView;
 	private boolean isGPSAuto = false;
 	private boolean isSpeakingAuto = false;
 	private String mCurPalyingURL = "";
@@ -243,6 +245,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 			mAMapNavi.setAMapNaviListener(this);
 		}
 
+		layout_map_routehelpe = (LinearLayout) findViewById(R.id.layout_map_routehelp);
 		imageMapAdvertClose = (ImageView) findViewById(R.id.image_map_advert_close);
 		relativelayoutMapAdvert = (RelativeLayout) findViewById(R.id.relativelayout_map_advert);
 		slideshowviewAdvert = (SlideShowView) findViewById(R.id.slideshowview_advert);
@@ -417,15 +420,26 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 	public void onTouch(MotionEvent event) {
 		float x = event.getX();
 		float y = event.getY();
-//		int[] location = new int[2];
-//		curDisplayView.getLocationOnScreen(location);
-//
-//		if((x>curDisplayView.getLeft()&&x<curDisplayView.getLeft()+curDisplayView.getWidth())
-//				&&(y>curDisplayView.getTop() && y<curDisplayView.getTop()+curDisplayView.getHeight())){
-//
-//		} else {
-//			curDisplayView.setVisibility(View.GONE);
-//		}
+		int[] location = new int[2];
+		if(layoutShow.getVisibility() == View.VISIBLE) {
+			layoutShow.getLocationOnScreen(location);
+			if((x>layoutShow.getLeft()&&x<layoutShow.getLeft()+layoutShow.getWidth())
+					&&(y>layoutShow.getTop() && y<layoutShow.getTop()+layoutShow.getHeight())){
+				indicateAnimation(layoutShow, null, 1);
+			}
+			return;
+		}
+		if(curDisplayView != null) {
+			curDisplayView.getLocationOnScreen(location);
+
+			if((x>curDisplayView.getLeft()&&x<curDisplayView.getLeft()+curDisplayView.getWidth())
+					&&(y>curDisplayView.getTop() && y<curDisplayView.getTop()+curDisplayView.getHeight())){
+
+			} else {
+				curDisplayView.setVisibility(View.GONE);
+			}
+		}
+
 	}
 	
 	@Override
@@ -773,6 +787,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 	 * 自定义infowinfow窗口
 	 */
 	public void render(Marker marker, final View view) {
+		curDisplayView = view;
 		final TextView voiceView = (TextView) view.findViewById(R.id.voice);
 		final TextView naviView = (TextView) view.findViewById(R.id.navi);
 		final ImageView cancelView = (ImageView) view.findViewById(R.id.pop_cancel_btn);

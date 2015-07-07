@@ -1,7 +1,10 @@
 package com.imyuu.travel.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -20,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.BounceInterpolator;
@@ -78,12 +82,14 @@ import com.imyuu.travel.model.SpotInfo;
 import com.imyuu.travel.util.ApplicationHelper;
 import com.imyuu.travel.util.CommonUtils;
 import com.imyuu.travel.util.Config;
+import com.imyuu.travel.util.ConstantsOld;
 import com.imyuu.travel.util.MarkerUtilsFor2D;
 import com.imyuu.travel.util.Player;
 import com.imyuu.travel.util.ToastUtil;
 import com.imyuu.travel.view.ColumnHorizontalScrollView;
 import com.imyuu.travel.view.GridView;
 import com.imyuu.travel.view.RoutePopView;
+import com.imyuu.travel.view.SlideShowView;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -110,7 +116,10 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	private GridView layoutShow;
 	private TextView routeText;
 	private RelativeLayout rl_column;
-
+	private LinearLayout layout_map_routehelpe;
+	private ImageView imageMapAdvertClose;
+	private SlideShowView slideshowviewAdvert;
+	private RelativeLayout relativelayoutMapAdvert;
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
 	private AMapNavi mAMapNavi;
@@ -233,6 +242,10 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			mAMapNavi.setAMapNaviListener(this);
 		}
 
+		layout_map_routehelpe = (LinearLayout) findViewById(R.id.layout_map_routehelp);
+		imageMapAdvertClose = (ImageView) findViewById(R.id.image_map_advert_close);
+		relativelayoutMapAdvert = (RelativeLayout) findViewById(R.id.relativelayout_map_advert);
+		slideshowviewAdvert = (SlideShowView) findViewById(R.id.slideshowview_advert);
 		rl_column = (RelativeLayout) findViewById(R.id.rl_column);
 		routeText = (TextView) findViewById(R.id.route);
 		cilckText = (TextView) findViewById(R.id.help);
@@ -404,15 +417,25 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	public void onTouch(MotionEvent event) {
 		float x = event.getX();
 		float y = event.getY();
-//		int[] location = new int[2];
-//		curDisplayView.getLocationOnScreen(location);
-//
-//		if((x>curDisplayView.getLeft()&&x<curDisplayView.getLeft()+curDisplayView.getWidth())
-//				&&(y>curDisplayView.getTop() && y<curDisplayView.getTop()+curDisplayView.getHeight())){
-//
-//		} else {
-//			curDisplayView.setVisibility(View.GONE);
-//		}
+		int[] location = new int[2];
+		if(layoutShow.getVisibility() == View.VISIBLE) {
+			if((x>layoutShow.getLeft()&&x<layoutShow.getLeft()+layoutShow.getWidth())
+					&&(y>layoutShow.getTop() && y<layoutShow.getTop()+layoutShow.getHeight())){
+				indicateAnimation(layoutShow, null, 1);
+			}
+			return;
+		}
+		if(curDisplayView != null) {
+			curDisplayView.getLocationOnScreen(location);
+
+			if((x>curDisplayView.getLeft()&&x<curDisplayView.getLeft()+curDisplayView.getWidth())
+					&&(y>curDisplayView.getTop() && y<curDisplayView.getTop()+curDisplayView.getHeight())){
+
+			} else {
+				curDisplayView.setVisibility(View.GONE);
+			}
+		}
+
 	}
 	
 	@Override
@@ -589,7 +612,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		});
 	}
 
-	private void getScenicAdvertNet(String scenicId) {
+	private void getScenicAdvertNet(final String scenicId) {
 		ApiClient.getIuuApiClient().queryScenicAdvertLists(scenicId, new Callback<List<ScenicAdvertJson>>() {
 			@Override
 			public void success(List<ScenicAdvertJson> resultJson, Response response) {
@@ -599,6 +622,54 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 					return;
 				}
 				ArrayList<ScenicAdvertJson> markerAdvertList = (ArrayList) resultJson;
+				// 广告加载
+				if (markerAdvertList.size() > 0) {
+					relativelayoutMapAdvert.setVisibility(View.VISIBLE);
+					imageViews = new ImageView[markerAdvertList.size()];
+					WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+					int width = wm.getDefaultDisplay().getWidth();
+					int height = 0;
+					Bitmap bitmap = null;
+					for (int i = 0; i < markerAdvertList.size(); i++) {
+						ScenicAdvertJson scenicAdvertModel = markerAdvertList
+								.get(i);
+						// 加载广告图片
+						imageViews[i] = new ImageView(MapOnlineActivity.this);
+						bitmap = BitmapFactory
+								.decodeFile(ConstantsOld.SCENIC_ADVERT_FILE_PATH
+										+ scenicId + "/"
+										+ scenicAdvertModel.getAdvertPic());
+						imageViews[i].setImageBitmap(bitmap);
+						height = width * bitmap.getHeight() / bitmap.getWidth();
+//				imageViews[i].setTag(scenicAdvertModel
+//						.getAdvertscenicId());
+						imageViews[i].setTag(scenicAdvertModel
+								.getAdvertScenicId());
+						imageViews[i]
+								.setOnClickListener(new View.OnClickListener() {
+									@Override
+									public void onClick(View v) {
+										Intent intent = new Intent();
+										intent.setClass(MapOnlineActivity.this,
+												MapOfflineActivity.class);
+										intent.putExtra(
+												ConstantsOld.SCIENCE_ID_KEY, v
+														.getTag().toString());
+										startActivity(intent);
+										finish();
+									}
+								});
+					}
+					LayoutParams params = slideshowviewAdvert.getLayoutParams();
+					params.width = width;
+					params.height = height;
+
+					slideshowviewAdvert.setImageViews(imageViews);
+					slideshowviewAdvert.invalidate();
+					slideshowviewAdvert.setLayoutParams(params);
+				} else {
+					relativelayoutMapAdvert.setVisibility(View.GONE);
+				}
 				markerUtilsFor2D.addMarkerGrphic(markerAdvertList);
 			}
 

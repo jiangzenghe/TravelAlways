@@ -74,6 +74,7 @@
 		       android:visibility="gone"/>
 		</LinearLayout>
 		<LinearLayout
+			android:id="@+id/layout_map_routehelp"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
