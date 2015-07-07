@@ -188,6 +188,9 @@ public class DetailFragments extends Fragment {
     @OnClick(R.id.bt_enter)
     public void enterClick() {
         Log.d(TAG, "enterClick");
+        if(scenicAreaJson == null) {
+            return;
+        }
         if(scenicAreaJson.getCanNavi().equals("0")) {
             if(!FileUtils.isExist(Config.NEW_FILEPATH+"scenic"+scenicId+"/scenic"+scenicId+"_files")) {
                 ToastUtil.show(getActivity(), "请先下载地图~");

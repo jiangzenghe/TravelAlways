@@ -163,7 +163,7 @@ public class RoutePopView extends PopupWindow {
 				}
 				if (arg1.size() != 0) {
 					lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
-							.addAll(arg1).color(Color.RED).visible(true));
+							.addAll(arg1).color(Color.BLUE).visible(true));
 					if(mCurrentVirtualPoint == null) {
 						mCurrentVirtualPoint = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
 								.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_map_point)));

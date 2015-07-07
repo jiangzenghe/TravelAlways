@@ -423,17 +423,22 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 		int[] location = new int[2];
 		if(layoutShow.getVisibility() == View.VISIBLE) {
 			layoutShow.getLocationOnScreen(location);
-			if((x>layoutShow.getLeft()&&x<layoutShow.getLeft()+layoutShow.getWidth())
-					&&(y>layoutShow.getTop() && y<layoutShow.getTop()+layoutShow.getHeight())){
+			int x_layout = location[0];
+			int y_layout = location[1];
+			if((x>x_layout&&x<x_layout+layoutShow.getWidth())
+					&&(y>y_layout && y<y_layout+layoutShow.getHeight())){
+
+			} else {
 				indicateAnimation(layoutShow, null, 1);
 			}
 			return;
 		}
 		if(curDisplayView != null) {
 			curDisplayView.getLocationOnScreen(location);
-
-			if((x>curDisplayView.getLeft()&&x<curDisplayView.getLeft()+curDisplayView.getWidth())
-					&&(y>curDisplayView.getTop() && y<curDisplayView.getTop()+curDisplayView.getHeight())){
+			int x_layout = location[0];
+			int y_layout = location[1];
+			if((x>x_layout&&x<x_layout+curDisplayView.getWidth())
+					&&(y>y_layout && y<y_layout+curDisplayView.getHeight())){
 
 			} else {
 				curDisplayView.setVisibility(View.GONE);
@@ -465,7 +470,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 			mMap.setInfoWindowAdapter(this);// 设置自定义InfoWindow样式
 			mMap.setOnCameraChangeListener(this);
 			mMap.setOnMapTouchListener(this);
-			mMap.getUiSettings().setCompassEnabled(false);
+			mMap.getUiSettings().setCompassEnabled(true);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
 			
 			setUpMap();

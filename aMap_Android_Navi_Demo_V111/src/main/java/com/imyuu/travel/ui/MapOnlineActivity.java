@@ -461,7 +461,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 			mMap.setInfoWindowAdapter(this);// 设置自定义InfoWindow样式
 			mMap.setOnCameraChangeListener(this);
 			mMap.setOnMapTouchListener(this);
-			mMap.getUiSettings().setCompassEnabled(false);
+			mMap.getUiSettings().setCompassEnabled(true);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
 			
 			setUpMap();
@@ -651,7 +651,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 									public void onClick(View v) {
 										Intent intent = new Intent();
 										intent.setClass(MapOnlineActivity.this,
-												MapOfflineActivity.class);
+												MapOnlineActivity.class);
 										intent.putExtra(
 												ConstantsOld.SCIENCE_ID_KEY, v
 														.getTag().toString());
