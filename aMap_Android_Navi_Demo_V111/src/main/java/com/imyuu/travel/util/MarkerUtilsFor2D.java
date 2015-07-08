@@ -173,6 +173,7 @@ public class MarkerUtilsFor2D {
 				arg1.icon(BitmapDescriptorFactory.fromBitmap(
 						getBitMap(each.getScenicPointName(), R.drawable.hotviewport_transparent_long)));
 				arg0.title(each.getScenicPointName());
+//				arg1.title(each.getScenicPointName());
 				Marker eachMarker = aMap.addMarker(arg0);
 				Marker eachMarker_add = aMap.addMarker(arg1);
 				eachMarker.setObject(each);//1--景区标志

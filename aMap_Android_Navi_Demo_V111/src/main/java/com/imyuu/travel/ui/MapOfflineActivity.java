@@ -248,6 +248,12 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 		layout_map_routehelpe = (LinearLayout) findViewById(R.id.layout_map_routehelp);
 		imageMapAdvertClose = (ImageView) findViewById(R.id.image_map_advert_close);
 		relativelayoutMapAdvert = (RelativeLayout) findViewById(R.id.relativelayout_map_advert);
+		imageMapAdvertClose.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				relativelayoutMapAdvert.setVisibility(View.GONE);
+			}
+		});
 		slideshowviewAdvert = (SlideShowView) findViewById(R.id.slideshowview_advert);
 		rl_column = (RelativeLayout) findViewById(R.id.rl_column);
 		routeText = (TextView) findViewById(R.id.route);
@@ -619,27 +625,25 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 				// 加载广告图片
 				imageViews[i] = new ImageView(MapOfflineActivity.this);
 				bitmap = BitmapFactory
-						.decodeFile(ConstantsOld.SCENIC_ADVERT_FILE_PATH
+						.decodeFile(Config.NEW_FILEPATH
 								+ scenicId + "/"
 								+ scenicAdvertModel.getAdvertPic());
 				imageViews[i].setImageBitmap(bitmap);
 				height = width * bitmap.getHeight() / bitmap.getWidth();
-//				imageViews[i].setTag(scenicAdvertModel
-//						.getAdvertscenicId());
 				imageViews[i].setTag(scenicAdvertModel
 						.getAdvertScenicId());
 				imageViews[i]
 						.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								Intent intent = new Intent();
-								intent.setClass(MapOfflineActivity.this,
-										MapOfflineActivity.class);
-								intent.putExtra(
-										ConstantsOld.SCIENCE_ID_KEY, v
-												.getTag().toString());
-								startActivity(intent);
-								finish();
+//								Intent intent = new Intent();
+//								intent.setClass(MapOfflineActivity.this,
+//										MapOfflineActivity.class);
+//								intent.putExtra(
+//										ConstantsOld.SCIENCE_ID_KEY, v
+//												.getTag().toString());
+//								startActivity(intent);
+//								finish();
 							}
 						});
 			}
