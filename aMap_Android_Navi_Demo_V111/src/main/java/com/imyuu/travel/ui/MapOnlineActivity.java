@@ -68,6 +68,7 @@ import com.amap.api.navi.model.AMapNaviLocation;
 import com.amap.api.navi.model.AMapNaviPath;
 import com.amap.api.navi.model.NaviInfo;
 import com.amap.api.navi.model.NaviLatLng;
+import com.facebook.imagepipeline.cache.BitmapMemoryCacheFactory;
 import com.imyuu.travel.R;
 import com.imyuu.travel.TTSController;
 import com.imyuu.travel.adapters.GridAdapter;
@@ -93,8 +94,12 @@ import com.imyuu.travel.view.GridView;
 import com.imyuu.travel.view.RoutePopView;
 import com.imyuu.travel.view.SlideShowView;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -102,6 +107,7 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import de.greenrobot.event.EventBus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -637,26 +643,51 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 					return;
 				}
 				ArrayList<ScenicAdvertJson> markerAdvertList = (ArrayList) resultJson;
-				Log.e("length", markerAdvertList.size()+"");
+				Log.e("length", markerAdvertList.size() + "");
 				// 广告加载
 				if (markerAdvertList.size() > 0) {
 					relativelayoutMapAdvert.setVisibility(View.VISIBLE);
 					imageViews = new ImageView[markerAdvertList.size()];
-
+					WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+					int width = wm.getDefaultDisplay().getWidth();
+					int height = 0;
+					Bitmap bitmap = null;
 					for (int i = 0; i < markerAdvertList.size(); i++) {
 						ScenicAdvertJson scenicAdvertModel = markerAdvertList
 								.get(i);
 						// 加载广告图片
 						imageViews[i] = new ImageView(MapOnlineActivity.this);
-//						searchSingleBitmap(scenicAdvertModel, i);
-						imageViews[i].setImageURI(Uri.parse(Config.IMAGE_SERVER_ADDR + scenicAdvertModel.getAdvertPic()));
+						bitmap = BitmapFactory
+								.decodeFile(Config.NEW_FILEPATH
+										+ scenicId + "/"
+										+ scenicAdvertModel.getAdvertPic());
+						imageViews[i].setImageBitmap(bitmap);
+						height = width * bitmap.getHeight() / bitmap.getWidth();
 						imageViews[i].setTag(scenicAdvertModel
 								.getAdvertScenicId());
-						Log.e("advert", Config.IMAGE_SERVER_ADDR + scenicAdvertModel.getAdvertPic());
-
+						imageViews[i]
+								.setOnClickListener(new View.OnClickListener() {
+									@Override
+									public void onClick(View v) {
+//								Intent intent = new Intent();
+//								intent.setClass(MapOfflineActivity.this,
+//										MapOfflineActivity.class);
+//								intent.putExtra(
+//										ConstantsOld.SCIENCE_ID_KEY, v
+//												.getTag().toString());
+//								startActivity(intent);
+//								finish();
+									}
+								});
 					}
+					LayoutParams params = slideshowviewAdvert.getLayoutParams();
+					params.width = width;
+					params.height = height;
+
 					slideshowviewAdvert.setImageViews(imageViews);
 					slideshowviewAdvert.invalidate();
+					slideshowviewAdvert.setLayoutParams(params);
+
 				} else {
 					relativelayoutMapAdvert.setVisibility(View.GONE);
 				}
@@ -670,45 +701,20 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		});
 	}
 
-	private void searchSingleBitmap(ScenicAdvertJson scenicAdvertModel, int i) {
-		Bitmap bitmap = null;
-		WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-		int width = wm.getDefaultDisplay().getWidth();
-		int height = 0;
+	private void searchSingleBitmap(final ScenicAdvertJson scenicAdvertModel, final ImageView imageView) {
+		Thread mThread = new Thread() {
+			@Override
+			public void run() {
+				Bitmap bitmap = null;
+				HttpOldUtil httpUtil = new HttpOldUtil();
+				InputStream inputStream = httpUtil.downFile(Config.IMAGE_SERVER_ADDR + scenicAdvertModel.getAdvertPic(),
+					);
+				bitmap = BitmapFactory.decodeStream(inputStream);
+			}
+		};
+		mThread.start();
 
-		HttpOldUtil httpUtil = new HttpOldUtil();
-		InputStream inputStream = httpUtil.getInputStreamFromURL(Config.IMAGE_SERVER_ADDR + scenicAdvertModel.getAdvertPic());
-		bitmap = BitmapFactory.decodeStream(inputStream);
 //		imageViews[i].setImageURI(Uri.parse(Config.IMAGE_SERVER_ADDR + scenicAdvertModel.getAdvertPic()));
-		imageViews[i].setImageBitmap(bitmap);
-		imageViews[i].setTag(scenicAdvertModel
-				.getAdvertScenicId());
-		if(bitmap != null) {
-			height = width * bitmap.getHeight() / bitmap.getWidth();
-
-			imageViews[i]
-					.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-//							Intent intent = new Intent();
-//							intent.setClass(MapOnlineActivity.this,
-//									MapOnlineActivity.class);
-//							intent.putExtra(
-//									ConstantsOld.SCIENCE_ID_KEY, v
-//											.getTag().toString());
-//							startActivity(intent);
-//							finish();
-						}
-					});
-		}
-
-		LayoutParams params = slideshowviewAdvert.getLayoutParams();
-		params.width = width;
-		params.height = height;
-
-		slideshowviewAdvert.setImageViews(imageViews);
-		slideshowviewAdvert.invalidate();
-		slideshowviewAdvert.setLayoutParams(params);
 
 	}
 

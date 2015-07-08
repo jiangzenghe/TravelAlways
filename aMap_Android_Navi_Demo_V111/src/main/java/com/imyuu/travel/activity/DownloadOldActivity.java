@@ -93,7 +93,9 @@ public class DownloadOldActivity extends Activity {
             @Override
             public void run() {
                 HttpOldUtil httpUtil = new HttpOldUtil();
-                int result = httpUtil.downFile(ConstantsOld.API_ALL_SCENIC_DOWNLOAD, ConstantsOld.SCENIC_ROUTER_FILE_PATH, ConstantsOld.SCENIC + ConstantsOld.ALL_SCENIC_ZIP);
+                int result = httpUtil.downFile(ConstantsOld.API_SINGLE_SCENIC_DOWNLOAD + "m" + scenicId,
+                        ConstantsOld.SCENIC_ROUTER_FILE_PATH, ConstantsOld.SCENIC
+                                + scenicId + ConstantsOld.ALL_SCENIC_ZIP);
                 Message message = new Message();
                 Bundle bundle = new Bundle();
                 bundle.putInt(ConstantsOld.API_MESSAGE_KEY, result);
