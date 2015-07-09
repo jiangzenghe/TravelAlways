@@ -167,17 +167,17 @@ public class MarkerUtilsFor2D {
 			for (ScenicPointJson each : selectPointsList){
 				MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
 						.position(new LatLng(each.getLat(), each.getLng()));
-				MarkerOptions arg1 = new MarkerOptions().anchor(0.0f, 0.5f)
-						.position(new LatLng(each.getLat(), each.getLng()));
+//				MarkerOptions arg1 = new MarkerOptions().anchor(0.0f, 0.5f)
+//						.position(new LatLng(each.getLat(), each.getLng()));
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.hotviewport_nosel_map));
-				arg1.icon(BitmapDescriptorFactory.fromBitmap(
-						getBitMap(each.getScenicPointName(), R.drawable.hotviewport_transparent_long)));
+//				arg1.icon(BitmapDescriptorFactory.fromBitmap(
+//						getBitMap(each.getScenicPointName(), R.drawable.hotviewport_transparent_long)));
 				arg0.title(each.getScenicPointName());
 //				arg1.title(each.getScenicPointName());
 				Marker eachMarker = aMap.addMarker(arg0);
-				Marker eachMarker_add = aMap.addMarker(arg1);
+//				Marker eachMarker_add = aMap.addMarker(arg1);
 				eachMarker.setObject(each);//1--景区标志
-				eachMarker_add.setObject(each);
+//				eachMarker_add.setObject(each);
 			}
 		} else if(spotType.equals("2")) {
 			for (ScenicPointJson each : selectPointsList){
@@ -252,10 +252,10 @@ public class MarkerUtilsFor2D {
 				eachMarker.setObject(each);//1--景区标志
 			}
 		}
-		
-		
+
+
 		//test the time to draw
-		Log.e("draw end", new Date().getTime() + "");
+//		Log.e("draw end", new Date().getTime() + "");
 	}
 	
 	private ArrayList<ScenicPointJson> getPointList(String spotType) {

@@ -327,6 +327,7 @@ public class RoutePopView extends PopupWindow {
 	}
 
 	public void removeRoute() {
+		context.removeRoute();
 		if(lineDraw != null) {
 			lineDraw.remove();
 		}

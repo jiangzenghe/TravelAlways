@@ -204,7 +204,14 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 		initView();
 	}
 
-	private void removeRoute() {
+	public void removeRoute() {
+		if (rl_column.getVisibility() == View.VISIBLE) {
+			Drawable nav_up = getResources().getDrawable(R.drawable.uparrow);
+			nav_up.setBounds(0, 0, nav_up.getMinimumWidth(), nav_up.getMinimumHeight());
+			routeText.setCompoundDrawables(nav_up, null, null, null);
+			rl_column.setVisibility(View.GONE);
+		}
+		popView.removeRoute();
 		if(lineDraw != null) {
 			lineDraw.remove();
 		}
@@ -624,18 +631,23 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 						.get(i);
 				// 加载广告图片
 				imageViews[i] = new ImageView(MapOfflineActivity.this);
+				String imageName = "";
+				if (scenicAdvertModel.getAdvertPic().contains("document_library/scenicAdvert/")) {
+					imageName = scenicAdvertModel.getAdvertPic().replace("document_library/scenicAdvert/", "");
+				}
 				bitmap = BitmapFactory
 						.decodeFile(Config.NEW_FILEPATH
 								+ scenicId + "/"
 								+ scenicAdvertModel.getAdvertPic());
 				imageViews[i].setImageBitmap(bitmap);
-				height = width * bitmap.getHeight() / bitmap.getWidth();
 				imageViews[i].setTag(scenicAdvertModel
 						.getAdvertScenicId());
-				imageViews[i]
-						.setOnClickListener(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
+				if(bitmap != null) {
+					height = width * bitmap.getHeight() / bitmap.getWidth();
+					imageViews[i]
+							.setOnClickListener(new View.OnClickListener() {
+								@Override
+								public void onClick(View v) {
 //								Intent intent = new Intent();
 //								intent.setClass(MapOfflineActivity.this,
 //										MapOfflineActivity.class);
@@ -644,8 +656,10 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 //												.getTag().toString());
 //								startActivity(intent);
 //								finish();
-							}
-						});
+								}
+							});
+				}
+
 			}
 			LayoutParams params = slideshowviewAdvert.getLayoutParams();
 			params.width = width;
@@ -653,7 +667,7 @@ public final class MapOfflineActivity extends Activity implements AMap.OnMarkerC
 
 			slideshowviewAdvert.setImageViews(imageViews);
 			slideshowviewAdvert.invalidate();
-			slideshowviewAdvert.setLayoutParams(params);
+//			slideshowviewAdvert.setLayoutParams(params);
 		} else {
 			relativelayoutMapAdvert.setVisibility(View.GONE);
 		}

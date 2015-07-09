@@ -13,9 +13,11 @@ import android.media.Image;
 import android.net.Uri;
 import android.opengl.Visibility;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -76,6 +78,8 @@ import com.imyuu.travel.api.ApiClient;
 import com.imyuu.travel.base.AppApplication;
 import com.imyuu.travel.bean.ScenicAdvertOldModel;
 import com.imyuu.travel.bean.SpotModel;
+import com.imyuu.travel.database.ScenicAdvertDataHelper;
+import com.imyuu.travel.database.ScenicRecommendLineDataHelper;
 import com.imyuu.travel.model.RecommendLine;
 import com.imyuu.travel.model.ScenicAdvertJson;
 import com.imyuu.travel.model.ScenicAreaJson;
@@ -85,22 +89,29 @@ import com.imyuu.travel.util.ApplicationHelper;
 import com.imyuu.travel.util.CommonUtils;
 import com.imyuu.travel.util.Config;
 import com.imyuu.travel.util.ConstantsOld;
+import com.imyuu.travel.util.FileUtil;
 import com.imyuu.travel.util.HttpOldUtil;
 import com.imyuu.travel.util.MarkerUtilsFor2D;
 import com.imyuu.travel.util.Player;
 import com.imyuu.travel.util.ToastUtil;
+import com.imyuu.travel.util.ZipUtil;
 import com.imyuu.travel.view.ColumnHorizontalScrollView;
 import com.imyuu.travel.view.GridView;
 import com.imyuu.travel.view.RoutePopView;
 import com.imyuu.travel.view.SlideShowView;
 
+import org.json.JSONArray;
+import org.json.JSONTokener;
+
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -210,7 +221,14 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		initView();
 	}
 
-	private void removeRoute() {
+	public void removeRoute() {
+		if (rl_column.getVisibility() == View.VISIBLE) {
+			Drawable nav_up = getResources().getDrawable(R.drawable.uparrow);
+			nav_up.setBounds(0, 0, nav_up.getMinimumWidth(), nav_up.getMinimumHeight());
+			routeText.setCompoundDrawables(nav_up, null, null, null);
+			rl_column.setVisibility(View.GONE);
+		}
+		popView.removeRoute();
 		if(lineDraw != null) {
 			lineDraw.remove();
 		}
@@ -607,9 +625,48 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 //			mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
 //					new LatLng(scenic.getLat(), scenic.getLng()), 19));  //37.5206,121.358
-			getScenicSpotsNet(scenic.getScenicId());
+			getAdvertLocalFile(scenic.getScenicId());
 		}
 	}
+
+	private void getAdvertLocalFile(final String scenicId) {
+		new Thread() {
+			@Override
+			public void run() {
+				HttpOldUtil HttpOldUtil = new HttpOldUtil();
+				int result = HttpOldUtil.downFile(ConstantsOld.API_SCENIC_ADVERT_DOWNLOAD + scenicId, ConstantsOld.SCENIC_ROUTER_FILE_PATH, ConstantsOld.SCENIC_ADVERT + scenicId + ConstantsOld.ALL_SCENIC_ZIP);
+				Message message = new Message();
+				Bundle bundle = new Bundle();
+				bundle.putInt(ConstantsOld.API_MESSAGE_KEY, result);
+				message.setData(bundle);
+				handlerAdvert.sendMessage(message);
+			}
+		}.start();
+	}
+
+	private Handler handlerAdvert = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			Bundle bundle = msg.getData();
+			int result = bundle.getInt(ConstantsOld.API_MESSAGE_KEY);
+			switch (result) {
+				case -1:
+					Toast.makeText(MapOnlineActivity.this, R.string.index_loading_fail, Toast.LENGTH_SHORT).show();
+					break;
+				case 0:
+					try {
+						ZipUtil.upZipFile(new File(Environment.getExternalStorageDirectory() + "/" + ConstantsOld.SCENIC_ROUTER_FILE_PATH + ConstantsOld.SCENIC_ADVERT + scenicId + ConstantsOld.ALL_SCENIC_ZIP), Environment.getExternalStorageDirectory() + "/" + ConstantsOld.SCENIC_ROUTER_FILE_PATH);
+					} catch (Exception e) {
+						Toast.makeText(MapOnlineActivity.this, R.string.index_loading_fail, Toast.LENGTH_SHORT).show();
+					}
+					break;
+				default:
+
+			}
+			getScenicSpotsNet(scenic.getScenicId());
+		}
+	};
 
 	private void getScenicSpotsNet(String scenicId) {
 		ApiClient.getIuuApiClient().queryScenicSpotLists(scenicId, new Callback<List<ScenicPointJson>>() {
@@ -621,6 +678,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 					return;
 				}
 				markerList = (ArrayList) resultJson;
+
 				markerUtilsFor2D = new MarkerUtilsFor2D(MapOnlineActivity.this, mMap, markerList);
 				addMarkerFunc("1");
 				getScenicAdvertNet(scenic.getScenicId());
@@ -643,7 +701,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 					return;
 				}
 				ArrayList<ScenicAdvertJson> markerAdvertList = (ArrayList) resultJson;
-				Log.e("length", markerAdvertList.size() + "");
 				// 广告加载
 				if (markerAdvertList.size() > 0) {
 					relativelayoutMapAdvert.setVisibility(View.VISIBLE);
@@ -657,18 +714,23 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 								.get(i);
 						// 加载广告图片
 						imageViews[i] = new ImageView(MapOnlineActivity.this);
+						String imageName = "";
+						if (scenicAdvertModel.getAdvertPic().contains("document_library/scenicAdvert/")) {
+							imageName = scenicAdvertModel.getAdvertPic().replace("document_library/scenicAdvert/", "");
+						}
 						bitmap = BitmapFactory
-								.decodeFile(Config.NEW_FILEPATH
-										+ scenicId + "/"
-										+ scenicAdvertModel.getAdvertPic());
+								.decodeFile(ConstantsOld.SCENIC_ADVERT_FILE_PATH + scenicId + "/"
+										+ imageName);
 						imageViews[i].setImageBitmap(bitmap);
-						height = width * bitmap.getHeight() / bitmap.getWidth();
 						imageViews[i].setTag(scenicAdvertModel
 								.getAdvertScenicId());
-						imageViews[i]
-								.setOnClickListener(new View.OnClickListener() {
-									@Override
-									public void onClick(View v) {
+
+						if (bitmap != null) {
+							height = width * bitmap.getHeight() / bitmap.getWidth();
+							imageViews[i]
+									.setOnClickListener(new View.OnClickListener() {
+										@Override
+										public void onClick(View v) {
 //								Intent intent = new Intent();
 //								intent.setClass(MapOfflineActivity.this,
 //										MapOfflineActivity.class);
@@ -677,8 +739,9 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 //												.getTag().toString());
 //								startActivity(intent);
 //								finish();
-									}
-								});
+										}
+									});
+						}
 					}
 					LayoutParams params = slideshowviewAdvert.getLayoutParams();
 					params.width = width;
@@ -686,7 +749,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 					slideshowviewAdvert.setImageViews(imageViews);
 					slideshowviewAdvert.invalidate();
-					slideshowviewAdvert.setLayoutParams(params);
 
 				} else {
 					relativelayoutMapAdvert.setVisibility(View.GONE);
@@ -699,23 +761,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 				Toast.makeText(MapOnlineActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
 			}
 		});
-	}
-
-	private void searchSingleBitmap(final ScenicAdvertJson scenicAdvertModel, final ImageView imageView) {
-		Thread mThread = new Thread() {
-			@Override
-			public void run() {
-				Bitmap bitmap = null;
-				HttpOldUtil httpUtil = new HttpOldUtil();
-				InputStream inputStream = httpUtil.downFile(Config.IMAGE_SERVER_ADDR + scenicAdvertModel.getAdvertPic(),
-					);
-				bitmap = BitmapFactory.decodeStream(inputStream);
-			}
-		};
-		mThread.start();
-
-//		imageViews[i].setImageURI(Uri.parse(Config.IMAGE_SERVER_ADDR + scenicAdvertModel.getAdvertPic()));
-
 	}
 
 	private void addMarkerFunc(String spotype) {
@@ -811,21 +856,26 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 	@Override
 	public View getInfoContents(Marker arg0) {
+		Log.e("getInfoContents", new Date().getTime()+"");
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public View getInfoWindow(Marker marker) {
-		marker.getPosition();
+		Log.e("getInfoWindow", new Date().getTime() + "");
 		// TODO Auto-generated method stub
 		if(marker.getObject() != null) {//1marker			
+//			View infoWindow = getLayoutInflater().inflate(
+//					R.layout.custom_info_window, null);
 			View infoWindow = getLayoutInflater().inflate(
-					R.layout.custom_info_window, null);
-			
-			render(marker, infoWindow);
+					R.layout.item, null);
+			Log.e("getInfoWindow_in", new Date().getTime() + "");
+//			render(marker, infoWindow);
+			renderView(marker, infoWindow);
 			return infoWindow;
-		} else {			
+		} else {
+			Log.e("getInfoWindow_null", new Date().getTime() + "");
 			return null;
 		}
 		
@@ -836,6 +886,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	 */
 	@Override
 	public void onInfoWindowClick(Marker marker) {
+		Log.e("onInfoWindowClick", new Date().getTime()+"");
 //		if(ApplicationHelper.getInstance().getPlayer().getStatus() == 0) {
 //            ApplicationHelper.getInstance().getPlayer().stop();
 //		}
@@ -843,17 +894,27 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 	
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
+		Log.e("onMarkerClick", new Date().getTime()+"");
 		// TODO Auto-generated method stub
-		arg0.showInfoWindow();
 		return false;
 	}
 
+	public void renderView(Marker marker, final View view) {
+		final ScenicPointJson point = (ScenicPointJson)marker.getObject();
+		TextView titleUi = ((TextView) view.findViewById(R.id.spot_name));
+		if (point != null) {
+			titleUi.setText(point.getScenicPointName());
+		} else {
+			titleUi.setText("");
+		}
+	}
 	/**
 	 * 自定义infowinfow窗口
 	 */
 	public void render(Marker marker,final View view) {
 		curDisplayView = view;
 		final TextView voiceView = (TextView) view.findViewById(R.id.voice);
+		final TextView spotNameView = (TextView) view.findViewById(R.id.spot_name);
 		final TextView naviView = (TextView) view.findViewById(R.id.navi);
 		final ImageView cancelView = (ImageView) view.findViewById(R.id.pop_cancel_btn);
 		cancelView.setOnClickListener(new OnClickListener() {
@@ -864,6 +925,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 		});
 
 		final ScenicPointJson point = (ScenicPointJson)marker.getObject();
+		spotNameView.setText(point.getScenicPointName());
 		if(point.getSpotType().equals("1")) {//point.getSpotType()
 			voiceView.setTag(point.getAudioUrl());
 			voiceView.setOnClickListener(new OnClickListener() {
@@ -884,7 +946,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 						player.pause();
 					}
 				}
-			
+
 			});
 		} else {
 			voiceView.setVisibility(View.GONE);
@@ -893,7 +955,6 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 			@Override
 			public void onClick(View v) {
-				// test data
 				if(mNaviStart==null) {
 					mNaviStart = new NaviLatLng(36.138143, 120.674922);
 				}
@@ -902,7 +963,7 @@ public final class MapOnlineActivity extends Activity implements AMap.OnMarkerCl
 
 //                mNaviStart.setLatitude(AppApplication.getInstance().getMyLocation().latitude);
 //                mNaviStart.setLongitude(AppApplication.getInstance().getMyLocation().longitude);
-				Log.e("endLoc", point.getLat() +"," + point.getLng());
+//				Log.e("endLoc", point.getLat() +"," + point.getLng());
 				mNaviEnd = new NaviLatLng(point.getLat(), point.getLng());
 				if(player.getStatus() == 0) {player.stop();}
 				calculateFootRoute();
