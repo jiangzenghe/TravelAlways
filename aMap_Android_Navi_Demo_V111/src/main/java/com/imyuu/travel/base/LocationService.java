@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.location.LocationManagerProxy;
@@ -17,7 +18,8 @@ import java.util.List;
 
 /**
  * 定位服务,基于高德的定位API V1.3.0实现
- * *  */
+ * *
+ */
 public class LocationService extends Service implements AMapLocationListener {
     public static final long LOCATION_UPDATE_MIN_TIME = 10 * 1000;
     public static final float LOCATION_UPDATE_MIN_DISTANCE = 5;
@@ -99,8 +101,8 @@ public class LocationService extends Service implements AMapLocationListener {
             Log.v("locationservice", "request error");
             return;
         }
-
-        AppApplication.getInstance().setMyLocation(new LatLng(aMapLocation.getLatitude(),aMapLocation.getLongitude()));
+        Log.v("locationservice", "request "+aMapLocation.getLatitude());
+        AppApplication.getInstance().setMyLocation(new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude()));
 
         //locationList是一个自定义实现的泛型类，
         //用于实现定长固定列表的功能。
@@ -118,7 +120,7 @@ public class LocationService extends Service implements AMapLocationListener {
 //        intent.putExtra(Constants.INTENT_ACTION_UPDATE_DATA_EXTRA_LONGITUDE,
 //                aMapLocation.getLongitude());
 
- //      this.sendBroadcast(intent);
+        //      this.sendBroadcast(intent);
     }
 
     @Override

@@ -102,7 +102,7 @@ public class RoutePopView extends PopupWindow {
 
 	private void initRouteList(String scenicId) {
 		routeList.clear();
-		ApiClient.getIuuApiClient().queryRecommendLines(scenicId, new Callback<List<RecommendLine>>() {
+		ApiClient.getMapService().queryRecommendLines(scenicId, new Callback<List<RecommendLine>>() {
 			@Override
 			public void success(List<RecommendLine> resultJson, Response response) {
 				Toast.makeText(context, "加载成功", Toast.LENGTH_SHORT).show();
@@ -232,6 +232,11 @@ public class RoutePopView extends PopupWindow {
 								View view = mRoute_layout.getChildAt(i);
 								ImageView eachMapLinePoint = (ImageView) view.findViewById(R.id.image_map_line_point);
 								eachMapLinePoint.setImageResource(R.drawable.img_map_point);
+							}
+							for (int i = 0; i < mRoute_layout.getChildCount(); i++) {
+								View view = mRoute_layout.getChildAt(i);
+								ImageView eachMapLinePoint = (ImageView) view.findViewById(R.id.image_map_line_point);
+								eachMapLinePoint.setImageResource(R.drawable.img_map_point_choice);
 								if (view.getTag().toString()
 										.equals(v.getTag().toString())) {
 									ImageView imageMapLinePoint = (ImageView) v.findViewById(R.id.image_map_line_point);
@@ -260,7 +265,7 @@ public class RoutePopView extends PopupWindow {
 									if(temp.size() > 0) {
 										movePoint(mCurrentVirtualPoint, temp);
 									}
-
+									break;
 								}
 							}
 						}

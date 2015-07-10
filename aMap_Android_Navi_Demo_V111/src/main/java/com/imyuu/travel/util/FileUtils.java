@@ -31,6 +31,10 @@ public class FileUtils {
     public FileUtils() {
     }
 
+    public static boolean existSDCard()
+    {
+        return true;
+    }
     private static void delete(File file) {
         if (file.isFile()) {
             file.delete();
@@ -75,6 +79,25 @@ public class FileUtils {
 
     }
 
+    public static boolean createDirectory(String s) {
+
+        boolean flag = (new File(s)).mkdir();
+
+        return flag;
+
+    }
+
+    public static void createNoMedia()
+    {
+        if(!isExist(Config.UU_FILEPATH+".nomedia")) {
+            try {
+                new File(Config.UU_FILEPATH + ".nomedia").createNewFile();
+            }catch(Exception e)
+            {
+
+            }
+        }
+    }
     public static void openFile(File file, Context context) {
         Log.e("OpenFile", file.getName());
         Intent intent = new Intent();
@@ -198,9 +221,7 @@ public class FileUtils {
             for (String aChildren : children) {
                 boolean success = deleteDir(dir.getAbsolutePath() + "/"
                         + aChildren);
-                if (!success) {
-                    return false;
-                }
+
             }
         }
         // The directory is now empty so now it can be smoked
@@ -295,11 +316,10 @@ public class FileUtils {
 
     public static void unzip(File zipFile, String outpath) {
         try {
-            File outputDir = new File(outpath);
-            if (!outputDir.exists()) {
-                outputDir.mkdirs();
-            }
 
+            File outputDir = new File(outpath);
+            if (!outputDir.exists())
+                outputDir.mkdir();
             ZipInputStream in = new ZipInputStream(new FileInputStream(zipFile));
             String outputDirectory = outputDir.getAbsolutePath();
             ZipEntry z;

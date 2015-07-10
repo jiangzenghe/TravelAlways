@@ -14,6 +14,7 @@ public class ConstantsOld {
     public static final String WELCOME_FLAG = "WELCOME_FLAG";
     public static final String INDEX_FLAG = "INDEX_FLAG";
     public static final String API_MESSAGE_KEY = "API_MESSAGE_KEY";
+    public static final String FINISH_MESSAGE_KEY = "FINISH_MESSAGE_KEY";
     public static final String SEARCH_CONTENT_KEY = "SEARCH_CONTENT_KEY";
     public static final String SCIENCE_ID_KEY = "SCIENCE_ID_KEY";
     public static final String SCIENCE_LINE_ID_KEY = "SCIENCE_LINE_ID_KEY";

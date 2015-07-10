@@ -151,14 +151,21 @@ public class MarkerUtilsFor2D {
 		return result;
 	}
 	public void addMarkerGrphic(List<ScenicAdvertJson> data) {
-		for (ScenicAdvertJson each : data){
-			MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
-					.position(new LatLng(each.getLat(), each.getLng()));
-			arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.img_map_voice));
-			arg0.title(each.getAdvertScenicName());
-			Marker eachMarker = aMap.addMarker(arg0);
-			eachMarker.setObject(each);//1--广告
+		for (ScenicAdvertJson advertJson : data){
+            Log.d("addMarkerGrphic",advertJson.toString());
+            if("1".equals(advertJson.getAdvertType())) {
+                MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
+                        .position(new LatLng(advertJson.getLat(), advertJson.getLng()));
+                arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.advert));
+                arg0.title(advertJson.getAdvertScenicName());
+                Marker eachMarker = aMap.addMarker(arg0);
+                eachMarker.setObject(advertJson);//1--景点广告
+            }
+            else {//2  下面的大图广告，位于UU助手上部
+
+            }
 		}
+
 	}
 
 	public void addMarkerGrphic(String spotType) {
@@ -167,17 +174,16 @@ public class MarkerUtilsFor2D {
 			for (ScenicPointJson each : selectPointsList){
 				MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
 						.position(new LatLng(each.getLat(), each.getLng()));
-//				MarkerOptions arg1 = new MarkerOptions().anchor(0.0f, 0.5f)
-//						.position(new LatLng(each.getLat(), each.getLng()));
+				MarkerOptions arg1 = new MarkerOptions().anchor(0.0f, 0.8f)
+						.position(new LatLng(each.getLat(), each.getLng()));
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.hotviewport_nosel_map));
-//				arg1.icon(BitmapDescriptorFactory.fromBitmap(
-//						getBitMap(each.getScenicPointName(), R.drawable.hotviewport_transparent_long)));
+				arg1.icon(BitmapDescriptorFactory.fromBitmap(
+						getBitMap(each.getScenicPointName(), R.drawable.hotviewport_transparent_long)));
 				arg0.title(each.getScenicPointName());
-//				arg1.title(each.getScenicPointName());
 				Marker eachMarker = aMap.addMarker(arg0);
-//				Marker eachMarker_add = aMap.addMarker(arg1);
+				Marker eachMarker_add = aMap.addMarker(arg1);
 				eachMarker.setObject(each);//1--景区标志
-//				eachMarker_add.setObject(each);
+				eachMarker_add.setObject(each);
 			}
 		} else if(spotType.equals("2")) {
 			for (ScenicPointJson each : selectPointsList){
@@ -252,10 +258,10 @@ public class MarkerUtilsFor2D {
 				eachMarker.setObject(each);//1--景区标志
 			}
 		}
-
-
+		
+		
 		//test the time to draw
-//		Log.e("draw end", new Date().getTime() + "");
+		Log.e("draw end", new Date().getTime() + "");
 	}
 	
 	private ArrayList<ScenicPointJson> getPointList(String spotType) {
@@ -274,9 +280,9 @@ public class MarkerUtilsFor2D {
 		             bitmap.getHeight());
 				Canvas canvas = new Canvas(bitmap);
 				TextPaint textPaint = new TextPaint();
-				textPaint.setTextSize(20f);
+				textPaint.setTextSize(22f);
 				textPaint.setColor(Color.RED);
-				canvas.drawText(text, 22, 15, textPaint);// 设置bitmap上面的文字位置
+				canvas.drawText(text, 22, 26, textPaint);// 设置bitmap上面的文字位置
 		return bitmap;
 	}
 	

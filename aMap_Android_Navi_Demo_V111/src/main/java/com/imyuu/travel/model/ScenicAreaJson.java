@@ -39,38 +39,6 @@ public class ScenicAreaJson extends Model implements Serializable {
     @Column(name = "right_lat")
     private Double right_lat;  //γ��
 
-    @Expose
-    @Column(name= "maxx")
-    private Integer maxx;
-
-    @Expose
-    @Column(name= "maxy")
-    private Integer maxy;
-
-    public Integer getScenicmapMaxy() {
-        return maxy;
-    }
-
-    public Integer getScenicmapMaxx() {
-        return maxx;
-    }
-
-    public Integer getMaxx() {
-        return maxx;
-    }
-
-    public void setMaxx(Integer maxx) {
-        this.maxx = maxx;
-    }
-
-    public Integer getMaxy() {
-        return maxy;
-    }
-
-    public void setMaxy(Integer maxy) {
-        this.maxy = maxy;
-    }
-
     public Double getRight_lat() {
         return right_lat;
     }
@@ -151,10 +119,45 @@ public class ScenicAreaJson extends Model implements Serializable {
     @Column(name = "scenicLevel")
     private String scenicLevel;  //5A 4A ��
     private String distance;
-
     @Expose
     @Column(name = "canNavi")
     private String canNavi;
+
+    @Expose
+    @Column(name = "maxX")
+    private Integer maxX;
+
+    @Expose
+    @Column(name = "maxY")
+    private Integer maxY;
+
+    public String getCanNavi() {
+        return canNavi;
+    }
+
+    public void setCanNavi(String canNavi) {
+        this.canNavi = canNavi;
+    }
+
+    public Integer getMaxX() {
+        return maxX;
+    }
+
+    public void setMaxX(Integer maxX) {
+        this.maxX = maxX;
+    }
+
+    public Integer getMaxY() {
+        return maxY;
+    }
+
+    public void setMaxY(Integer maxY) {
+        this.maxY = maxY;
+    }
+
+    public Integer getScenicmapMaxy() {
+        return this.maxY;
+    }
 
     public ScenicAreaJson() {
         distance = "";
@@ -184,17 +187,13 @@ public class ScenicAreaJson extends Model implements Serializable {
         this.distance = distance;
     }
 
+
+
+
     public String getScenicType() {
         return scenicType;
     }
 
-    public String getCanNavi() {
-        return canNavi;
-    }
-
-    public void setCanNavi(String canNavi) {
-        this.canNavi = canNavi;
-    }
 
     @Override
     public String toString() {

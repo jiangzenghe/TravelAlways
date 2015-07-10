@@ -9,7 +9,9 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.imyuu.travel.model.MapInfoModel;
 import com.imyuu.travel.model.RecommendLine;
+import com.imyuu.travel.model.ScenicAdvertJson;
 import com.imyuu.travel.model.ScenicAreaJson;
 import com.imyuu.travel.model.ScenicPointJson;
 import com.imyuu.travel.model.SpotInfo;
@@ -31,10 +33,11 @@ public class JSonUtil {
 
     }
 
-    public static int parseScenicInfo(String scenicId, Context context) {
-        String json = FileUtils.readFile(Config.NEW_FILEPATH
+    public static int parseScenicInfo(String scenicId,MapInfoModel tmapInfoModel,Context context) {
+        String json = FileUtils.readFile(Config.UU_FILEPATH
                 + scenicId + "/" + scenicId + Config.jsonFile);
         int code = -1;
+
         ScenicAreaJson scenicAreaJson = new ScenicAreaJson();
         if (!TextUtils.isEmpty(json)) {
 
@@ -43,15 +46,32 @@ public class JSonUtil {
                 JSONObject jsonObject = (JSONObject) jsonParser.nextValue();
                 scenicAreaJson.setScenicId(jsonObject.getString("id"));
                 Log.d("-----", "scenicId:" + scenicId);
-                scenicAreaJson.setScenicName(jsonObject.getString("scenicName"));
-                scenicAreaJson.setLat(jsonObject.getDouble("Latitude"));
-                scenicAreaJson.setLng(jsonObject.getDouble("Longitude"));
-                scenicAreaJson.setDesc(jsonObject.getString("scenicNote"));
-                scenicAreaJson.setScenicLocation(jsonObject.getString("Location"));
-                scenicAreaJson.setScenicLevel(jsonObject.getString("scenicLevel"));
-                scenicAreaJson.setImageUrl(jsonObject.getString("mapUrl"));
-                //scenicAreaJson.setCommentsNum(jsonObject.getInt(""));
-                scenicAreaJson.setSmallImage(jsonObject.getString("smallpic"));
+                try {
+                    scenicAreaJson.setScenicName(jsonObject.getString("scenicName"));
+
+                    scenicAreaJson.setLat(jsonObject.getDouble("Latitude"));
+                    scenicAreaJson.setLng(jsonObject.getDouble("Longitude"));
+                    scenicAreaJson.setRight_lat(jsonObject.getDouble("right_lat"));
+                    scenicAreaJson.setRight_lng(jsonObject.getDouble("right_lng"));
+                    scenicAreaJson.setDesc(jsonObject.getString("scenicNote"));
+                    scenicAreaJson.setScenicLocation(jsonObject.getString("Location"));
+                    scenicAreaJson.setCity(jsonObject.getString("city"));
+                    scenicAreaJson.setProvince(jsonObject.getString("province"));
+                    scenicAreaJson.setMapSize(jsonObject.getString("mapSize"));
+                    scenicAreaJson.setImageUrl(jsonObject.getString("mapUrl"));
+                    //scenicAreaJson.setCommentsNum(jsonObject.getInt(""));
+                    scenicAreaJson.setSmallImage(jsonObject.getString("searchsmallpic"));
+                    scenicAreaJson.setScenicLevel(jsonObject.getString("scenicLevel"));
+                }catch(Exception e)
+                {
+                   e.printStackTrace();
+                }
+                //save download info
+                tmapInfoModel.setScenicName(scenicAreaJson.getScenicName());
+
+                String iconname = scenicAreaJson.getSmallImage();
+
+                tmapInfoModel.setImagePath(iconname);
                 //remove and save scenicAreaJson to sqllite
                 scenicAreaJson.remove(scenicId);
 
@@ -61,6 +81,7 @@ public class JSonUtil {
                 tline.setScenicId(scenicId);
                 tline.remove(scenicId);
 
+                ScenicAdvertJson.remove(scenicId);
                 //begin save
                 scenicAreaJson.save();
                 JSONArray jsonArray = jsonObject.getJSONArray("scenicMap");
@@ -84,6 +105,26 @@ public class JSonUtil {
                     //begin save ScenicPointJson
                     scenicPointJson.save();
                 }
+                jsonArray = jsonObject.getJSONArray("scenicAdvert");
+                List<ScenicAdvertJson> advertList = new ArrayList<ScenicAdvertJson>();
+                for (int j = 0; j < jsonArray.length(); j++) {
+                    ScenicAdvertJson advertJson = new ScenicAdvertJson();
+                    advertJson.setAdvertId(jsonArray.getJSONObject(j).getString("advertId"));
+                    String scenicName = jsonArray.getJSONObject(j).getString("scenicName");
+                    advertJson.setScenicName(scenicName);
+                    String advertPic = jsonArray.getJSONObject(j).getString("advertPic");
+                    advertJson.setAdvertPic(advertPic.substring(advertPic.lastIndexOf('/')+1));
+                    advertJson.setAdvertScenicId(jsonArray.getJSONObject(j).getString("advertScenicId"));
+                    advertJson.setAdvertType(jsonArray.getJSONObject(j).getString("advertType"));
+                    advertJson.setScenicId(scenicId);
+                    advertJson.setLat(jsonArray.getJSONObject(j).getDouble("lat"));
+                    advertJson.setLng(jsonArray.getJSONObject(j).getDouble("lng"));
+                    advertJson.setAdvertScenicName(jsonArray.getJSONObject(j).getString("advertScenicName"));
+                    advertList.add(advertJson);
+                    //begin save advertJson
+                    advertJson.save();
+                }
+
                 jsonArray = jsonObject.getJSONArray("scenicRecommendLine");
                 List<RecommendLine> lineList = new ArrayList<RecommendLine>();
 

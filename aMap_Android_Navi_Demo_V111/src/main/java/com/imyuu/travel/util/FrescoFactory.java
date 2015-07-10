@@ -74,7 +74,7 @@ public class FrescoFactory {
                 Integer.MAX_VALUE, // 内存缓存中准备清除的总图片的最大数量。
                 Integer.MAX_VALUE); // 内存缓存中单个图片的最大大小。
 
-//修改内存图片缓存数量，空间策略（这个方式有点恶心）
+        //修改内存图片缓存数量，空间策略（这个方式有点恶心）
         Supplier<MemoryCacheParams> mSupplierMemoryCacheParams = new Supplier<MemoryCacheParams>() {
             @Override
             public MemoryCacheParams get() {
@@ -86,7 +86,7 @@ public class FrescoFactory {
         DiskCacheConfig diskSmallCacheConfig = DiskCacheConfig.newBuilder()
                 .setBaseDirectoryPath(context.getApplicationContext().getCacheDir())//缓存图片基路径
                 .setBaseDirectoryName(IMAGE_PIPELINE_SMALL_CACHE_DIR)//文件夹名
-// .setCacheErrorLogger(cacheErrorLogger)//日志记录器用于日志错误的缓存。
+        // .setCacheErrorLogger(cacheErrorLogger)//日志记录器用于日志错误的缓存。
 // .setCacheEventListener(cacheEventListener)//缓存事件侦听器。
 // .setDiskTrimmableRegistry(diskTrimmableRegistry)//类将包含一个注册表的缓存减少磁盘空间的环境。
                 .setMaxCacheSize(FrescoFactory.MAX_DISK_CACHE_SIZE)//默认缓存的最大大小。
@@ -108,7 +108,7 @@ public class FrescoFactory {
 // .setVersion(version)
                 .build();
 
-//缓存图片配置
+        //缓存图片配置
         ImagePipelineConfig.Builder configBuilder = ImagePipelineConfig.newBuilder(context)
 // .setAnimatedImageFactory(AnimatedImageFactory animatedImageFactory)//图片加载动画
                 .setBitmapMemoryCacheParamsSupplier(mSupplierMemoryCacheParams)//内存缓存配置（一级缓存，已解码的图片）
@@ -270,7 +270,7 @@ public class FrescoFactory {
     @SuppressWarnings("deprecation")
     public static void init(final Resources resources) {
         if (sPlaceholderDrawable == null) {
-            sPlaceholderDrawable = resources.getDrawable(R.color.placeholder);
+            sPlaceholderDrawable = resources.getDrawable(R.drawable.icon_map_point);
         }
         if (sErrorDrawable == null) {
             sErrorDrawable = resources.getDrawable(R.color.error);

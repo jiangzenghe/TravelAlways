@@ -64,14 +64,19 @@ public class UserInfoJson extends Model implements Serializable {
     private String email;
     private String verifyCode;  //短信验证码
     @Expose
+    @Column(name="ssoSource")
     private String ssoSource;//  集成登录的来源
     @Expose
+    @Column(name="ssoAccount")
     private String ssoAccount;  //集成登录账号
     @Expose
+    @Column(name="platform")
     private Integer platform; //0:android 1:ios
     @Expose
+    @Column(name="lat")
     private Double lat;
     @Expose
+    @Column(name="lng")
     private Double lng;
     @Expose
     @Column(name="credits")

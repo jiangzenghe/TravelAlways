@@ -133,10 +133,8 @@ public class HttpOldUtil {
                 return 1;
             } else {
                 inputStream = getInputStreamFromURL(urlStr);
-                File resultFile = fileUtil.write2SDFromInput(path, fileName, inputStream);
-                if (resultFile == null) {
-                    return -1;
-                }
+                fileUtil.write2SDFromInput(path, fileName, inputStream);
+
             }
         } catch (Exception e) {
             e.printStackTrace();

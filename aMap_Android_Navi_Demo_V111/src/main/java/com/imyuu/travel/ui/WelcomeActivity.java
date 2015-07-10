@@ -1,5 +1,6 @@
 package com.imyuu.travel.ui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,7 +12,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.app.Activity;
+
 import com.imyuu.travel.R;
 import com.imyuu.travel.adapters.ViewPagerAdapter;
 import com.imyuu.travel.util.Config;
@@ -28,18 +29,16 @@ import java.util.List;
  * @since 1.0
  */
 public class WelcomeActivity extends Activity implements View.OnClickListener, ViewPager.OnPageChangeListener {
+    //引导图片资源
+    private static final int[] pics = {R.drawable.img_welcome_01,
+            R.drawable.img_welcome_02, R.drawable.img_welcome_03,
+            R.drawable.img_welcome_04};
     private SharedPreferences mySharedPreferences;
     private SharedPreferences.Editor editor;
     private Button buttonWelcomeStart;
     private ViewPager vp;
     private ViewPagerAdapter vpAdapter;
     private List<View> views;
-
-    //引导图片资源
-    private static final int[] pics = {R.drawable.img_welcome_01,
-            R.drawable.img_welcome_02, R.drawable.img_welcome_03,
-            R.drawable.img_welcome_04};
-
     //底部小店图片
     private ImageView[] dots;
 
@@ -114,7 +113,7 @@ public class WelcomeActivity extends Activity implements View.OnClickListener, V
 //        }
 
         currentIndex = 0;
-       // dots[currentIndex].setImageResource(R.drawable.img_white_dot);//设置为白色，即选中状态
+        // dots[currentIndex].setImageResource(R.drawable.img_white_dot);//设置为白色，即选中状态
         buttonWelcomeStart.setVisibility(View.INVISIBLE);
     }
 

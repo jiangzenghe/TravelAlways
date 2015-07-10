@@ -26,8 +26,8 @@ public class GridView extends android.widget.GridView {
 	
 	/**
 	 * 构造器
-	 * @param context上下文
-	 * @param attrs自定义资源
+	 * @param
+	 * @param
 	 */
 	public GridView(Context context, AttributeSet attrs){
 		super(context, attrs);
@@ -35,7 +35,7 @@ public class GridView extends android.widget.GridView {
 	}
 	/**
 	 * 构造器
-	 * @param context上下文
+	 * @param
 	 */
 	public GridView(Context context){
 		this(context, null);

@@ -13,16 +13,26 @@ public class Food implements Serializable {
     private String address;
     private String distance;
 
+    public String getBusiness_url() {
+        return business_url;
+    }
+
+    public void setBusiness_url(String business_url) {
+        this.business_url = business_url;
+    }
+
+    private String business_url;
     public Food() {
     }
 
-    public Food(String s_photo_url, String avg_price, String rating_s_img_url, String name, String address, String distance) {
+    public Food(String s_photo_url, String avg_price, String rating_s_img_url, String name, String address, String distance,String business_url) {
         this.s_photo_url = s_photo_url;
         this.avg_price = avg_price;
         this.rating_s_img_url = rating_s_img_url;
         this.name = name;
         this.address = address;
         this.distance = distance;
+        this.business_url = business_url;
     }
 
     public String getS_photo_url() {

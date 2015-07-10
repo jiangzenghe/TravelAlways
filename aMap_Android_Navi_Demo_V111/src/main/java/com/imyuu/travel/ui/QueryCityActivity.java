@@ -47,30 +47,19 @@ import com.imyuu.travel.view.GridView;
 import com.imyuu.travel.view.IndexBarView;
 import com.imyuu.travel.view.PinnedHeaderListView;
 
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-/**
- * 搜索功能
- *
- * @author 
- * 
- * <p>Modification History:</p>
- * <p>Date         Author      Description</p>
- * <p>      New  </p>
- * <p>  </p>
- */
 public class QueryCityActivity extends Activity{
 	
 		ArrayList<City> original_items;
-		
-		// unsorted list items pinyin
+	   // unsorted list items pinyin
 		ArrayList<String> mItems;
-
 		// array list to store section positions
 		ArrayList<Integer> mListSectionPos;
-
 		// array list to store listView data
 		ArrayList<String> mListItems;
 		
@@ -99,20 +88,17 @@ public class QueryCityActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-//		ActionBar actionBar = getActionBar();
-//		actionBar.setDisplayHomeAsUpEnabled(true);// 显示返回箭头
-//		actionBar.setDisplayShowHomeEnabled(false);
-//		actionBar.setTitle("                        "+"选择城市");
-		// UI elements
 		setupViews();
-
+        ButterKnife.inject(this);
 		getCitys(savedInstanceState);
-//		original_items = CityScenicUtils.createCities();
-		// Array to ArrayList
-//		mItems = new ArrayList<String>(Arrays.asList(ITEMS));
+
 
 	}
 
+    @OnClick(R.id.image_cancel_back)
+    public void cacelBackClick() {
+       this.finish();
+    }
 	private void getCitys(final Bundle savedInstanceState) {
 		ApiClient.getIuuApiClient().getCityList(new Callback<List<CityInfoJson>>() {
 			@Override
@@ -245,9 +231,7 @@ public class QueryCityActivity extends Activity{
 	public class ListFilter extends Filter {
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
-			// NOTE: this function is *always* called from a background thread,
-			// and
-			// not the UI thread.
+
 			String constraintStr = constraint.toString().toLowerCase(Locale.getDefault());
 			FilterResults result = new FilterResults();
 
@@ -338,6 +322,8 @@ public class QueryCityActivity extends Activity{
 				String prev_section = "";
 				for (String current_item : items) {
 //					String current_item = current_city.getPName();
+                    if(current_item == null || current_item.length()<1)
+                        continue;
 					String current_section = current_item.substring(0, 1).toUpperCase(Locale.getDefault());
 
 					if (!prev_section.equals(current_section)) {

@@ -58,7 +58,6 @@ public class ScenicSummaryFragment extends Fragment {
         scenicLevel = (TextView) view.findViewById(R.id.tv_summary_sceniclevel);
         scenicType = (TextView) view.findViewById(R.id.tv_summary_scenictype);
         Intent intent = getActivity().getIntent();
-        String url = intent.getStringExtra("URL");
         String scenicId = intent.getStringExtra("scenicId");
         Log.d("ScenicSummaryFragment", scenicId + " is called");
         scenicName.setText(intent.getStringExtra("scenicName"));
@@ -82,12 +81,15 @@ public class ScenicSummaryFragment extends Fragment {
         ApiClient.getIuuApiClient().queryScenicIntro(scenicId, new Callback<ScenicIntroductionJson>() {
             @Override
             public void success(ScenicIntroductionJson scenicIntroductionJson, Response response) {
-                LogUtil.v(scenicIntroductionJson.toString());
+                if(null == scenicIntroductionJson)
+                    return;
+                LogUtil.d("ScenicSummaryFragment",scenicIntroductionJson.toString());
                 setIntroductionInfo(scenicIntroductionJson);
                 imageList.addAll(scenicIntroductionJson.getImageList());
                 for(RecommendImage recommend: scenicIntroductionJson.getImageList())
                 {
                     recommend.setScenicId(scenicId);
+                    LogUtil.d("ScenicSummaryFragment",recommend.toString());
                     recommend.save();
                 }
                 scenicIntroductionJson.save();

@@ -2,13 +2,14 @@ package com.imyuu.travel.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.TextView;
-import android.graphics.drawable.Drawable;
+
 public class DrawableCenterTextView extends TextView {
 
     public DrawableCenterTextView(Context context, AttributeSet attrs,
-            int defStyle) {
+                                  int defStyle) {
         super(context, attrs, defStyle);
     }
 

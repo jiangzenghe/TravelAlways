@@ -1,14 +1,11 @@
 package com.imyuu.travel.util;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.os.Environment;
+
 import com.amap.api.maps.model.Tile;
 import com.amap.api.maps.model.TileProvider;
-import java.io.PrintStream;
 
-public class CustomTileOnlineProvider    implements TileProvider
-{
+public class CustomTileOnlineProvider implements TileProvider {
 
     public static final int BUFFER_SIZE = 16384;
     private static final int DEFAULT_SRC_WIDTH = 1024;
@@ -25,8 +22,7 @@ public class CustomTileOnlineProvider    implements TileProvider
     private int srcWidth;
     private String tilePath;
 
-    public CustomTileOnlineProvider(int i, int j, int k, int l, String s)
-    {
+    public CustomTileOnlineProvider(int i, int j, int k, int l, String s) {
         srcWidth = i;
         srcHeight = j;
         fileDirectory = s;
@@ -34,27 +30,23 @@ public class CustomTileOnlineProvider    implements TileProvider
         blockCoordinateY = l;
     }
 
-    private Bitmap cropBitmap(Bitmap bitmap1, int i, int j, int k, int l)
-    {
+    private Bitmap cropBitmap(Bitmap bitmap1, int i, int j, int k, int l) {
         return Bitmap.createBitmap(bitmap1, i, j, k, l, null, true);
     }
 
-    private String get18FileName(int i, int j)
-    {
+    private String get18FileName(int i, int j) {
         return (new StringBuilder(String.valueOf(fileDirectory))).append("src/").append(i).append('_').append(j).append(".png").toString();
     }
 
-    private byte[] getTileBytes(String s)
-    {
-    	//65536
-         Bitmap bitmap1 = BitmapUtils.getAutoSizeBitmap(0x10000, s);
+    private byte[] getTileBytes(String s) {
+        //65536
+        Bitmap bitmap1 = BitmapUtils.getAutoSizeBitmap(0x10000, s);
         byte abyte0[] = BitmapUtils.convertBitmapToBytes(bitmap1);
         BitmapUtils.releaseBitmap(bitmap1);
         return abyte0;
     }
 
-    private String getTileFilename(int i, int j, int k)
-    {
+    private String getTileFilename(int i, int j, int k) {
         return (new StringBuilder(String.valueOf(fileDirectory))).append(k).append('/').append(i).append('_').append(j).append(".png").toString();
     }
 
@@ -62,58 +54,56 @@ public class CustomTileOnlineProvider    implements TileProvider
         int size = 1 << zoom; // size = 2^zoom
         return size - 1 - y;
     }
-    
-    private Tile getTileFormFile(int x, int y, int zoom)
-    {   
-    	y = fixYCoordinate(y, zoom);
-    	
-    	
-    	System.out.println((new StringBuilder("x=")).append(x).append(",y=").append(y).append(",zoom=").append(zoom).toString());
+
+    private Tile getTileFormFile(int x, int y, int zoom) {
+        y = fixYCoordinate(y, zoom);
+
+
+        System.out.println((new StringBuilder("x=")).append(x).append(",y=").append(y).append(",zoom=").append(zoom).toString());
         double d = Math.pow(2D, 18 - zoom);
-       
+
         String s = getTileFilename(x, y, zoom);
         if (FileUtils.isExist(s)) {
-	         System.out.println("file exist");
-	         Tile tile = new Tile(256, 256, getTileBytes(s));
-	         return tile;
+            System.out.println("file exist");
+            Tile tile = new Tile(256, 256, getTileBytes(s));
+            return tile;
         }
-        
-        
-         int level = (int)(256D * d);
-         int i1 = (int)(d * (double)x);
-         int j1 = (int)(d * (double)y);
-        
-         int x_scope = srcWidth / 256;
-         int y_scope = srcHeight / 256;
-         if (i1 >= blockCoordinateX && i1 <= x_scope + blockCoordinateX &&
-         		j1 >= blockCoordinateY && j1 <= y_scope + blockCoordinateY) 
-         	{
-   
-         System.out.println((new StringBuilder("x18=")).append(i1).append(",y18=").append(j1).toString());
-          int i2 = blockCoordinateX + 4 * ((i1 - blockCoordinateX) / 4);
-         int j2 = blockCoordinateY + 4 * ((j1 - blockCoordinateY) / 4);
-         System.out.println((new StringBuilder("x18Start=")).append(i2).append(",y18Start=").append(j2).append(",itemWidth=").append(level).toString());
-        
-        int  k2 = (int)((1024D / d) * (1024D / d));
-         System.out.println((new StringBuilder("sampleSize=")).append(d).append(",maxPixels=").append(k2).append(",filePath=").append(s).toString());
-       
-         float f = 256 * (i1 - blockCoordinateX);
-         float f1 = 256 * (j1 - blockCoordinateY);
-         float f2 = 256 * (i1 - blockCoordinateX);
-         float f3 = 256 * (j1 - blockCoordinateY);
-         
-         float f4 = f2 + (float)level;
-         float f5 = f3 + (float)level;
-         float f6 = f2 + (float)level;
-        System.out.println((new StringBuilder("x18Pixels=")).append(f).append(",y18Pixels=").append(f1).toString());
 
-        float f7 = f % 1024F;
-        float f8 = f1 % 1024F;
-       
-         	} 
-         
-         return null;
-    	/*
+
+        int level = (int) (256D * d);
+        int i1 = (int) (d * (double) x);
+        int j1 = (int) (d * (double) y);
+
+        int x_scope = srcWidth / 256;
+        int y_scope = srcHeight / 256;
+        if (i1 >= blockCoordinateX && i1 <= x_scope + blockCoordinateX &&
+                j1 >= blockCoordinateY && j1 <= y_scope + blockCoordinateY) {
+
+            System.out.println((new StringBuilder("x18=")).append(i1).append(",y18=").append(j1).toString());
+            int i2 = blockCoordinateX + 4 * ((i1 - blockCoordinateX) / 4);
+            int j2 = blockCoordinateY + 4 * ((j1 - blockCoordinateY) / 4);
+            System.out.println((new StringBuilder("x18Start=")).append(i2).append(",y18Start=").append(j2).append(",itemWidth=").append(level).toString());
+
+            int k2 = (int) ((1024D / d) * (1024D / d));
+            System.out.println((new StringBuilder("sampleSize=")).append(d).append(",maxPixels=").append(k2).append(",filePath=").append(s).toString());
+
+            float f = 256 * (i1 - blockCoordinateX);
+            float f1 = 256 * (j1 - blockCoordinateY);
+            float f2 = 256 * (i1 - blockCoordinateX);
+            float f3 = 256 * (j1 - blockCoordinateY);
+
+            float f4 = f2 + (float) level;
+            float f5 = f3 + (float) level;
+            float f6 = f2 + (float) level;
+            System.out.println((new StringBuilder("x18Pixels=")).append(f).append(",y18Pixels=").append(f1).toString());
+
+            float f7 = f % 1024F;
+            float f8 = f1 % 1024F;
+
+        }
+
+        return null;
+        /*
         if (f7 + (float)level <= 1024F)
         {
         	
@@ -444,21 +434,18 @@ _L23:
         j6 = 0;
           goto _L24
           */
-         	
+
     }
 
-    public final Tile getTile(int i, int j, int k)
-    {
+    public final Tile getTile(int i, int j, int k) {
         return getTileFormFile(i, j, k);
     }
 
-    public int getTileHeight()
-    {
+    public int getTileHeight() {
         return 256;
     }
 
-    public int getTileWidth()
-    {
+    public int getTileWidth() {
         return 256;
     }
 }

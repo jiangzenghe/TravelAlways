@@ -511,13 +511,13 @@ public abstract class NanoHTTPD {
 
                 StringTokenizer st = new StringTokenizer(inLine);
                 if (!st.hasMoreTokens()) {
-                    throw new ResponseException(Response.Status.BAD_REQUEST, "BAD REQUEST: Syntax error. Usage: GET /example/file.html");
+                    throw new ResponseException(Status.BAD_REQUEST, "BAD REQUEST: Syntax error. Usage: GET /example/file.html");
                 }
 
                 pre.put("method", st.nextToken());
 
                 if (!st.hasMoreTokens()) {
-                    throw new ResponseException(Response.Status.BAD_REQUEST, "BAD REQUEST: Missing URI. Usage: GET /example/file.html");
+                    throw new ResponseException(Status.BAD_REQUEST, "BAD REQUEST: Missing URI. Usage: GET /example/file.html");
                 }
 
                 String uri = st.nextToken();
@@ -552,7 +552,7 @@ public abstract class NanoHTTPD {
 
                 pre.put("uri", uri);
             } catch (IOException ioe) {
-                throw new ResponseException(Response.Status.INTERNAL_ERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage(), ioe);
+                throw new ResponseException(Status.INTERNAL_ERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage(), ioe);
             }
         }
 
@@ -563,7 +563,7 @@ public abstract class NanoHTTPD {
             try {
                 int[] boundary_idxs = getBoundaryPositions(fbuf, boundary.getBytes());
                 if (boundary_idxs.length < 2) {
-                    throw new ResponseException(Response.Status.BAD_REQUEST, "BAD REQUEST: Content type is multipart/form-data but contains less than two boundary strings.");
+                    throw new ResponseException(Status.BAD_REQUEST, "BAD REQUEST: Content type is multipart/form-data but contains less than two boundary strings.");
                 }
 
                 final int MAX_HEADER_SIZE = 1024;
@@ -578,7 +578,7 @@ public abstract class NanoHTTPD {
                     // First line is boundary string
                     String mpline = in.readLine();
                     if (!mpline.contains(boundary)) {
-                        throw new ResponseException(Response.Status.BAD_REQUEST, "BAD REQUEST: Content type is multipart/form-data but chunk does not start with boundary.");
+                        throw new ResponseException(Status.BAD_REQUEST, "BAD REQUEST: Content type is multipart/form-data but chunk does not start with boundary.");
                     }
 
                     String part_name = null, file_name = null, content_type = null;
@@ -608,7 +608,7 @@ public abstract class NanoHTTPD {
                     // Read the part data
                     int part_header_len = len - (int) in.skip(MAX_HEADER_SIZE);
                     if (part_header_len >= len - 4) {
-                        throw new ResponseException(Response.Status.INTERNAL_ERROR, "Multipart header size exceeds MAX_HEADER_SIZE.");
+                        throw new ResponseException(Status.INTERNAL_ERROR, "Multipart header size exceeds MAX_HEADER_SIZE.");
                     }
                     int part_data_start = boundary_idxs[bi] + part_header_len;
                     int part_data_end = boundary_idxs[bi + 1] - 4;
@@ -637,7 +637,7 @@ public abstract class NanoHTTPD {
             } catch (ResponseException re) {
                 throw re;
             } catch (Exception e) {
-                throw new ResponseException(Response.Status.INTERNAL_ERROR, e.toString());
+                throw new ResponseException(Status.INTERNAL_ERROR, e.toString());
             }
         }
 
@@ -726,7 +726,7 @@ public abstract class NanoHTTPD {
 
                 this.method = Method.lookup(pre.get("method"));
                 if (this.method == null) {
-                    throw new ResponseException(Response.Status.BAD_REQUEST, "BAD REQUEST: Syntax error.");
+                    throw new ResponseException(Status.BAD_REQUEST, "BAD REQUEST: Syntax error.");
                 }
 
                 this.uri = pre.get("uri");
@@ -739,7 +739,7 @@ public abstract class NanoHTTPD {
                 // Ok, now do the serve()
                 Response r = serve(this);
                 if (r == null) {
-                    throw new ResponseException(Response.Status.INTERNAL_ERROR, "SERVER INTERNAL ERROR: Serve() returned a null response.");
+                    throw new ResponseException(Status.INTERNAL_ERROR, "SERVER INTERNAL ERROR: Serve() returned a null response.");
                 } else {
                     String acceptEncoding = this.headers.get("accept-encoding");
                     this.cookies.unloadQueue(r);
@@ -760,7 +760,7 @@ public abstract class NanoHTTPD {
                 // exception up the call stack.
                 throw ste;
             } catch (IOException ioe) {
-                Response r = newFixedLengthResponse(Response.Status.INTERNAL_ERROR, NanoHTTPD.MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
+                Response r = newFixedLengthResponse(Status.INTERNAL_ERROR, NanoHTTPD.MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
                 r.send(this.outputStream);
                 safeClose(this.outputStream);
             } catch (ResponseException re) {
@@ -939,7 +939,7 @@ public abstract class NanoHTTPD {
                     if ("multipart/form-data".equalsIgnoreCase(contentType)) {
                         // Handle multipart/form-data
                         if (!st.hasMoreTokens()) {
-                            throw new ResponseException(Response.Status.BAD_REQUEST,
+                            throw new ResponseException(Status.BAD_REQUEST,
                                     "BAD REQUEST: Content type is multipart/form-data but boundary missing. Usage: GET /example/file.html");
                         }
 
@@ -1337,7 +1337,7 @@ public abstract class NanoHTTPD {
          * @param pending
          *            -1 to send everything, otherwise sets a max limit to the
          *            number of bytes sent
-         * @throws IOException
+         * @throws java.io.IOException
          *             if something goes wrong while sending the data.
          */
         private void sendBody(OutputStream outputStream, long pending) throws IOException {
@@ -1397,19 +1397,19 @@ public abstract class NanoHTTPD {
 
         private static final long serialVersionUID = 6569838532917408380L;
 
-        private final Response.Status status;
+        private final Status status;
 
-        public ResponseException(Response.Status status, String message) {
+        public ResponseException(Status status, String message) {
             super(message);
             this.status = status;
         }
 
-        public ResponseException(Response.Status status, String message, Exception e) {
+        public ResponseException(Status status, String message, Exception e) {
             super(message, e);
             this.status = status;
         }
 
-        public Response.Status getStatus() {
+        public Status getStatus() {
             return this.status;
         }
     }
@@ -1770,21 +1770,21 @@ public abstract class NanoHTTPD {
     /**
      * Create a response with unknown length (using HTTP 1.1 chunking).
      */
-    public Response newChunkedResponse(Response.IStatus status, String mimeType, InputStream data) {
+    public Response newChunkedResponse(IStatus status, String mimeType, InputStream data) {
         return new Response(status, mimeType, data, -1);
     }
 
     /**
      * Create a response with known length.
      */
-    public Response newFixedLengthResponse(Response.IStatus status, String mimeType, InputStream data, long totalBytes) {
+    public Response newFixedLengthResponse(IStatus status, String mimeType, InputStream data, long totalBytes) {
         return new Response(status, mimeType, data, totalBytes);
     }
 
     /**
      * Create a text response with known length.
      */
-    public Response newFixedLengthResponse(Response.IStatus status, String mimeType, String txt) {
+    public Response newFixedLengthResponse(IStatus status, String mimeType, String txt) {
         if (txt == null) {
             return newFixedLengthResponse(status, mimeType, new ByteArrayInputStream(new byte[0]), 0);
         } else {
@@ -1803,7 +1803,7 @@ public abstract class NanoHTTPD {
      * Create a text response with known length.
      */
     public Response newFixedLengthResponse(String msg) {
-        return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_HTML, msg);
+        return newFixedLengthResponse(Status.OK, NanoHTTPD.MIME_HTML, msg);
     }
 
     /**
@@ -1823,7 +1823,7 @@ public abstract class NanoHTTPD {
             try {
                 session.parseBody(files);
             } catch (IOException ioe) {
-                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, NanoHTTPD.MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
+                return newFixedLengthResponse(Status.INTERNAL_ERROR, NanoHTTPD.MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
             } catch (ResponseException re) {
                 return newFixedLengthResponse(re.getStatus(), NanoHTTPD.MIME_PLAINTEXT, re.getMessage());
             }
@@ -1854,7 +1854,7 @@ public abstract class NanoHTTPD {
      */
     @Deprecated
     public Response serve(String uri, Method method, Map<String, String> headers, Map<String, String> parms, Map<String, String> files) {
-        return newFixedLengthResponse(Response.Status.NOT_FOUND, NanoHTTPD.MIME_PLAINTEXT, "Not Found");
+        return newFixedLengthResponse(Status.NOT_FOUND, NanoHTTPD.MIME_PLAINTEXT, "Not Found");
     }
 
     /**
@@ -1880,7 +1880,7 @@ public abstract class NanoHTTPD {
     /**
      * Start the server.
      * 
-     * @throws IOException
+     * @throws java.io.IOException
      *             if the socket is in use.
      */
     public void start() throws IOException {
@@ -1892,7 +1892,7 @@ public abstract class NanoHTTPD {
      * 
      * @param timeout
      *            timeout to use for socket connections.
-     * @throws IOException
+     * @throws java.io.IOException
      *             if the socket is in use.
      */
     public void start(final int timeout) throws IOException {

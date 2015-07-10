@@ -4,5 +4,5 @@ package com.imyuu.travel.callback;
  * Created by zhaokaiqiang on 15/4/9.
  */
 public interface LoadFinishCallBack {
-	void loadFinish(Object obj);
+    void loadFinish(Object obj);
 }

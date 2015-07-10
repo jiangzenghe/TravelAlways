@@ -15,7 +15,7 @@ import java.io.*;
 public class FileUtil {
     private String SDPATH;
 
-    private int FILESIZE = 10 * 1024;
+    private int FILESIZE = 4 * 1024;
 
     public String getSDPATH() {
         return SDPATH;
@@ -40,7 +40,7 @@ public class FileUtil {
      * @throws IOException
      */
     public File createSDFile(String fileName) throws IOException {
-        File file = new File(SDPATH + fileName);
+        File file = new File( fileName);
         final File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
         file.renameTo(to);
         to.delete();
@@ -80,12 +80,12 @@ public class FileUtil {
      * @return
      */
     public File write2SDFromInput(String path, String fileName, InputStream input) {
-        File file = null;
+
         OutputStream output = null;
         try {
             createSDDir(path);
-            file = createSDFile(path + fileName);
-            output = new FileOutputStream(file);
+
+            output = new FileOutputStream(path + fileName);
             byte[] buffer = new byte[FILESIZE];
 
             /*真机测试，这段可能有问题，请采用下面网友提供的
@@ -112,7 +112,7 @@ public class FileUtil {
                 e.printStackTrace();
             }
         }
-        return file;
+        return null;
     }
 
     //读取文本文件中的内容

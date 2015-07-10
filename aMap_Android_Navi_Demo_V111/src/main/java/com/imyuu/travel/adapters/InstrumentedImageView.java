@@ -23,58 +23,58 @@ import com.facebook.common.internal.Preconditions;
 /**
  * {@link android.widget.ImageView} that notifies its instance of {@link com.imyuu.travel.adapters.Instrumentation} whenever an image request
  * lifecycle event happens.
- *
+ * <p/>
  * <p> setImageResource and setImageURI methods are not expected to be used by any library,
  * UnsupportedOperationException is thrown if those are called
  */
 public class InstrumentedImageView extends ImageView implements Instrumented {
 
-  private final Instrumentation mInstrumentation;
+    private final Instrumentation mInstrumentation;
 
-  public InstrumentedImageView(final Context context) {
-    super(context);
-    mInstrumentation = new Instrumentation(this);
-  }
-
-  @Override
-  public void initInstrumentation(final String tag, PerfListener perfListener) {
-    mInstrumentation.init(tag, perfListener);
-    // we don't have a better estimate on when to call onStart, so do it here.
-    mInstrumentation.onStart();
-  }
-
-  @Override
-  public void onDraw(final Canvas canvas) {
-    super.onDraw(canvas);
-    mInstrumentation.onDraw(canvas);
-  }
-
-  @Override
-  public void setImageDrawable(final Drawable drawable) {
-    Preconditions.checkNotNull(drawable);
-    if (drawable == Drawables.sPlaceholderDrawable) {
-      // ignore
-    } else if (drawable == Drawables.sErrorDrawable) {
-      mInstrumentation.onFailure();
-    } else {
-      mInstrumentation.onSuccess();
+    public InstrumentedImageView(final Context context) {
+        super(context);
+        mInstrumentation = new Instrumentation(this);
     }
-    super.setImageDrawable(drawable);
-  }
 
-  /**
-   * Throws UnsupportedOperationException
-   */
-  @Override
-  public void setImageResource(int resourceId) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public void initInstrumentation(final String tag, PerfListener perfListener) {
+        mInstrumentation.init(tag, perfListener);
+        // we don't have a better estimate on when to call onStart, so do it here.
+        mInstrumentation.onStart();
+    }
 
-  /**
-   * Throws UnsupportedOperationException
-   */
-  @Override
-  public void setImageURI(Uri uri) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public void onDraw(final Canvas canvas) {
+        super.onDraw(canvas);
+        mInstrumentation.onDraw(canvas);
+    }
+
+    @Override
+    public void setImageDrawable(final Drawable drawable) {
+        Preconditions.checkNotNull(drawable);
+        if (drawable == Drawables.sPlaceholderDrawable) {
+            // ignore
+        } else if (drawable == Drawables.sErrorDrawable) {
+            mInstrumentation.onFailure();
+        } else {
+            mInstrumentation.onSuccess();
+        }
+        super.setImageDrawable(drawable);
+    }
+
+    /**
+     * Throws UnsupportedOperationException
+     */
+    @Override
+    public void setImageResource(int resourceId) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Throws UnsupportedOperationException
+     */
+    @Override
+    public void setImageURI(Uri uri) {
+        throw new UnsupportedOperationException();
+    }
 }

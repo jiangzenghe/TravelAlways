@@ -1,8 +1,7 @@
 package com.imyuu.travel.bean;
 
 
-public class AttractionPtd
-{
+public class AttractionPtd {
 
     private String AMapZipSize;
     private String AMapZipUrl;
@@ -42,377 +41,302 @@ public class AttractionPtd
     private String ZipCreateTime;
     private String Zoom;
 
-    public AttractionPtd()
-    {
+    public AttractionPtd() {
     }
 
-    public String getAMapZipSize()
-    {
+    public String getAMapZipSize() {
         return AMapZipSize;
     }
 
-    public String getAMapZipUrl()
-    {
-        return AMapZipUrl;
-    }
-
-    public String getAMapZipUrlCreateTime()
-    {
-        return AMapZipUrlCreateTime;
-    }
-
-    public String getAddress()
-    {
-        return Address;
-    }
-
-    public String getAmapZipCreateTime()
-    {
-        return AmapZipCreateTime;
-    }
-
-    public String getForeword()
-    {
-        return Foreword;
-    }
-
-    public int getHits()
-    {
-        return Hits;
-    }
-
-    public String getHotSeason()
-    {
-        return HotSeason;
-    }
-
-    public int getId()
-    {
-        return Id;
-    }
-
-    public String getIntroduction()
-    {
-        return Introduction;
-    }
-
-    public String getMapZipSize()
-    {
-        return MapZipSize;
-    }
-
-    public String getMapZipUrl()
-    {
-        return MapZipUrl;
-    }
-
-    public String getMp3Name()
-    {
-        return Mp3Name;
-    }
-
-    public String getMp3Url()
-    {
-        return Mp3Url;
-    }
-
-    public String getName()
-    {
-        return Name;
-    }
-
-    public String getNewMp3Url()
-    {
-        return NewMp3Url;
-    }
-
-    public String getOpenTime()
-    {
-        return OpenTime;
-    }
-
-    public String getPic()
-    {
-        return Pic;
-    }
-
-    public int getScaleType()
-    {
-        return ScaleType;
-    }
-
-    public String getShareTemplate()
-    {
-        return ShareTemplate;
-    }
-
-    public String getStarLevel()
-    {
-        return StarLevel;
-    }
-
-    public String getTicketsPrice()
-    {
-        return TicketsPrice;
-    }
-
-    public String getTourType()
-    {
-        return TourType;
-    }
-
-    public String getViewPath()
-    {
-        return ViewPath;
-    }
-
-    public String getX()
-    {
-        return X;
-    }
-
-    public String getY()
-    {
-        return Y;
-    }
-
-    public String getZipCreateTime()
-    {
-        return ZipCreateTime;
-    }
-
-    public String getZoom()
-    {
-        return Zoom;
-    }
-
-    public boolean isHasQuestion()
-    {
-        return HasQuestion;
-    }
-
-    public boolean isIsAMapZip()
-    {
-        return IsAMapZip;
-    }
-
-    public boolean isIsExitesExperience()
-    {
-        return IsExitesExperience;
-    }
-
-    public boolean isIsHaveProject()
-    {
-        return IsHaveProject;
-    }
-
-    public boolean isIsHot()
-    {
-        return IsHot;
-    }
-
-    public boolean isIsMapZip()
-    {
-        return IsMapZip;
-    }
-
-    public boolean isIsNeedKey()
-    {
-        return IsNeedKey;
-    }
-
-    public boolean isIsRecommend()
-    {
-        return IsRecommend;
-    }
-
-    public boolean isIsShowWord()
-    {
-        return IsShowWord;
-    }
-
-    public void setAMapZipSize(String s)
-    {
+    public void setAMapZipSize(String s) {
         AMapZipSize = s;
     }
 
-    public void setAMapZipUrl(String s)
-    {
+    public String getAMapZipUrl() {
+        return AMapZipUrl;
+    }
+
+    public void setAMapZipUrl(String s) {
         AMapZipUrl = s;
     }
 
-    public void setAMapZipUrlCreateTime(String s)
-    {
+    public String getAMapZipUrlCreateTime() {
+        return AMapZipUrlCreateTime;
+    }
+
+    public void setAMapZipUrlCreateTime(String s) {
         AMapZipUrlCreateTime = s;
     }
 
-    public void setAddress(String s)
-    {
+    public String getAddress() {
+        return Address;
+    }
+
+    public void setAddress(String s) {
         Address = s;
     }
 
-    public void setAmapZipCreateTime(String s)
-    {
+    public String getAmapZipCreateTime() {
+        return AmapZipCreateTime;
+    }
+
+    public void setAmapZipCreateTime(String s) {
         AmapZipCreateTime = s;
     }
 
-    public void setForeword(String s)
-    {
+    public String getForeword() {
+        return Foreword;
+    }
+
+    public void setForeword(String s) {
         Foreword = s;
     }
 
-    public void setHasQuestion(boolean flag)
-    {
-        HasQuestion = flag;
+    public int getHits() {
+        return Hits;
     }
 
-    public void setHits(int i)
-    {
+    public void setHits(int i) {
         Hits = i;
     }
 
-    public void setHotSeason(String s)
-    {
+    public String getHotSeason() {
+        return HotSeason;
+    }
+
+    public void setHotSeason(String s) {
         HotSeason = s;
     }
 
-    public void setId(int i)
-    {
+    public int getId() {
+        return Id;
+    }
+
+    public void setId(int i) {
         Id = i;
     }
 
-    public void setIntroduction(String s)
-    {
+    public String getIntroduction() {
+        return Introduction;
+    }
+
+    public void setIntroduction(String s) {
         Introduction = s;
     }
 
-    public void setIsAMapZip(boolean flag)
-    {
-        IsAMapZip = flag;
+    public String getMapZipSize() {
+        return MapZipSize;
     }
 
-    public void setIsExitesExperience(boolean flag)
-    {
-        IsExitesExperience = flag;
-    }
-
-    public void setIsHaveProject(boolean flag)
-    {
-        IsHaveProject = flag;
-    }
-
-    public void setIsHot(boolean flag)
-    {
-        IsHot = flag;
-    }
-
-    public void setIsMapZip(boolean flag)
-    {
-        IsMapZip = flag;
-    }
-
-    public void setIsNeedKey(boolean flag)
-    {
-        IsNeedKey = flag;
-    }
-
-    public void setIsRecommend(boolean flag)
-    {
-        IsRecommend = flag;
-    }
-
-    public void setIsShowWord(boolean flag)
-    {
-        IsShowWord = flag;
-    }
-
-    public void setMapZipSize(String s)
-    {
+    public void setMapZipSize(String s) {
         MapZipSize = s;
     }
 
-    public void setMapZipUrl(String s)
-    {
+    public String getMapZipUrl() {
+        return MapZipUrl;
+    }
+
+    public void setMapZipUrl(String s) {
         MapZipUrl = s;
     }
 
-    public void setMp3Name(String s)
-    {
+    public String getMp3Name() {
+        return Mp3Name;
+    }
+
+    public void setMp3Name(String s) {
         Mp3Name = s;
     }
 
-    public void setMp3Url(String s)
-    {
+    public String getMp3Url() {
+        return Mp3Url;
+    }
+
+    public void setMp3Url(String s) {
         Mp3Url = s;
     }
 
-    public void setName(String s)
-    {
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String s) {
         Name = s;
     }
 
-    public void setNewMp3Url(String s)
-    {
+    public String getNewMp3Url() {
+        return NewMp3Url;
+    }
+
+    public void setNewMp3Url(String s) {
         NewMp3Url = s;
     }
 
-    public void setOpenTime(String s)
-    {
+    public String getOpenTime() {
+        return OpenTime;
+    }
+
+    public void setOpenTime(String s) {
         OpenTime = s;
     }
 
-    public void setPic(String s)
-    {
+    public String getPic() {
+        return Pic;
+    }
+
+    public void setPic(String s) {
         Pic = s;
     }
 
-    public void setScaleType(int i)
-    {
+    public int getScaleType() {
+        return ScaleType;
+    }
+
+    public void setScaleType(int i) {
         ScaleType = i;
     }
 
-    public void setShareTemplate(String s)
-    {
+    public String getShareTemplate() {
+        return ShareTemplate;
+    }
+
+    public void setShareTemplate(String s) {
         ShareTemplate = s;
     }
 
-    public void setStarLevel(String s)
-    {
+    public String getStarLevel() {
+        return StarLevel;
+    }
+
+    public void setStarLevel(String s) {
         StarLevel = s;
     }
 
-    public void setTicketsPrice(String s)
-    {
+    public String getTicketsPrice() {
+        return TicketsPrice;
+    }
+
+    public void setTicketsPrice(String s) {
         TicketsPrice = s;
     }
 
-    public void setTourType(String s)
-    {
+    public String getTourType() {
+        return TourType;
+    }
+
+    public void setTourType(String s) {
         TourType = s;
     }
 
-    public void setViewPath(String s)
-    {
+    public String getViewPath() {
+        return ViewPath;
+    }
+
+    public void setViewPath(String s) {
         ViewPath = s;
     }
 
-    public void setX(String s)
-    {
+    public String getX() {
+        return X;
+    }
+
+    public void setX(String s) {
         X = s;
     }
 
-    public void setY(String s)
-    {
+    public String getY() {
+        return Y;
+    }
+
+    public void setY(String s) {
         Y = s;
     }
 
-    public void setZipCreateTime(String s)
-    {
+    public String getZipCreateTime() {
+        return ZipCreateTime;
+    }
+
+    public void setZipCreateTime(String s) {
         ZipCreateTime = s;
     }
 
-    public void setZoom(String s)
-    {
+    public String getZoom() {
+        return Zoom;
+    }
+
+    public void setZoom(String s) {
         Zoom = s;
+    }
+
+    public boolean isHasQuestion() {
+        return HasQuestion;
+    }
+
+    public void setHasQuestion(boolean flag) {
+        HasQuestion = flag;
+    }
+
+    public boolean isIsAMapZip() {
+        return IsAMapZip;
+    }
+
+    public void setIsAMapZip(boolean flag) {
+        IsAMapZip = flag;
+    }
+
+    public boolean isIsExitesExperience() {
+        return IsExitesExperience;
+    }
+
+    public void setIsExitesExperience(boolean flag) {
+        IsExitesExperience = flag;
+    }
+
+    public boolean isIsHaveProject() {
+        return IsHaveProject;
+    }
+
+    public void setIsHaveProject(boolean flag) {
+        IsHaveProject = flag;
+    }
+
+    public boolean isIsHot() {
+        return IsHot;
+    }
+
+    public void setIsHot(boolean flag) {
+        IsHot = flag;
+    }
+
+    public boolean isIsMapZip() {
+        return IsMapZip;
+    }
+
+    public void setIsMapZip(boolean flag) {
+        IsMapZip = flag;
+    }
+
+    public boolean isIsNeedKey() {
+        return IsNeedKey;
+    }
+
+    public void setIsNeedKey(boolean flag) {
+        IsNeedKey = flag;
+    }
+
+    public boolean isIsRecommend() {
+        return IsRecommend;
+    }
+
+    public void setIsRecommend(boolean flag) {
+        IsRecommend = flag;
+    }
+
+    public boolean isIsShowWord() {
+        return IsShowWord;
+    }
+
+    public void setIsShowWord(boolean flag) {
+        IsShowWord = flag;
     }
 }

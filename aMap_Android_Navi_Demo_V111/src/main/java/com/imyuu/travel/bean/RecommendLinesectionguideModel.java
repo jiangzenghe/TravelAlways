@@ -21,6 +21,15 @@ public class RecommendLinesectionguideModel {
     private String recommendrouteDetailname;
     private String recommendrouteName;
 
+    public String getScenicId() {
+        return scenicId;
+    }
+
+    public void setScenicId(String scenicId) {
+        this.scenicId = scenicId;
+    }
+
+    private String scenicId;
     public static final String KEY = "_id";
     public static final String CREATED = "createdTime";
     public static final String RecommendLinesectionguideId = "recommendLinesectionguideId";
@@ -33,6 +42,7 @@ public class RecommendLinesectionguideModel {
     public static final String AbsoluteLatitude = "absoluteLatitude";
     public static final String RecommendrouteDetailname = "recommendrouteDetailname";
     public static final String RecommendrouteName = "recommendrouteName";
+    public static final String ScenicId = "ScenicId";
 
     public Integer getId() {
         return id;

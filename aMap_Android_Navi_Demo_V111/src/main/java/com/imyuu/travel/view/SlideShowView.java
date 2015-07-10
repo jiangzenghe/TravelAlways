@@ -242,13 +242,13 @@ public class SlideShowView extends FrameLayout {
                     break;
                 case 0:// 滑动结束，即切换完毕或者加载完毕
 //                    // 当前为最后一张，此时从右向左滑，则切换到第一张
-//                    if (viewPager.getCurrentItem() == viewPager.getAdapter().getCount() - 1) {
-//                        viewPager.setCurrentItem(0);
-//                    }
-//                    // 当前为第一张，此时从左向右滑，则切换到最后一张
-//                    else if (viewPager.getCurrentItem() == 0) {
-//                        viewPager.setCurrentItem(viewPager.getAdapter().getCount() - 1);
-//                    }
+                    if (viewPager.getCurrentItem() == viewPager.getAdapter().getCount() - 1) {
+                        viewPager.setCurrentItem(0);
+                    }
+                    // 当前为第一张，此时从左向右滑，则切换到最后一张
+                    else if (viewPager.getCurrentItem() == 0) {
+                        viewPager.setCurrentItem(viewPager.getAdapter().getCount() - 1);
+                    }
                     break;
             }
         }
@@ -261,13 +261,13 @@ public class SlideShowView extends FrameLayout {
         @Override
         public void onPageSelected(int pos) {
             currentItem = pos;
-//            for(int i=0;i < dotViewsList.size();i++){
-//                if(i == pos){
-//                    ((View)dotViewsList.get(pos)).setBackgroundResource(R.drawable.dot_black);
-//                }else {
-//                    ((View)dotViewsList.get(i)).setBackgroundResource(R.drawable.dot_white);
-//                }
-//            }
+            for(int i=0;i < dotViewsList.size();i++){
+                if(i == pos){
+                    ((View)dotViewsList.get(pos)).setBackgroundResource(R.drawable.dian_default);
+                }else {
+                    ((View)dotViewsList.get(i)).setBackgroundResource(R.drawable.dian_select);
+                }
+            }
         }
 
     }

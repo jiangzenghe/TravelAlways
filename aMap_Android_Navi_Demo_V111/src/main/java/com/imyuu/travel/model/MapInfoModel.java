@@ -36,6 +36,18 @@ public class MapInfoModel  extends Model{
     @Column(name="filePath")
     private String filePath;
 
+    public String getCanNav() {
+        return canNav;
+    }
+
+    public void setCanNav(String canNav) {
+        this.canNav = canNav;
+    }
+
+    @Expose
+    @Column(name="canNavi")
+    private String canNav;
+
     public String getVersionID() {
         return versionID;
     }

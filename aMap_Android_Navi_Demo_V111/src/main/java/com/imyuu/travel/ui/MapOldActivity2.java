@@ -14,15 +14,14 @@ import com.imyuu.travel.bean.MapVoiceObject;
 import com.imyuu.travel.bean.RecommendLinesectionModel;
 import com.imyuu.travel.bean.RecommendLinesectionguideModel;
 import com.imyuu.travel.bean.ScenicMapOldModel;
-import com.imyuu.travel.bean.ScenicOldModel;
 import com.imyuu.travel.bean.ScenicRecommendLineModel;
 import com.imyuu.travel.database.RecommendLinesectionDataHelper;
 import com.imyuu.travel.database.RecommendLinesectionguideDataHelper;
-import com.imyuu.travel.database.ScenicDataHelper;
 import com.imyuu.travel.database.ScenicMapDataHelper;
 import com.imyuu.travel.database.ScenicRecommendLineDataHelper;
 import com.imyuu.travel.model.ScenicAreaJson;
 import com.imyuu.travel.util.ConstantsOld;
+import com.imyuu.travel.util.LogUtil;
 import com.imyuu.travel.util.MediaHelper;
 import com.imyuu.travel.view.IuuMapWidget;
 import com.inttus.app.annotation.Gum;
@@ -59,6 +58,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+
+/*
+* 一期地图加载和控制
+* */
 @SuppressLint({ "HandlerLeak", "UseSparseArrays" })
 public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 	@Gum(resId = R.id.travel_map)
@@ -70,7 +76,7 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 	@Gum(resId = R.id.horizontalscrollview_map_line)
 	private HorizontalScrollView horizontalscrollviewMapLine;
 	private IuuMapWidget map;
-	private IuuTitleModel title;
+
 	private String scenicId;
 	private ScenicAreaJson scenicModel;
 	String lineId;
@@ -85,7 +91,8 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 	private Layer iuuLayer;
 	private MapIuuObject iuuObject;
 	private MapWidgetHelper helper = new MapWidgetHelper();
-
+    @InjectView(R.id.tx_scenicName)
+    TextView tx_scenicName;
 	private static class MapWidgetHelper implements OnMapTouchListener {
 		MapOldActivity2 self;
 
@@ -144,20 +151,25 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 		currentVoiceObject = voiceObject;
 	}
 
+    @OnClick(R.id.image_cancel_back)
+    public void cacelBackClick() {
+        Intent intent = new Intent(MapOldActivity2.this, MainActivity.class);
+        startActivity(intent);
+    }
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
-		title = new IuuTitleModel(this, R.id.image_search_back,
-				R.id.text_app_title);
+        ButterKnife.inject(this);
 		bindViews();
 		buttonMapMenuChoice.setOnClickListener(this);
 		initData();
 		initMap(savedInstanceState);
 	}
 
-	private void initMap(Bundle savedInstanceState) {
+	private void initMap(Bundle savedInstanceState)
+    {
 		map = new IuuMapWidget(savedInstanceState, this, new File(getPathFor(
 				scenicId, 3)), 12);
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
@@ -171,7 +183,7 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 		OfflineMapConfig config = map.getConfig();
 		config.setPinchZoomEnabled(true); // Sets pinch gesture to zoom
 		config.setFlingEnabled(true); // Sets inertial scrolling of the map
-		config.setMaxZoomLevelLimit(20);
+		config.setMaxZoomLevelLimit(19);
 		config.setZoomBtnsVisible(false); // Sets embedded zoom buttons visible
 
 		MapGraphicsConfig graphicsConfig = config.getGraphicsConfig();
@@ -185,8 +197,10 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 	private void initData() {
 		Intent intent = getIntent();
 		if (intent != null) {
-//			scenicId = intent.getStringExtra(ConstantsOld.SCIENCE_ID_KEY);
-		scenicId = "221";
+
+            ScenicAreaJson  scenic   = (ScenicAreaJson)getIntent().getExtras().getSerializable("scenicInfo");
+            scenicId = scenic.getScenicId();
+            tx_scenicName.setText(scenic.getScenicName());
 		}
 
 		if (TextUtils.isEmpty(scenicId)) {
@@ -450,7 +464,7 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 				@SuppressWarnings("unchecked")
 				@Override
 				public void handleMessage(Message msg) {
-					title.progress(false);
+
 					int code = msg.arg1;
 					if (type == 0) {
 						if (code == -1) {
@@ -458,7 +472,8 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 							finish();
 						} else {
 							scenicModel = (ScenicAreaJson) msg.obj;
-							title.setTitle(scenicModel.getScenicName());
+                            LogUtil.e("maxy", scenicModel.getScenicmapMaxy()+"");
+
 						}
 					} else if (type == 1) {
 						if (code == 0) {
@@ -498,7 +513,7 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 
 	private Thread getThread(final int type) {
 		getHandler(type);
-		title.progress(true);
+
 		return new Thread() {
 
 			@Override
@@ -507,8 +522,10 @@ public class MapOldActivity2 extends TravelActvity implements OnClickListener {
 				int code = -1;
 				Object result = null;
 				if (type == 0) {
-					result = ScenicAreaJson.load(scenicId);
-					code = 0;
+
+                    result = ScenicAreaJson.load(scenicId);
+                    code = 0;
+
 				} else if (type == 1) {
 					ScenicRecommendLineDataHelper scenicRecommendLineDataHelper = new ScenicRecommendLineDataHelper(
 							MapOldActivity2.this);

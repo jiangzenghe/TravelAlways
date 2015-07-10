@@ -41,7 +41,8 @@ public class RecommendLinesectionguideSqliteHelper extends IuuSQLiteOpenHelper {
                         RecommendLinesectionguideModel.AbsoluteLatitude + " double, " +
                         RecommendLinesectionguideModel.RecommendrouteDetailid + " varchar," +
                         RecommendLinesectionguideModel.RecommendrouteDetailname + " varchar," +
-                        RecommendLinesectionguideModel.RecommendrouteName + " varchar " +
+                        RecommendLinesectionguideModel.RecommendrouteName + " varchar, " +
+                        RecommendLinesectionguideModel.ScenicId + " varchar" +
                         ")"
         );
         super.onCreate(db);

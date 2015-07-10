@@ -47,7 +47,7 @@ public class RecommendLinesectionguideDataHelper {
         values.put(RecommendLinesectionguideModel.RecommendrouteDetailid, model.getRecommendrouteDetailid());
         values.put(RecommendLinesectionguideModel.RecommendrouteDetailname, model.getRecommendrouteDetailname());
         values.put(RecommendLinesectionguideModel.RecommendrouteName, model.getRecommendrouteName());
-
+        values.put(RecommendLinesectionguideModel.ScenicId, model.getScenicId());
         values.put(RecommendLinesectionguideModel.CREATED, System.currentTimeMillis());
 
         Long uid = db.insert(RecommendLinesectionguideSqliteHelper.TB_NAME, RecommendLinesectionguideModel.KEY, values);
@@ -119,6 +119,12 @@ public class RecommendLinesectionguideDataHelper {
     public Integer deleteByRouteId(String routeId) {
         String[] args = {routeId};
         return db.delete(RecommendLinesectionguideSqliteHelper.TB_NAME, RecommendLinesectionguideModel.RecommendrouteId + "=?", args);
+    }
+
+    //删除信息
+    public Integer deleteByScenicId(String scenicId) {
+        String[] args = {scenicId};
+        return db.delete(RecommendLinesectionguideSqliteHelper.TB_NAME, RecommendLinesectionguideModel.ScenicId + "=?", args);
     }
 
     //删除信息
